@@ -12,4 +12,5 @@ This is a hackathon repo. Speed matters more than polish, but the tracking docs 
 
 - Never commit secrets. Keys go in `.env`; add the variable name to `.env.example`.
 - Small commits with plain messages ("add upload endpoint", not "wip").
+- No PRs: commit and push straight to `main` (pull/rebase first). If a change goes against the rest of the repo (a recorded decision, a convention here, the direction in the docs), flag it to the person you're working with before pushing.
 - Prefer the simplest thing that demos well. Ask before adding a big dependency.

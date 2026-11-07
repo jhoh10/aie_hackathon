@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Push straight to main, no PRs
+
+- **Chose:** everyone commits and pushes directly to `main`; changes that go against the rest of the repo get flagged before pushing.
+- **Over:** feature branches with PR review.
+- **Because:** speed matters more than process at a hackathon, and the flag-first rule keeps the team aligned on anything surprising.
+- **Revisit if:** we keep clobbering each other's work on main.
+
 ## 2026-11-07: Build idea 1, the verification-first harness
 
 - **Chose:** Idea 1: talk through the tests before writing the code. The agent and the engineer agree on inputs, outputs and the test plan first, then the agent builds until the approved tests pass (verification-first-harness/).
