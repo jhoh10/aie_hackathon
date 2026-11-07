@@ -16,7 +16,7 @@ Team Trust Issues at the AIE Code Summit 2026 Hackathon.
 ## The idea
 
 - **Problem:** AI writes more code than anyone can read, so reviewing it line by line doesn't scale.
-- **What we're building:** a verification-first harness for coding agents. The engineer and the agent agree on inputs, outputs and a test plan before any code is written, and the agent isn't done until the approved tests pass. Details in [verification-first-harness/](verification-first-harness/README.md).
+- **What we're building:** a verification-first harness for coding agents. The engineer and the agent agree on claims (what must be true, in plain language) and the checks that prove them before any code is written, and the agent isn't done until every approved claim is proven. Details in [verification-first-harness/](verification-first-harness/README.md).
 - **Demo moment:** _The one thing judges should see that makes them go "oh nice"._
 
 We picked idea 1 from [docs/ideas.md](docs/ideas.md).

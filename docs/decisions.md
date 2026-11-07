@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: The engineer approves claims, not tests
+
+- **Chose:** the one human gate approves **claims**: plain-language behaviours that must be true. Tests, screenshots, evals and the rest are the checks under each claim, shown as evidence. Pitch is now "The engineer approves the claims, not the code." Harness docs, templates and the README updated to match. Agreed with DT.
+- **Over:** approving a table of tests directly.
+- **Because:** claims mean the same thing at any task size, so a feature doesn't turn into 40 unit tests to approve. They are also exactly what the verifier already takes (verifier/docs/claims-contract.md), so the harness and the verifier now share one hand-off.
+- **Revisit if:** engineers can't judge a claim without opening its checks every time.
+
 ## 2026-11-07: The harness display scales by grouping claims, not by mode
 
 - **Chose:** one tree for every task (feature → optional area → claim → evidence). The engineer approves claims; tests sit under them as evidence. How far the tree opens by default depends on the number of claims, and failures always open down to the failing test. Details in verification-first-harness/display-scaling.md.

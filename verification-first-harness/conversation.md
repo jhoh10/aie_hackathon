@@ -2,7 +2,7 @@
 
 Every session goes through five phases in order. The agent may loop back (for example from D to C when the engineer edits the plan), but never skips forward. Code is only written in phase E.
 
-The engineer approves **one thing: the test and verification plan**. The code and the architecture are the agent's call; it doesn't ask for approval on them.
+The engineer approves **one thing: the claims** (what must be true) and the checks that will prove them. The code and the architecture are the agent's call; it doesn't ask for approval on them.
 
 Running example used below: **"Add a password-reset flow"** to an existing web app.
 
@@ -66,31 +66,34 @@ Running example used below: **"Add a password-reset flow"** to an existing web a
 
 ## Phase C: Expand into the testing approach
 
-**Goal:** turn the brief and findings into a complete, plain-language **test plan**. This is the heart of the harness.
+**Goal:** turn the brief and findings into a complete set of plain-language **claims**, each with the **checks** that will prove it. This is the heart of the harness.
 
 **The agent:**
 - Walks through the [testing catalog](testing-catalog.md) and considers **every category**, not just unit tests. For each one it decides: include, skip (with a one-line reason), or ask.
-- Writes each check as one row: *type, what's tested, what it proves, how it runs*. No test code in this phase.
-- Covers the happy path, each edge case from phase A, and each "must not change" item (as regression checks).
+- Writes each behaviour as one **claim**: an input and an output, specific enough that a test could disprove it, with no implementation detail.
+- Lists the **checks** under each claim: *type, what's tested, how it runs*. A claim can have several checks. No test code in this phase.
+- Covers the happy path, each edge case from phase A, and each "must not change" item (as `no_behavior_change` claims).
 - Marks which checks are **new** and which **already exist** and must keep passing.
 - Estimates cost: how long the suite will take and any new dependencies.
 - Flags anything it **can't** verify automatically (for example "the email looks good in Outlook") so a human can check it by hand.
 
 **What the engineer sees** (full template in [test-plan-template.md](test-plan-template.md#2-test-plan)):
 
-| # | Type | Check | Proves | Runs with |
-| --- | --- | --- | --- | --- |
-| 1 | Unit | Token expires after 30 min | Old links are rejected | Jest |
-| 2 | Unit | Weak password is refused | Password policy holds | Jest |
-| 3 | Integration | Reset email is queued exactly once | No duplicate emails | Jest + test DB |
-| 4 | Integration | Unknown email returns the same response as a known one | Accounts aren't revealed | Jest + test DB |
-| 5 | E2E | Request → email → new password → sign in | Whole flow works in a browser | Playwright |
-| 6 | E2E | Reused link shows an error | Links are single-use | Playwright |
-| 7 | Visual | Reset page matches baseline, desktop + mobile | No layout regressions | Playwright screenshots |
-| 8 | Accessibility | Reset form has no axe violations | Usable with a screen reader | axe-core |
-| 9 | Security | 10 requests/min per IP limit on reset | Can't be used to spam | Jest + test DB |
-| 10 | Regression | Existing 40 unit tests still pass | Nothing else broke | Jest |
-| — | Manual | Email renders well in Gmail and Outlook | Looks right to real users | Human, before release |
+| # | Claim | Checks | Runs with |
+| --- | --- | --- | --- |
+| c1 | A reset link older than 30 minutes is rejected | Unit: token expires after 30 min | Jest |
+| c2 | A weak new password is refused | Unit: password policy | Jest |
+| c3 | Asking for a reset sends exactly one email | Integration: email queued once | Jest + test DB |
+| c4 | The response doesn't reveal whether an account exists | Integration: unknown and known email get the same response | Jest + test DB |
+| c5 | A user can reset their password and sign in | E2E: request → email → new password → sign in | Playwright |
+| c6 | A reset link works only once | E2E: reused link shows an error | Playwright |
+| c7 | The reset page looks right on desktop and mobile | Visual: matches baseline at both sizes | Playwright screenshots |
+| c8 | The reset form works with a screen reader | Accessibility: no axe violations | axe-core |
+| c9 | One IP can request at most 10 resets a minute | Security: 11th request is refused | Jest + test DB |
+| c10 | Everything that worked before still works (`no_behavior_change`) | Regression: existing 40 unit tests | Jest |
+| — | The email looks right in Gmail and Outlook | Manual | Human, before release |
+
+For a big task the claims get grouped into areas and the checks fold under each claim; see [display-scaling.md](display-scaling.md).
 
 Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time), cross-browser beyond Chromium (ask if needed).*
 
@@ -103,39 +106,39 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 **Goal:** the engineer approves exactly what "done" means and how it will be verified. This is **the only gate** in the session.
 
 **The agent:**
-- Shows the table, the skipped list and the manual checks.
+- Shows the claims with their checks, the skipped list and the manual checks.
 - Asks one direct question: *Approve, or edit?*
-- Applies edits (add, remove, change a row) and shows the plan again. Loops until approved.
+- Applies edits (add, remove or change a claim or a check) and shows the plan again. Loops until approved.
 - Saves the approved plan to `.verify/plan.md` with who approved it and when.
 
 **The engineer can:**
 - Approve as is.
-- Edit rows ("add an iPhone screenshot", "drop the rate-limit test, the gateway does that").
+- Edit claims or checks ("add an iPhone screenshot to c7", "drop c9, the gateway does that").
 - Promote a skipped check back in.
-- Mark a row as "nice to have" (runs, but doesn't block done).
-- Add a check for anything they care about in *how* it's built, such as "no new dependencies", "p95 under 200 ms" or "uses the existing `mailer.ts`". This is the only way the engineer steers the design: as a verifiable check, not a design review.
+- Mark a claim as "nice to have" (runs, but doesn't block done).
+- Add a claim for anything they care about in *how* it's built, such as "no new dependencies", "p95 under 200 ms" or "uses the existing `mailer.ts`". This is the only way the engineer steers the design: as a verifiable check, not a design review.
 
 **What the agent does not do here:** show or ask about the architecture. It doesn't need the engineer's sign-off on components, libraries or file layout.
 
-**Exit criteria:** the engineer approves the test plan. No code exists yet.
+**Exit criteria:** the engineer approves the claims. No code exists yet.
 
-> **Agent:** Here's the plan: 10 automated checks and 1 manual one. Approve, or edit?
+> **Agent:** Here's the plan: 10 claims with automated checks and 1 manual one. Approve, or edit?
 >
 > **Engineer:** Add the visual check on an iPhone viewport too. Otherwise approve.
 >
-> **Agent:** Updated row 7 to desktop + iPhone 15. Saved to `.verify/plan.md` as approved. Starting the build.
+> **Agent:** Updated c7's check to desktop + iPhone 15. Saved to `.verify/plan.md` as approved. Starting the build.
 
 ---
 
 ## Phase E: Implement the code and the tests, and make them pass
 
-**Goal:** the agent builds until every approved check passes, then proves it.
+**Goal:** the agent builds until every approved claim is proven, then shows the evidence.
 
 **Order of work:**
-1. **Choose the design.** The agent picks the code and architecture it thinks are best, following the codebase's existing patterns from phase B. No approval needed. It writes short **design notes** (components, the main choices and why, and which plan rows cover each component) that go into the verification report.
-2. **Check coverage of its own design.** If a component it plans to build isn't covered by any approved row, the agent adds a check for it, marked **agent-added**. The agent may add checks freely, but never remove or weaken an approved one.
-3. **Write the tests first**, from the approved plan, one test (or test group) per row. Run them and confirm they **fail** for the right reason (the feature doesn't exist yet). A test that passes before the feature exists is testing nothing.
-4. **Lock the approved tests.** The agent records a hash of each test file in `.verify/plan.md`. From here on it may not weaken an assertion, skip a test or delete a row without asking.
+1. **Choose the design.** The agent picks the code and architecture it thinks are best, following the codebase's existing patterns from phase B. No approval needed. It writes short **design notes** (components, the main choices and why, and which claims cover each component) that go into the verification report.
+2. **Check coverage of its own design.** If a component it plans to build isn't covered by any approved claim, the agent adds a claim for it, marked **agent-added**. The agent may add claims and checks freely, but never remove or weaken an approved one.
+3. **Write the tests first**, from the approved plan, one test (or test group) per check. Run them and confirm they **fail** for the right reason (the feature doesn't exist yet). A test that passes before the feature exists is testing nothing.
+4. **Lock the approved tests.** The agent records a hash of each test file in `.verify/plan.md`. From here on it may not weaken an assertion, skip a test or drop a claim without asking.
 5. **Implement** the feature.
 6. **Run the full suite**, including the existing regression tests.
 7. **Loop:** read failures, fix the *code*, re-run. Repeat until green. The agent may change its own design along the way if that's what it takes; it just updates the design notes.
@@ -147,9 +150,9 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 - Flaky test detection: re-run a failing test 3 times; if results differ, report it as flaky instead of "fixing" it.
 - Visual tests: first run creates baselines; the engineer approves the baseline screenshots once.
 
-**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every row with pass/fail, how many attempts it took, links to screenshots and logs, any agent-added checks, the manual checks still pending, the design notes and the diff summary. The design notes are there to explain, not for approval. This report goes in the PR description, so the **reviewer checks the plan and the evidence, not every line of code.**
+**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every claim with pass/fail and the checks under it, how many attempts it took, links to screenshots and logs, any agent-added claims, the manual checks still pending, the design notes and the diff summary. The design notes are there to explain, not for approval. This report goes in the PR description, so the **reviewer checks the claims and the evidence, not every line of code.**
 
-> **Agent:** Done. 10/10 approved checks pass, plus 1 I added for the token cleanup job (row 6 failed twice: the token wasn't being cleared after use; fixed in `token.ts`). Design: a stateless token service with hashed tokens in the `users` table; notes in the report. Visual baselines for desktop and iPhone are attached for your approval. One manual check is pending: email rendering in Outlook. Report saved to `.verify/report.md`.
+> **Agent:** Done. 10/10 approved claims proven, plus 1 I added for the token cleanup job (c6 failed twice: the token wasn't being cleared after use; fixed in `token.ts`). Design: a stateless token service with hashed tokens in the `users` table; notes in the report. Visual baselines for desktop and iPhone are attached for your approval. One manual check is pending: email rendering in Outlook. Report saved to `.verify/report.md`.
 
 ---
 
