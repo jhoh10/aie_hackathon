@@ -1,0 +1,22 @@
+{
+  "claims": [
+    {
+      "id": "c1",
+      "text": "A valid auth token sent in the `Authorization` header with the prefix `bearer` in any letter case (for example `bearer `, `BEARER ` or `bEaReR `) authenticates the request the same as the prefix `Bearer `.",
+      "kind": "behavior_change",
+      "group": "Auth header"
+    },
+    {
+      "id": "c2",
+      "text": "A valid auth token sent with the exact prefix `Bearer `, or with no prefix at all, still authenticates the request.",
+      "kind": "no_behavior_change",
+      "group": "Auth header"
+    },
+    {
+      "id": "c3",
+      "text": "A request whose `Authorization` header carries an invalid token is still not authenticated, whatever the letter case of its prefix.",
+      "kind": "no_behavior_change",
+      "group": "Auth header"
+    }
+  ]
+}

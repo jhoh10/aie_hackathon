@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- `upstream/` is a read-only copy of the team repo (jhoh10/aie_hackathon); the app imports example plans from it with `?raw`, so refresh it from GitHub rather than editing it here.
+- Claims review data and the `.verify/plan.md` parser live in `src/lib/review/`; UI stays in `src/components/review/` so the parser can be tested without the page.
