@@ -43,7 +43,7 @@ Updated 3:40 PM. **Open work is in "Open: pick one up", most urgent first.** Put
 ### Open: pick one up
 
 1. [x] [JH] **Demo scenario picked (3:58 PM): A, then D, with C as the fallback.** A: the developer harness on `idchars`. Default Claude guesses its own list of forbidden id characters and fails the hidden tests; our harness shows a plan, the engineer adds one line, it passes (results in verification-first-developer-harness/evaluation/pocketbase/results/). D: the reviewer packet on pylint-8898 (`verification-first-reviewer-harness/examples/pylint-8898/review.html`). C: `h-bearer` plan-to-PASS if anything breaks. Options and reasoning: docs/decisions.md and the "Demo scenario options" doc (ask JH to share it).
-2. [ ] **Write the demo script** in docs/submission.md, 3 minutes: problem (15 s) → A, default vs harness on `idchars` (60 s) → D, the review packet (45 s) → numbers and what's next (30 s). Due at the 4:00 PM freeze.
+2. [x] [JH] **Demo script written** in docs/submission.md: timed lines, stage setup (4 tabs), fallback, and Q&A answers, including the honest ones (AI review, simulated reviewer, cost). Rehearse it twice.
 3. [ ] **Slides.** SB's 6-slide deck and diagrams are in presentation/. Add the numbers slide from JH and a "what's next" slide (Lean from MA, extended split, developer-side eval).
 4. [ ] **One-minute demo video** as a backup in case the live demo fails: a screen capture of the `idchars` default vs harness runs works for this. Due 4:30 PM.
 5. [ ] **README pitch, team and links**, then **submit the form** (every member listed, repo public and readable by judges). Due 4:45 PM. Check the README and pitch say "developer harness" and "reviewer harness" consistently.
