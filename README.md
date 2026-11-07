@@ -27,7 +27,7 @@ Code review assumes a person reads every line. With agents writing the code, tha
 We move the human's effort to the start, where it's cheap, and replace line-by-line reading with executed evidence.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Engineer approves<br/>3–4 plain-language claims"] --> B["Agent writes the code<br/>(harness)"]
     B --> C["Verifier writes its own checks<br/>from the claims, blind to the code"]
     C --> D["Runs them on the old and new<br/>versions in a sealed sandbox"]
