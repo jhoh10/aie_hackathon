@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Reviewer harness scope: review the change, not the code
+
+- **Chose:** a review packet generated from the diff after the build: what the PR does (before → after), its tests as inputs → outputs, and its architecture changes, kept to about 300 words (at most 3 one-line behaviour rows plus one row for every behaviour no test covers, marked **No test**). The reviewer approves or critiques packet items, and blocking comments go back to the developer harness as claim edits (verification-first-reviewer-harness/).
+- **Over:** reviewing the raw diff, or relying only on what already serves the reviewer: the claims review page (before the build: are these the right claims?) and the verifier verdict (are the approved claims proven?). Neither looks for behaviour beyond the claims.
+- **Because:** on pylint-8898 a run passed all 11 approved checks but also changed `( )` comma handling, which no check covered. That is what failed the real hidden test. The packet marked it **No test**, in about 30 seconds for about $0.20.
+- **Revisit if:** packets miss real problems that a raw-diff review would catch, or reviewers still open the diff for most items.
+
 ## 2026-11-07: Demo in Claude Code; Meta shows up as the independent verifier
 
 - **Chose:** keep building and demoing the developer harness in Claude Code. Meta's models do the verifying: the verifier's claims, claim-test, probe and triage roles call Muse Spark through the Meta Model API.

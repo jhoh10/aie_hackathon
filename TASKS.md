@@ -29,7 +29,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 ## Now
 
-- [ ] [DT] Reviewer harness: scope it first in two sentences in docs/decisions.md. It has to say what it adds over what already serves the reviewer (claims review page `ui/plan-review.html`, the verifier's PASS / BLOCK / NEEDS_HUMAN, the PR status and page) so we don't build those twice. Likely shape: a reviewer gets a PR plus its claims and is walked through the verdict and the evidence, opening only what failed. Checkpoint at 3:30 PM.
+- [ ] [DT] Reviewer harness: scoped in docs/decisions.md and first version built (verification-first-reviewer-harness/, with a real pylint-8898 example). Next: show the packet on the verifier PR page next to the verdict, and measure it against a raw-diff review. Checkpoint at 3:30 PM.
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue, blocks demo materials**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
 - [ ] **Everyone: claim the $100 Meta credits before 3:00 PM PT** (form on the CV details page; needs billing set up at dev.meta.ai and your Team ID, see resources/sponsors.md). Billing setup is likely also the fix for our 402 `billing_not_configured`. Without it the Meta prize story and the "real model" claim are weak.
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
