@@ -177,7 +177,7 @@ There is no CLI. The harness is a way of running a coding agent: [verification-f
 
 - Hackathon page: https://cerebralvalley.ai/e/aie-code-2026-hackathon (schedule, rules and prizes in [resources/event.md](resources/event.md))
 - Sponsor docs: [resources/sponsors.md](resources/sponsors.md)
-- Slides: https://claude.ai/artifact/7xuTH5ZMozXnB3w5Wa3WRW
-- Results diagrams: https://claude.ai/artifact/7cH4e89QAiXjvaW2zWs3Ci
+- Slides: [presentation/slides.pdf](presentation/slides.pdf) (6 slides, opens on GitHub; sources and the editable original in [presentation/](presentation/README.md))
+- Results: [verifier/results/summary.md](verifier/results/summary.md) (all 20 benchmark cases; the results slide is the last page of the slides)
 - Submission form:
 - Demo video:
