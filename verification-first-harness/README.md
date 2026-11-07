@@ -1,6 +1,6 @@
 # Verification-first harness
 
-Expands **Idea 1** from [../ideas.md](../ideas.md): talk through the tests before writing the code.
+Expands **Idea 1** from [docs/ideas.md](../docs/ideas.md): talk through the tests before writing the code.
 
 A harness for coding agents (Claude Code or similar) that changes the order of work. Before any code is written, the agent and the engineer agree on **what "done" looks like and how it will be proven**. Then the agent builds until every agreed check passes.
 
