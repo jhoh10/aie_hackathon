@@ -1,4 +1,4 @@
-// node src/metrics.ts <dev|holdout>
+// node src/metrics.ts <dev|holdout|extended>
 // Turns raw benchmark results into the numbers we show: errors caught, defects that would merge,
 // false alarms, tokens and developer effort. Definitions are in docs/metrics.md.
 // `score` is pure so it can be tested and recomputed from saved results.

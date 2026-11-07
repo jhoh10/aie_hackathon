@@ -1,4 +1,4 @@
-// node src/benchmark.ts <dev|holdout> <verifier|agent_tests|review|ci|sim|all>
+// node src/benchmark.ts <dev|holdout|extended> <verifier|agent_tests|review|ci|sim|all>
 // Runs the same cases through each approach and records raw results, including failures.
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';

@@ -11,7 +11,7 @@ const git = (args: string[], opts: any = {}) => execFileSync('git', args, { maxB
 const rp = (r: string) => git(['-C', REPO, 'rev-parse', r]);
 const IDENT = ['-c', 'user.name=case-builder', '-c', 'user.email=case-builder@vouch.test', '-c', 'commit.gpgsign=false'];
 
-export interface Case { id: string; split: 'dev' | 'holdout'; group: 'honest' | 'revert' | 'injected' | 'gaming'; expected: 'good' | 'bad'; base: string; head: string; issue: string; prTitle: string; prBody: string; defect?: string; }
+export interface Case { id: string; split: 'dev' | 'holdout' | 'extended'; group: 'honest' | 'revert' | 'injected' | 'gaming'; expected: 'good' | 'bad'; base: string; head: string; issue: string; prTitle: string; prBody: string; defect?: string; }
 
 function commitPatch(id: string, base: string, patch: string, reverse: boolean): string {
   const branch = `case/${id}`;

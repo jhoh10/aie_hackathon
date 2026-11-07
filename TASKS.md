@@ -35,6 +35,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
 - [ ] [SB] Verifier: test the PR page and GitHub status end to end (not tried yet)
+- [ ] [SB, JH] Run the 19 new `extended` cases (verifier/cases/README.md): `node src/benchmark.ts extended`, after the holdout run. CI step done (19/19 pass, reverts included), so run `verifier`, `agent_tests`, `review`, `sim`. Report extended next to holdout if it finishes by 3:30 PM.
 - [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo. Candidates: developer harness lean vs default (cost $0.42 vs $0.74, time 1.3 vs 2.5 min, words read), BLOCK on the revert cases, and reviewer load from `simulate.ts` (claims plus verifier summary vs reading the diff). That last one is the reviewer-experience number and can run before the reviewer harness exists.
 - [ ] [MA] Research Lean for software verification. Decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 

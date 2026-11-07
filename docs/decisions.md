@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Grow the benchmark to 39 cases in a separate `extended` split
+
+- **Chose:** 19 more PocketBase cases (10 real upstream fixes, 9 reverts), mostly built as fix/revert pairs from the same commit, in a new `extended` split. 18 good and 21 bad in total.
+- **Over:** staying at 20, or adding them to holdout.
+- **Because:** at 20 cases one case moves a rate by 5 to 12 points, and 8 good cases can't pin down the false-alarm rate (1 in 8 has a 95% interval of about 2–47%). Pairs give good and bad cases of the same difficulty, so a catch can't just be "flags hard diffs". A separate split leaves the dev/holdout split as it was fixed before any run, and leaves Sebastian's holdout run untouched.
+- **Revisit if:** the extended run doesn't finish by the 3:30 PM numbers checkpoint. Then report dev and holdout only and mention extended as in progress.
+
 ## 2026-11-07: Reviewer harness scope: review the change, not the code
 
 - **Chose:** a review packet generated from the diff after the build: what the PR does (before → after), its tests as inputs → outputs, and its architecture changes, kept to about 300 words (at most 3 one-line behaviour rows plus one row for every behaviour no test covers, marked **No test**). The reviewer approves or critiques packet items, and blocking comments go back to the developer harness as claim edits (verification-first-reviewer-harness/).

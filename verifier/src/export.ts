@@ -5,7 +5,7 @@ import { ROOT } from './sandbox.ts';
 import { decide } from './verdict.ts';
 const V: any = { PASS: 'pass', BLOCK: 'stop', NEEDS_HUMAN: 'human' };
 const rows: any[] = [];
-for (const split of ['dev', 'holdout']) {
+for (const split of ['dev', 'holdout', 'extended']) {
   const dir = join(ROOT, '.work/results', split);
   const load = (n: string) => (existsSync(join(dir, n + '.json')) ? JSON.parse(readFileSync(join(dir, n + '.json'), 'utf8')) : {});
   const cases = existsSync(join(dir, 'cases.json')) ? JSON.parse(readFileSync(join(dir, 'cases.json'), 'utf8')) : [];
