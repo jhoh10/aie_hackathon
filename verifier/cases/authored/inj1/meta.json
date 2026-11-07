@@ -1,0 +1,8 @@
+{
+  "id": "inj1",
+  "fix_commit": "f8687567",
+  "issue": "Fixed `number` settings validator to not ignore 0 `max` value.",
+  "pr_title": "Fix number field validators ignoring zero values",
+  "pr_body": "`NumberField.ValidateSettings` used `validation.Min(*f.Min)` for the max option. ozzo-validation threshold rules skip \"empty\" values, so `max: 0` was never compared against `min` and e.g. `min: 5, max: 0` was accepted.\n\nChanges:\n- Replaced the max/min cross check with a small `checkMaxNotLessThanMin` rule that doesn't skip zero values.\n- `ValidateValue` had the same \"zero is ignored\" shortcut: a `0` value returned early and skipped the min/max checks. The early return is removed so the configured bounds are applied consistently (the `Required` check for zero is kept as before).\n\n`go test ./apis/ ./core/` passes.",
+  "group": "injected"
+}

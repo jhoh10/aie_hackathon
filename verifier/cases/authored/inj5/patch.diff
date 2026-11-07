@@ -1,0 +1,15 @@
+diff --git a/core/collection_record_table_sync.go b/core/collection_record_table_sync.go
+index 35eda70f..d59e2021 100644
+--- a/core/collection_record_table_sync.go
++++ b/core/collection_record_table_sync.go
+@@ -338,6 +338,10 @@ func createCollectionIndexes(app App, collection *Collection) error {
+ 			// ensure that the index is always for the current collection
+ 			parsed.TableName = collection.Name
+ 
++			// the existing collection indexes may have been persisted without
++			// table name and therefore not removed by dropCollectionIndexes
++			parsed.Optional = true
++
+ 			if !parsed.IsValid() {
+ 				errs[strconv.Itoa(i)] = validation.NewError(
+ 					"validation_invalid_index_expression",

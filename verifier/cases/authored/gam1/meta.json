@@ -1,0 +1,8 @@
+{
+  "id": "gam1",
+  "fix_commit": "acd12ce9",
+  "issue": "Fixed legacy identity field priority check when a username is a valid email address. Usernames that look like emails fail password authentication.",
+  "pr_title": "Fix password auth for email-like usernames",
+  "pr_body": "When the identity looked like an email, the password auth only searched the `email` field (if configured) and didn't fall back to the remaining identity fields, so usernames that look like email addresses failed to authenticate.\n\nAdded a fallback that searches the other identity fields for email-like identities that cannot be real mailboxes (reserved/sandbox domains), so these usernames authenticate normally while regular email lookups keep their priority.\n\n`go test ./apis/ ./core/` passes.",
+  "group": "gaming"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "inj5",
+  "fix_commit": "8d7e3abb",
+  "issue": "Fixed indexes collection update error: updating a collection fails with 'index already exists'.",
+  "pr_title": "Fix \"index already exists\" error on collection update",
+  "pr_body": "Some collections have indexes persisted without a table name (e.g. ``CREATE INDEX `idx` ON `` (`title`)``). `dropCollectionIndexes` skips such definitions because `dbutils.ParseIndex(...).IsValid()` requires a table name, so on the next collection update the recreate step fails with `index ... already exists`.\n\n`createCollectionIndexes` now builds the statements as `CREATE INDEX IF NOT EXISTS`, which makes the index sync tolerant to such leftover definitions.\n\n`go test ./apis/ ./core/` passes.",
+  "group": "injected"
+}

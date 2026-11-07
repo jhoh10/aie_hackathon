@@ -1,0 +1,8 @@
+{
+  "id": "inj4",
+  "fix_commit": "44f817e7",
+  "issue": "Fixed nested cascade delete of self-referenced relation records.",
+  "pr_title": "Fix nested cascade delete of self-referenced relation records",
+  "pr_body": "When a collection has a self-referencing multiple relation field with cascade delete (e.g. `a <- b`, `c -> [a, b]`), deleting `a` loaded `b` and `c` in a single batch. Deleting `b` cascaded to `c` (removing the `b` reference), but afterwards the already loaded stale `c` record was processed and saved back, leaving `c` alive with a reference to the deleted `b`.\n\nThe batch of referencing records is now processed newest first, so the nested references are resolved before their parents and no stale record overwrites the nested changes.\n\n`go test ./apis/ ./core/` passes.",
+  "group": "injected"
+}

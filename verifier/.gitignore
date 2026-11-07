@@ -1,3 +1,4 @@
-.work/
+.work
 scratch/
 node_modules/
+cases/authored/*/secret.md

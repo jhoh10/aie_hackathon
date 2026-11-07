@@ -45,3 +45,7 @@ test('reach counts only changed statements that were executed', () => {
   const r = reachOfChanged(diff, profile);
   assert.equal(r.reached, 3); assert.equal(r.total, 5); assert.deepEqual(r.unreached, [{ file: 'x/a.go', line: 12 }]);
 });
+
+test('an undeclared minor change is noted, not escalated', () => {
+  assert.equal(decide({ claims: [{ id: 'c1', result: 'proven' }], probes: [{ id: 'p', changed: true, triage: 'undeclared', severity: 'minor' }], reach: { reached: 1, total: 1 }, minReach: 0.3 }).verdict, 'PASS');
+});

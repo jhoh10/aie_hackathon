@@ -3,11 +3,11 @@
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadCases, REPO, type Case } from './cases.ts';
-import { verify, diffFor } from './pipeline.ts';
+import { verify, diffFor, fullDiffFor } from './pipeline.ts';
 import { modelFromEnv, Pending } from './model.ts';
 import * as P from './prompts.ts';
 import { simPlanning, simReviewDiff, simReviewVerdict } from './simulate.ts';
-import { ROOT, buildImage, ensureNetwork, runScenario, pool, sh, goVersion } from './sandbox.ts';
+import { ROOT, buildImage, ensureNetwork, runScenario, pool, sh, goExperiment } from './sandbox.ts';
 
 const [split, what = 'all'] = process.argv.slice(2);
 const OUT = join(ROOT, '.work/results', split); mkdirSync(OUT, { recursive: true });
@@ -24,7 +24,7 @@ async function runVerifier(c: Case) {
 }
 async function runAgentTests(c: Case) {
   const diff = diffFor(REPO, c.base, c.head);
-  const { scenarios } = await model.json('agent_tests', c.id, P.writeAgentTests(c.issue, diff));
+  const { scenarios } = await model.json('agent_tests', c.id, P.writeAgentTests(c.issue, fullDiffFor(REPO, c.base, c.head)));
   await ensureNetwork();
   const image = await buildImage(REPO, c.head);
   const runs = await pool(scenarios, 4, (s: any) => runScenario({ image, scenario: s }));
@@ -33,7 +33,7 @@ async function runAgentTests(c: Case) {
 }
 async function runReview(c: Case) {
   const diff = diffFor(REPO, c.base, c.head);
-  return { id: c.id, ...(await model.json('review', c.id, P.reviewDiff(c.issue, c.prTitle, c.prBody, diff))) };
+  return { id: c.id, ...(await model.json('review', c.id, P.reviewDiff(c.issue, c.prTitle, c.prBody, fullDiffFor(REPO, c.base, c.head)))) };
 }
 // Existing CI: the project's own Go tests at the head commit, for the packages the PR touches.
 async function runCi(c: Case) {
@@ -44,7 +44,7 @@ async function runCi(c: Case) {
   if (!pkgs.length) return { id: c.id, pass: true, pkgs, note: 'no tested packages touched' };
   const started = Date.now();
   const script = `mkdir -p /s && git -C /repo archive ${c.head} | tar -x -C /s && cd /s && CGO_ENABLED=0 go test ${pkgs.join(' ')} 2>&1 | tail -15`;
-  const out = await sh('docker', ['run', '--rm', '-v', `${REPO}:/repo:ro`, '-v', 'vouch-gomod:/go/pkg/mod', '-v', 'vouch-gocache:/root/.cache/go-build', '-e', 'GOFLAGS=-buildvcs=false', `golang:${await goVersion(REPO, c.head)}-alpine`, 'sh', '-c', `apk add -q git >/dev/null; git config --global --add safe.directory '*'; ${script}`]);
+  const out = await sh('docker', ['run', '--rm', '-v', `${REPO}:/repo:ro`, '-v', 'vouch-gomod:/go/pkg/mod', '-v', 'vouch-gocache:/root/.cache/go-build', '-e', 'GOFLAGS=-buildvcs=false', '-e', `GOEXPERIMENT=${await goExperiment(REPO, c.head)}`, 'golang:1.27-alpine', 'sh', '-c', `apk add -q git >/dev/null; git config --global --add safe.directory '*'; ${script}`]);
   const r = { id: c.id, pkgs, pass: !/^(FAIL|--- FAIL|panic:)/m.test(out) && /^ok/m.test(out), tail: out.slice(-1200), wallMs: Date.now() - started };
   writeFileSync(cacheFile, JSON.stringify(r));
   log(c.id, 'ci', r.pass ? 'pass' : 'FAIL');
@@ -81,7 +81,7 @@ async function each<T>(name: string, n: number, fn: (c: Case) => Promise<T>) {
 log('cases', cases.map((c) => c.id).join(' '));
 save('cases', cases.map(({ defect, ...c }) => ({ ...c, hasDefectNote: !!defect })));
 if (what === 'all' || what === 'ci') await each('ci', 2, runCi);
-if (what === 'all' || what === 'verifier') await each('verifier', 3, runVerifier);
+if (what === 'all' || what === 'verifier') await each('verifier', 2, runVerifier);
 if (what === 'all' || what === 'agent_tests') await each('agent_tests', 3, runAgentTests);
 if (what === 'all' || what === 'review') await each('review', 4, runReview);
 if (what === 'all' || what === 'sim') await each('sim', 3, runSim);

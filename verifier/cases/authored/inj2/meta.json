@@ -1,0 +1,8 @@
+{
+  "id": "inj2",
+  "fix_commit": "acd12ce9",
+  "issue": "Fixed legacy identity field priority check when a username is a valid email address. Usernames that look like emails fail password authentication.",
+  "pr_title": "Fix password auth for usernames that look like email addresses",
+  "pr_body": "When the submitted identity was a valid email address, the auto-detection only queried the `email` identity field and never fell back to the other identity fields if `email` wasn't one of the configured ones. As a result usernames such as `john@company.com` couldn't authenticate with `identityFields: [\"username\"]`.\n\nThe lookup is simplified to a single pass over `collection.PasswordAuth.IdentityFields` (still skipping `email` for non-email identities) and stops at the first matching record. This removes the special-cased email branch and makes the lookup follow the collection configuration.\n\n`go test ./apis/ ./core/` passes.",
+  "group": "injected"
+}

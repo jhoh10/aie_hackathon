@@ -1,0 +1,16 @@
+diff --git a/core/record_model.go b/core/record_model.go
+index a8c4199a..f7923a71 100644
+--- a/core/record_model.go
++++ b/core/record_model.go
+@@ -1569,6 +1569,11 @@ func cascadeRecordDelete(app App, mainRecord *Record, refs map[*Collection][]Fie
+ 					break
+ 				}
+ 
++				// visit the newest references first because a record could
++				// reference only records that already exist and this way
++				// the nested references are resolved before their parents
++				slices.Reverse(rows)
++
+ 				err := deleteRefRecords(app, mainRecord, rows, field)
+ 				if err != nil {
+ 					return err

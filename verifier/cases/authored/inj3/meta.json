@@ -1,0 +1,8 @@
+{
+  "id": "inj3",
+  "fix_commit": "d763d3df",
+  "issue": "Fixed OAuth2 providers config merge incorrectly replacing the entire slice. Adding an OAuth2 provider removes the client secret of the other already configured providers.",
+  "pr_title": "Preserve OAuth2 provider client secrets on collection update",
+  "pr_body": "OAuth2 client secrets are write-only and are never returned by the API, so the Dashboard submits the providers list without them. Because the whole `providers` slice was replaced on unmarshal, adding a new provider (or editing any provider) wiped the stored client secrets of the already configured providers.\n\nAdded `OAuth2Config.UnmarshalJSON` that keeps the stored `clientSecret` for submitted provider configs that don't include one. Explicitly submitted secrets still override the stored ones.\n\n`go test ./apis/ ./core/` passes.",
+  "group": "injected"
+}

@@ -1,0 +1,41 @@
+diff --git a/core/collection_model_auth_options.go b/core/collection_model_auth_options.go
+index e5eb6bab..1d699b68 100644
+--- a/core/collection_model_auth_options.go
++++ b/core/collection_model_auth_options.go
+@@ -1,6 +1,8 @@
+ package core
+ 
+ import (
++	"encoding/json/v2"
++	"slices"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+@@ -409,6 +411,27 @@ type OAuth2Config struct {
+ 	Enabled bool `form:"enabled" json:"enabled"`
+ }
+ 
++// UnmarshalJSON implements the [json.Unmarshaler] interface.
++//
++// The client secrets are write-only and are not part of the API responses,
++// so a provider config submitted without one keeps its stored secret.
++func (c *OAuth2Config) UnmarshalJSON(b []byte) error {
++	stored := slices.Clone(c.Providers)
++
++	type alias OAuth2Config
++	if err := json.Unmarshal(b, (*alias)(c)); err != nil {
++		return err
++	}
++
++	for i := range c.Providers {
++		if c.Providers[i].ClientSecret == "" && i < len(stored) {
++			c.Providers[i].ClientSecret = stored[i].ClientSecret
++		}
++	}
++
++	return nil
++}
++
+ // GetProviderConfig returns the first OAuth2ProviderConfig that matches the specified name.
+ //
+ // Returns false and zero config if no such provider is available in c.Providers.

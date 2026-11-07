@@ -40,6 +40,8 @@ export function decide(i: DecideInput): { verdict: Verdict; reasons: string[] } 
   if (!i.claims.length) human.push('No approved claims');
   for (const p of i.probes.filter((x) => x.changed)) {
     if (p.triage === 'explained') continue;
+    // Tuned on the dev split (h-number): a reworded message nobody declared is worth a note, not a person's time.
+    if (p.triage === 'undeclared' && p.severity === 'minor') continue;
     if (p.triage === 'undeclared' && p.severity === 'breaking') block.push(`Undeclared breaking behaviour change in probe ${p.id}`);
     else human.push(`Unexplained behaviour change in probe ${p.id}`);
   }

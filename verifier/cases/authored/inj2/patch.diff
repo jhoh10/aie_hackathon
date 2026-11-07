@@ -1,0 +1,36 @@
+diff --git a/apis/record_auth_with_password.go b/apis/record_auth_with_password.go
+index c28f911d..67ab66ec 100644
+--- a/apis/record_auth_with_password.go
++++ b/apis/record_auth_with_password.go
+@@ -40,23 +40,16 @@ func recordAuthWithPassword(e *core.RequestEvent) error {
+ 	if form.IdentityField != "" {
+ 		foundRecord, foundErr = findRecordByIdentityField(e.App, collection, form.IdentityField, form.Identity)
+ 	} else {
+-		// prioritize email lookup
+ 		isEmail := is.EmailFormat.Validate(form.Identity) == nil
+-		if isEmail && list.ExistInSlice(core.FieldNameEmail, collection.PasswordAuth.IdentityFields) {
+-			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, core.FieldNameEmail, form.Identity)
+-		}
+ 
+-		// search by the other identity fields
+-		if !isEmail || foundErr != nil {
+-			for _, name := range collection.PasswordAuth.IdentityFields {
+-				if !isEmail && name == core.FieldNameEmail {
+-					continue // no need to search by the email field if it is not an email
+-				}
+-
+-				foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
+-				if foundErr == nil {
+-					break
+-				}
++		for _, name := range collection.PasswordAuth.IdentityFields {
++			if !isEmail && name == core.FieldNameEmail {
++				continue // no need to search by the email field if it is not an email
++			}
++
++			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
++			if foundErr == nil {
++				break
+ 			}
+ 		}
+ 	}

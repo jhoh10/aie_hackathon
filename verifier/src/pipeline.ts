@@ -1,9 +1,11 @@
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 // The verification procedure: approved intent -> locked tests -> old/new runs -> evidence -> verdict.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import * as P from './prompts.ts';
 import type { Model } from './model.ts';
-import { buildImage, ensureNetwork, runScenario, pool, newCoverageVolume, readCoverage } from './sandbox.ts';
+import { ROOT, buildImage, ensureNetwork, runScenario, pool, newCoverageVolume, readCoverage } from './sandbox.ts';
 import { fingerprint, type ScenarioRun } from './normalize.ts';
 import { classifyClaimScenario, rollupClaim, decide, type Observed, type ClaimResult, type ProbeFinding } from './verdict.ts';
 import { reachOfChanged } from './reach.ts';
@@ -14,11 +16,21 @@ const REPS = 2;
 export function diffFor(repo: string, base: string, head: string) {
   return execFileSync('git', ['-C', repo, 'diff', `${base}..${head}`, '--', '*.go', ':!*_test.go'], { maxBuffer: 1 << 28 }).toString();
 }
+export function fullDiffFor(repo: string, base: string, head: string) {
+  return execFileSync('git', ['-C', repo, 'diff', `${base}..${head}`, '--', '*.go'], { maxBuffer: 1 << 28 }).toString();
+}
 const sha = (x: unknown) => createHash('sha256').update(JSON.stringify(x)).digest('hex');
 
+// Recorded runs are reused when the same locked scenario meets the same image again, so a run that
+// stops for a missing model answer doesn't redo its sandbox work. Delete .work/runcache to force fresh runs.
+const RUNCACHE = join(ROOT, '.work/runcache');
 async function observe(image: string, s: any, cov?: string) {
-  const runs: ScenarioRun[] = [];
-  for (let i = 0; i < REPS; i++) runs.push(await runScenario({ image, scenario: s, covVolume: cov }));
+  const file = join(RUNCACHE, sha({ image, s, REPS }).slice(0, 24) + '.json');
+  let runs: ScenarioRun[] = existsSync(file) && !cov ? JSON.parse(readFileSync(file, 'utf8')) : [];
+  if (!runs.length) {
+    for (let i = 0; i < REPS; i++) runs.push(await runScenario({ image, scenario: s, covVolume: cov }));
+    mkdirSync(RUNCACHE, { recursive: true }); writeFileSync(file, JSON.stringify(runs));
+  }
   const prints = runs.map(fingerprint);
   return { status: runs[0].status, stable: runs.every((r) => r.status === runs[0].status), identical: prints.every((p) => p === prints[0]), print: prints[0], run: runs[0] };
 }
@@ -29,7 +41,7 @@ export async function extractClaimsFor(key: string, issue: string, model: Model)
 
 export async function verify(i: VerifyInput, model: Model) {
   const emit = i.onEvent ?? (() => {});
-  const conc = i.concurrency ?? 4;
+  const conc = i.concurrency ?? 3;
   // Wall time per stage in ms. Model stages are near zero when answers come from the cache.
   const timings: Record<string, number> = {};
   const t0 = Date.now(); let mark = t0;
@@ -70,6 +82,9 @@ export async function verify(i: VerifyInput, model: Model) {
 
   const changed = probeRuns.filter((r: any) => r.base.identical && r.head.identical && r.base.print !== r.head.print);
   const unstable = probeRuns.filter((r: any) => !r.base.identical || !r.head.identical).map((r: any) => r.s.id);
+  // Tuned on the dev split (r-secret): if old answers the same probe consistently and new doesn't,
+  // the change introduced the instability, so it can't be dismissed as noise.
+  const newlyUnstable = probeRuns.filter((r: any) => r.base.identical && !r.head.identical).map((r: any) => r.s.id);
   let findings: ProbeFinding[] = [];
   let triage: any[] = [];
   if (changed.length) {
@@ -79,8 +94,10 @@ export async function verify(i: VerifyInput, model: Model) {
   }
   lap('triage');
   timings.total = Date.now() - t0;
+  // A rule escalating newly unstable probes was tried on dev and dropped: it escalated an honest fix (h-bearer)
+  // and missed r-secret, whose old version was unstable too. Unstable probes are still listed as evidence.
   const decision = decide({ claims: claimResults, probes: findings, reach, minReach: i.minReach ?? 0.3 });
-  const result = { key: i.key, base: i.base, head: i.head, lock, locked: { claims, claimTests, probes, triage }, ...decision, claims: claimResults, probes: { total: probes.length, changed: findings, triage, unstable, runs: probeRuns.map((r: any) => ({ id: r.s.id, base: r.base.run, head: r.head.run, changed: r.base.print !== r.head.print })) }, reach, timings };
+  const result = { key: i.key, base: i.base, head: i.head, lock, locked: { claims, claimTests, probes, triage }, ...decision, claims: claimResults, probes: { total: probes.length, changed: findings, triage, unstable, newlyUnstable, runs: probeRuns.map((r: any) => ({ id: r.s.id, base: r.base.run, head: r.head.run, changed: r.base.print !== r.head.print })) }, reach, timings };
   emit('verdict', { verdict: decision.verdict, reasons: decision.reasons });
   return result;
 }

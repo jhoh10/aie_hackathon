@@ -1,11 +1,12 @@
 // Turns the manifest into concrete base and head commits in a local clone.
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, mkdtempSync, rmSync, realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ROOT } from './sandbox.ts';
 
-export const REPO = join(ROOT, '.work/repos/pocketbase');
+// Resolved so Docker bind mounts work when .work is a symlink.
+export const REPO = existsSync(join(ROOT, '.work/repos/pocketbase')) ? realpathSync(join(ROOT, '.work/repos/pocketbase')) : join(ROOT, '.work/repos/pocketbase');
 const git = (args: string[], opts: any = {}) => execFileSync('git', args, { maxBuffer: 1 << 28, ...opts }).toString().trim();
 const rp = (r: string) => git(['-C', REPO, 'rev-parse', r]);
 const IDENT = ['-c', 'user.name=case-builder', '-c', 'user.email=case-builder@vouch.test', '-c', 'commit.gpgsign=false'];
