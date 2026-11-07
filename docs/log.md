@@ -4,6 +4,7 @@ Newest entries at the top. Keep each one short: what happened, who, and anything
 
 ## 2026-11-07
 
+- **Metrics defined** (JH, on `jh/metrics`, branched from `verifier`). `verifier/docs/metrics.md` defines defects caught, defects that would merge, false alarms, tokens, developer effort and evidence quality. `node src/metrics.ts dev` computes them from benchmark results. Model calls now save token usage. Not run on real results yet, since there are none.
 - **Verifier core written** (SO, on the `verifier` branch). One real PocketBase bug reproduced by hand: a lowercase `bearer` prefix returns 401 on the old commit and 200 on the fix. No benchmark results yet. Claude subagents will write tests until we have Meta keys.
 - **Team name: Trust Issues.** Working pitch: "AI writes more code than anyone can read. We treat code as a black box: settle the inputs, outputs and tests up front, then verify the result against them." Now in the README.
 - **Direction: trust but verify.** Two ideas on the table (docs/ideas.md). Leaning towards idea 1: a conversation about tests and inputs/outputs before any code is written, with code treated as a black box. Not final yet.

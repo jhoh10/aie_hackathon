@@ -7,6 +7,7 @@ One line per task. Put the owner's initials in brackets. Move lines between sect
 - [ ] [JH] Pick the idea (see docs/ideas.md)
 - [ ] [SO] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/)
 - [ ] Tests-first conversation: output approved claims per verifier/docs/claims-contract.md
+- [ ] [JH] Metrics (AIE-5): definitions and script done on `jh/metrics`. Next: run on real benchmark results and pick what goes in the demo
 
 ## Next
 
