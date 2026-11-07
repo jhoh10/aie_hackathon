@@ -41,6 +41,7 @@ Planned backwards from an **assumed 6:00 PM submission deadline**. Nobody has co
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. Due by **1:30 PM**.
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
+- [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Write the demo script (docs/submission.md)
 - [ ] Slides, plus a backup demo video
@@ -52,6 +53,7 @@ _Nothing yet. Say what it's waiting on._
 
 ## Done
 
+- [x] [JH] Write up how the harness display scales with task size (2026-11-07)
 - [x] Pick the idea: idea 1, verification-first harness (2026-11-07)
 - [x] [SB] Verifier core pipeline written, not yet benchmarked (2026-11-07)
 - [x] [SB] Add deadline, judging criteria and disqualifiers to docs/submission.md (2026-11-07)

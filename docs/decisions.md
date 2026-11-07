@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: The harness display scales by grouping claims, not by mode
+
+- **Chose:** one tree for every task (feature → optional area → claim → evidence). The engineer approves claims; tests sit under them as evidence. How far the tree opens by default depends on the number of claims, and failures always open down to the failing test. Details in verification-first-harness/display-scaling.md.
+- **Over:** a separate "bug fix" and "feature" view, or a scale setting the user picks; and showing every unit test as a plan row.
+- **Because:** claims are the same kind of thing at any scale, so the gate stays the same. A feature plan stays readable, and a bug fix still shows its tests.
+- **Revisit if:** real plans don't group cleanly into areas, or engineers keep opening the evidence to approve a plan.
+
 ## 2026-11-07: Push straight to main, no PRs
 
 - **Chose:** everyone commits and pushes directly to `main`; changes that go against the rest of the repo get flagged before pushing.

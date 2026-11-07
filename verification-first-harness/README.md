@@ -48,6 +48,7 @@ Five phases, with one human gate: the test plan. Each phase is described in [con
 | [conversation.md](conversation.md) | The five phases in detail: goals, agent behaviour, questions, exit criteria, example dialogue |
 | [testing-catalog.md](testing-catalog.md) | Every kind of check the agent can propose, what each proves and when to suggest it |
 | [test-plan-template.md](test-plan-template.md) | The artifacts: task brief, test plan table, design notes, verification report |
+| [display-scaling.md](display-scaling.md) | How the plan and report show a one-line bug fix and a whole feature on the same screen |
 
 ## Proposed answers to the open questions in ideas.md
 

@@ -21,6 +21,7 @@ This is the hand-off from the tests-first conversation to the verifier. Whatever
 - `kind`:
   - `behavior_change`: must fail on the old version and pass on the new one.
   - `no_behavior_change`: must pass on both versions.
+- `group` (optional): a short area name, such as `"Sending invites"`, used to group claims when a plan is large. Only the display uses it; the verifier ignores it. See [display-scaling.md](../../verification-first-harness/display-scaling.md).
 
 ## Rules
 
