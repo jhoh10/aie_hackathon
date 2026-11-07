@@ -50,6 +50,21 @@ Five phases, with one human gate: the plan (claims, plus the checks that prove t
 | [test-plan-template.md](test-plan-template.md) | The artifacts: task brief, plan (claims and checks), design notes, verification report |
 | [display-scaling.md](display-scaling.md) | How the plan and report show a one-line bug fix and a whole feature on the same screen |
 
+## End to end: harness plan → verifier → verdict
+
+One command takes an approved harness plan, turns its Claims table into the verifier's claims JSON ([claims contract](../verifier/docs/claims-contract.md)), and runs the verifier on the old and new commits in Docker. Needs Docker and Node 23+. Run it from `verifier/`:
+
+```bash
+git clone https://github.com/pocketbase/pocketbase .work/repos/pocketbase   # once
+node --no-warnings src/handoff.ts ../verification-first-harness/examples/h-bearer/.verify/plan.md --case h-bearer
+```
+
+- **Input:** [examples/h-bearer/.verify/plan.md](examples/h-bearer/.verify/plan.md), the plan the harness writes in phase C and the engineer approves in phase D (PocketBase: accept the `Bearer` prefix in any letter case). Plans without `Status: APPROVED by ...` are refused.
+- **Hand-off:** the Claims table becomes `.verify/claims.json` next to the plan. That file is all the verifier gets; no code and no notes.
+- **Output:** each claim proven or not, with old and new HTTP status per check, probes on the diff, coverage of the changed lines, then `VERDICT PASS | BLOCK | NEEDS_HUMAN`. Exit code 0, 1 or 2. Full evidence goes to `verifier/.work/runs/handoff-h-bearer.json`.
+- **Model:** with `MODEL_API_KEY` set, the verifier's model writes the checks. Without it, the checks come from hand-written answers in [examples/h-bearer/answers/](examples/h-bearer/answers/), standing in for the model until the Meta API works.
+- **Time:** about 3 minutes the first time (two Go builds), about 75 seconds after that (each check runs twice on each version in a fresh container).
+
 ## Proposed answers to the open questions in ideas.md
 
 These are a starting point for the team to argue with, not decisions yet.

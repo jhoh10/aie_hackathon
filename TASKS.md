@@ -8,7 +8,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 - [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
 - [ ] **12:30 PM: stack and skeleton (overdue).** Meta Model API keys work for everyone, "Running it" in the README filled in.
-- [ ] **1:30 PM: hello world end to end (half done, overdue).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-harness/evaluation/). Still missing: runnable from the repo ("Running it" in the README), the approved claims handed to the verifier, and the demo scenario named in the README's "Demo moment".
+- [ ] **1:30 PM: hello world end to end (half done, overdue).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-harness/evaluation/). Hand-off done: `src/handoff.ts` runs an approved plan through the verifier, PASS on `h-bearer` (verification-first-harness/README.md, "End to end"). Still missing: "Running it" in the root README, and the demo scenario named in the README's "Demo moment".
 - [ ] **2:00 PM: benchmark running.** `node src/benchmark.ts dev verifier` started on the real dev cases. The first run will need debugging, so allow 1–2 hours. Holdout is optional.
 - [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
 - [ ] **3:30 PM: numbers in.** The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier).
@@ -28,7 +28,6 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 ## Now
 
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
-- [ ] [DT, SB] Hand the harness's approved claims to the verifier (verifier/docs/claims-contract.md), so one case runs harness → verifier → verdict
 - [ ] [SB] Find evals and datasets we can use
 - [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/)
 - [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo
@@ -37,7 +36,8 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 ## Next
 
 - [ ] Copy the schedule and prize breakdown from the CV details page into resources/event.md. Leave out the venue Wi-Fi password, this repo is public.
-- [ ] Tests-first conversation: output approved claims per verifier/docs/claims-contract.md, so the harness can hand off to the verifier
+- [ ] Run the hand-off with the real model (needs Meta billing fixed: the key gets 402 `billing_not_configured`), so the h-bearer checks aren't hand-written
+- [ ] Run the hand-off on a bad case (an `r-*` revert) to show BLOCK end to end; needs a plan.md for that case
 - [ ] [DT] Get Meta Model API keys for everyone (the $5k prize track)
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
@@ -58,6 +58,7 @@ _Nothing yet. Say what it's waiting on._
 
 ## Done
 
+- [x] [JH] Hand the harness's approved claims to the verifier: `verifier/src/handoff.ts` turns `.verify/plan.md` into claims JSON and runs the verifier. PASS on `h-bearer` (checks hand-written, Meta billing blocked) (2026-11-07)
 - [x] [DT] Harness run end to end on two SWE-bench Verified tasks (sympy-24661, pylint-8898), side by side with default Claude Code; both sides resolved both (2026-11-07)
 - [x] Confirm the real deadline: 5:00 PM PT, milestones shifted to match (2026-11-07)
 - [x] [JH] Write up how the harness display scales with task size (2026-11-07)
