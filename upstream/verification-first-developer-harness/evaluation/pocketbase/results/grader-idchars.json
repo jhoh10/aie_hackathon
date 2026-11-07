@@ -1,0 +1,8 @@
+{
+  "id": "idchars",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestTextFieldValidateValue (0.17s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/core\t0.198s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/core\t0.075s"
+}

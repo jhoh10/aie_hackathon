@@ -1,0 +1,94 @@
+diff --git a/sympy/parsing/sympy_parser.py b/sympy/parsing/sympy_parser.py
+index 52711d1324..7ffd0b4c76 100644
+--- a/sympy/parsing/sympy_parser.py
++++ b/sympy/parsing/sympy_parser.py
+@@ -1186,6 +1186,43 @@ def visit_BinOp(self, node):
+             return new_node
+         return node
+ 
++    relational_operators = {
++        ast.Lt: 'Lt',
++        ast.Gt: 'Gt',
++        ast.LtE: 'Le',
++        ast.GtE: 'Ge',
++        ast.Eq: 'Eq',
++        ast.NotEq: 'Ne',
++    }
++
++    def visit_Compare(self, node):
++        if not all(op.__class__ in self.relational_operators
++                   for op in node.ops):
++            # e.g. ``in`` or ``is``: no SymPy relational equivalent
++            return self.generic_visit(node)
++        operands = [self.visit(node.left)] + [self.visit(c)
++                                              for c in node.comparators]
++        rels = [
++            ast.Call(
++                func=ast.Name(id=self.relational_operators[op.__class__],
++                              ctx=ast.Load()),
++                args=[lhs, rhs],
++                keywords=[ast.keyword(arg='evaluate',
++                    value=ast.NameConstant(value=False, ctx=ast.Load()))],
++                starargs=None,
++                kwargs=None)
++            for op, lhs, rhs in zip(node.ops, operands, operands[1:])]
++        if len(rels) == 1:
++            return rels[0]
++        # chained comparison ``a < b < c`` means ``(a < b) and (b < c)``
++        return ast.Call(
++            func=ast.Name(id='And', ctx=ast.Load()),
++            args=rels,
++            keywords=[ast.keyword(arg='evaluate',
++                value=ast.NameConstant(value=False, ctx=ast.Load()))],
++            starargs=None,
++            kwargs=None)
++
+     def visit_Call(self, node):
+         new_node = self.generic_visit(node)
+         if isinstance(node.func, ast.Name) and node.func.id in self.functions:
+diff --git a/sympy/parsing/tests/test_sympy_parser.py b/sympy/parsing/tests/test_sympy_parser.py
+index 7c43e1fce3..87a74b9d46 100644
+--- a/sympy/parsing/tests/test_sympy_parser.py
++++ b/sympy/parsing/tests/test_sympy_parser.py
+@@ -6,7 +6,7 @@
+ import types
+ 
+ from sympy.assumptions import Q
+-from sympy.core import Symbol, Function, Float, Rational, Integer, I, Mul, Pow, Eq
++from sympy.core import S, Symbol, Function, Float, Rational, Integer, I, Mul, Pow, Eq
+ from sympy.functions import exp, factorial, factorial2, sin, Min, Max
+ from sympy.logic import And
+ from sympy.series import Limit
+@@ -359,3 +359,32 @@ def test_issue_22822():
+     raises(ValueError, lambda: parse_expr('x', {'': 1}))
+     data = {'some_parameter': None}
+     assert parse_expr('some_parameter is None', data) is True
++
++
++def test_evaluate_false_relationals():
++    from sympy.core.relational import Lt, Gt, Le, Ge, Ne
++    from sympy import Add
++    x, y = Symbol('x'), Symbol('y')
++    # every operator, unevaluated
++    for text, cls in [('1 < 2', Lt), ('1 > 2', Gt), ('1 <= 2', Le),
++                      ('1 >= 2', Ge), ('1 == 2', Eq), ('1 != 2', Ne)]:
++        res = parse_expr(text, evaluate=False)
++        assert res is not True and res is not False
++        assert isinstance(res, cls)
++        assert res.args == (1, 2)
++    assert parse_expr('1 < 2', evaluate=False) == Lt(1, 2, evaluate=False)
++    # symbolic / nested operands
++    assert parse_expr('x < y', evaluate=False) == Lt(x, y, evaluate=False)
++    assert parse_expr('x + 1 > y', evaluate=False) == Gt(
++        Add(x, 1, evaluate=False), y, evaluate=False)
++    # with boolean ops
++    assert parse_expr('(1 < 2) & (3 > 2)', evaluate=False) == And(
++        Lt(1, 2, evaluate=False), Gt(3, 2, evaluate=False), evaluate=False)
++    # chained comparison
++    res = parse_expr('1 < 2 < 3', evaluate=False)
++    assert res is not True
++    assert res == And(Lt(1, 2, evaluate=False), Lt(2, 3, evaluate=False),
++                      evaluate=False)
++    # default path unchanged
++    assert parse_expr('1 < 2') is S.true
++    assert parse_expr('x < y') == Lt(x, y)

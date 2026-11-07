@@ -15,6 +15,9 @@ import { CATEGORY, PLANS, STRENGTH } from '@/data/plans';
 import { changeApproval, claimsOf, freshReview, lockReview, parsePlanJson, readPreference, savePreference, strongest, STRENGTH_ORDER, type ReviewState } from '@/data/review-state';
 import type { Plan, Strength } from '@/data/types';
 import { parseSourceHtml, reconcileSource, SOURCE_URL, startSourceRefresh } from '@/data/source-refresh';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { feedbackPlan } from '@/data/feedback';
+import { useTrust } from './TrustContext';
 import { cn } from '@/lib/utils';
 
 const POLICY_KEY = 'vf-auto-approve-regression';
@@ -31,7 +34,8 @@ function IconTool({ label, children, onClick }: { label: string; children: React
   return <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={label} onClick={onClick}>{children}</Button></TooltipTrigger><TooltipContent>{label}</TooltipContent></Tooltip>;
 }
 
-export function ReviewWorkspace() {
+export function ReviewWorkspace({ visible = true }: { visible?: boolean }) {
+  const location = useLocation(); const navigate = useNavigate(); const { edits, feedbackVersion } = useTrust();
   const [plans, setPlans] = useState(initialPlans);
   const [active, setActive] = useState('bugfix');
   const [reviews, setReviews] = useState<Record<string, ReviewState>>({});
@@ -93,14 +97,16 @@ export function ReviewWorkspace() {
     if (savedTheme === 'light' || savedTheme === 'dark') setTheme(savedTheme);
   }, []);
   useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const apply = () => {
-      const dark = theme === 'dark' || (theme === 'system' && media.matches);
-      document.documentElement.classList.toggle('dark', dark); setIsDark(dark);
-    };
-    apply(); media.addEventListener('change', apply);
-    return () => media.removeEventListener('change', apply);
-  }, [theme]);
+    const requested = new URLSearchParams(location.searchStr).get('plan');
+    if (requested && plans[requested]) { setActive(requested); setFocused(null); }
+  }, [location.searchStr, plans]);
+  useEffect(() => {
+    if (!edits.length) return;
+    const next = feedbackPlan(PLANS.bugfix, edits);
+    setPlans(previous => ({ ...previous, feedback: next }));
+    setReviews(previous => ({ ...previous, feedback: freshReview(next, false) }));
+    setActive('feedback'); setFocused(null);
+  }, [feedbackVersion]);
 
   function update(fn: (current: ReviewState) => ReviewState) {
     setReviews(previous => ({ ...previous, [active]: fn(previous[active] ?? freshReview(plan, policy)) }));
@@ -109,6 +115,7 @@ export function ReviewWorkspace() {
     const next = plans[id]; if (!next) return;
     setReviews(previous => ({ ...previous, [id]: previous[id] ?? freshReview(next, policy) }));
     setActive(id); setFocused(null);
+    void navigate({ to: '/developer', search: { plan: id } });
   }
   function toggleSet(field: 'open' | 'evidence', id: string) {
     update(current => {
@@ -124,6 +131,7 @@ export function ReviewWorkspace() {
   }
   useEffect(() => {
     function keyboard(event: KeyboardEvent) {
+      if (!visible) return;
       const target = event.target;
       if (target instanceof HTMLElement && (target.matches('input,textarea,select') || target.isContentEditable)) return;
       if (event.ctrlKey || event.metaKey || event.altKey || importOpen) return;
@@ -156,18 +164,9 @@ export function ReviewWorkspace() {
   }
 
   return <TooltipProvider delayDuration={200}><div className="review-workspace min-h-screen pb-28">
-    <header className="border-b bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-8">
-        <div className="flex items-center gap-3"><div className="brand-mark"><ShieldCheck className="size-5" /></div><div><span className="block text-base font-semibold">Trust Issues<span className="ml-2 hidden font-normal text-muted-foreground sm:inline">/ Claims Review</span></span><span className="block text-xs text-muted-foreground">Verification-first harness</span></div></div>
-        <div className="flex items-center gap-1">
-          <Popover><PopoverTrigger asChild><Button variant="ghost" size="icon" aria-label="Keyboard shortcuts"><CircleHelp /></Button></PopoverTrigger><PopoverContent align="end" className="w-72"><h3 className="mb-3 font-semibold">Keyboard shortcuts</h3>{[['1–4','Switch plans'],['j / k','Next / previous claim'],['x','Toggle focused claim'],['e','Toggle evidence'],['Shift + A','Approve focused category']].map(([key, label]) => <div key={key} className="flex justify-between gap-3 py-1 text-xs"><kbd className="font-mono text-muted-foreground">{key}</kbd><span>{label}</span></div>)}<div className="mt-3 border-t pt-3"><Button variant="ghost" size="sm" onClick={() => { setTheme('system'); savePreference(THEME_KEY, 'system'); }}>Use system theme {theme === 'system' && <Check />}</Button></div></PopoverContent></Popover>
-          <IconTool label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} onClick={() => { const next = isDark ? 'light' : 'dark'; setTheme(next); savePreference(THEME_KEY, next); }}>{isDark ? <Sun /> : <Moon />}</IconTool>
-          <Button variant="outline" size="sm" className="ml-1" onClick={() => { setImportOpen(true); setError(''); }}><FileUp /><span className="hidden sm:inline">Import plan</span><span className="sm:hidden">Import</span></Button>
-        </div>
-      </div>
-    </header>
     <main className="mx-auto max-w-5xl px-4 pt-8 sm:px-8 sm:pt-10">
-      <div className="mb-7 flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">Claims Review</h1><span className="flex items-center gap-2 text-xs text-muted-foreground"><GitPullRequest className="size-4" />Engineer approval gate</span></div>
+      <ol aria-label="Developer phases" className="phase-strip mb-7 grid grid-cols-5 gap-2">{['Discuss','Read code','Draft claims','Approve claims','Build and verify'].map((phase,i) => <li key={phase} className={cn('border-b-2 pb-3', (state.locked ? i === 4 : i === 3) ? 'border-primary text-primary' : 'border-border text-muted-foreground')}><span className="mb-1 block font-mono text-xs">{i < 3 || (state.locked && i === 3) ? '✓' : String.fromCharCode(65 + i)}</span><span className="text-[11px]">{phase}</span></li>)}</ol>
+      {active === 'feedback' && <section className="mb-6 border-l-2 border-warn bg-warn-soft p-4"><h2 className="text-sm font-semibold">From review · needs approval</h2>{edits.map((edit,i) => <p key={i} className="mt-2 text-xs leading-5"><span className="font-mono">{edit.item}</span> · {edit.type === 'check' ? 'New check' : edit.type === 'structure' ? 'Structure claim' : 'Proposed claim edit'}: {edit.text}</p>)}</section>}
       <p role="status" aria-label="GitHub source status" className="mb-5 break-words text-xs text-muted-foreground">{sourceStatus}{state.locked ? ' · Locked plan preserved' : ''}</p>
       <Tabs value={active} onValueChange={selectPlan}><TabsList className="plan-tabs mb-8 grid h-auto w-full grid-cols-2 gap-1 p-1 sm:flex sm:w-fit">{Object.entries(plans).map(([id, p]) => <TabsTrigger key={id} value={id} className="min-w-0 whitespace-normal px-4 py-2.5 text-xs sm:text-sm">{p.label}</TabsTrigger>)}</TabsList></Tabs>
       <section className="mb-7">
@@ -175,6 +174,7 @@ export function ReviewWorkspace() {
         <div className="mt-3 flex flex-wrap items-start justify-between gap-4"><h2 className="max-w-2xl break-words text-2xl leading-tight font-semibold sm:text-3xl">{plan.title}</h2><Badge variant="outline" className={cn('status-badge shrink-0', state.locked && 'bg-ok-soft text-ok border-ok/25')}>{state.locked ? <LockKeyhole className="size-3" /> : <span className="size-1.5 rounded-full bg-warn" />}{state.locked ? 'Approved' : 'Awaiting review'}</Badge></div>
         <p className="mt-3 font-mono text-xs leading-6 text-muted-foreground">{plan.label} · {claims.length} claims in {plan.categories.length} categories · {totalChecks} checks</p>
       </section>
+      {claims.length > 8 && <p className="mb-5 text-xs text-warn">Lean default is at most 8 claims</p>}
       <section className="why-section mb-7 border-l-2 border-primary pl-4"><h3 className="mb-1 text-xs font-semibold">Why this structure</h3><p className="text-sm leading-6 text-muted-foreground"><BoldText text={plan.why} /></p></section>
       <section className="progress-tool mb-6 rounded-xl border bg-card p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3"><h3 className="text-sm font-medium"><span className="font-mono font-semibold">{done} of {claims.length}</span> claims approved</h3><span className="font-mono text-xs text-muted-foreground">{Math.round(done / claims.length * 100)}%</span></div>
@@ -206,6 +206,7 @@ export function ReviewWorkspace() {
       })}</div>
       <section className="mt-9"><h3 className="mb-4 text-sm font-semibold">Considered and skipped <span className="ml-1 font-mono text-xs font-normal text-muted-foreground">{plan.skipped.length}</span></h3><div className="border-t">{plan.skipped.map(([category, reason]) => <div key={category} className="grid gap-2 border-b py-4 text-xs leading-5 sm:grid-cols-[210px_1fr]"><span className="font-medium">{category}</span><span className="text-muted-foreground">{reason}</span></div>)}</div></section>
       {state.locked && <section className="mt-8 rounded-xl border border-ok/30 bg-card p-5" aria-label="Approved claims handoff"><div className="flex flex-wrap items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-sm font-semibold"><ShieldCheck className="size-4 text-ok" />Approved claims, handed to the verifier</h3><Button variant="outline" size="sm" onClick={async () => { try { await navigator.clipboard.writeText(json); toast.success('Copied'); } catch { toast.error('Unable to copy. Select the JSON to copy it manually.'); } }}><Copy />Copy JSON</Button></div><pre data-testid="handoff-json" className="mt-4 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 font-mono text-xs leading-6">{json}</pre></section>}
+      {state.locked && active === 'bugfix' && <Button asChild className="mt-5"><Link to="/reviewer" search={{ example: 'sympy-24661' }}>Open the review packet for this PR<ArrowRight /></Link></Button>}
       <div className="mt-7 flex items-center gap-2 text-[11px] text-muted-foreground"><ShieldCheck className="size-3.5" /><span>Trust Issues · Verification-first harness</span></div>
     </main>
     <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-card"><div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8"><div className="flex items-center gap-2 text-sm">{state.locked ? <LockKeyhole className="size-4 text-ok" /> : <span className="size-2 rounded-full bg-warn" />}<span>{state.locked ? 'Claims approved and locked' : done === claims.length ? 'Every claim approved' : <><span className="font-mono font-semibold">{claims.length - done}</span> claims left to approve</>}</span></div><div className="flex items-center gap-2"><Button variant="ghost" size="sm" disabled={state.locked} onClick={() => { update(() => freshReview(plan, policy)); setFocused(null); }}><RotateCcw />Reset</Button><Button disabled={done !== claims.length || state.locked} onClick={() => { setLockedJson(previous => ({ ...previous, [active]: json })); update(current => lockReview(plan, current)); toast.success('Claims approved'); }}>{state.locked ? <Check /> : null}{state.locked ? 'Approved' : 'Approve claims'}{!state.locked && <ArrowRight />}</Button></div></div></footer>

@@ -1,0 +1,8 @@
+{
+  "id": "cascade",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestRecordDelete (0.39s)\n--- FAIL: TestRecordDeleteWithMultipleRelationCascade (0.41s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/core\t0.416s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/core\t0.103s"
+}

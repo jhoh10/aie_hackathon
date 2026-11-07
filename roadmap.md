@@ -1,4 +1,8 @@
-# Fresh Claims Review
+# Trust Issues rebuild
+- [x] Refresh both harness sources and port exact plans and four packets.
+- [x] Build a shared Developer / Reviewer shell, routes, themes and shortcuts.
+- [x] Add per-example review persistence, exports and the blocking-feedback loop.
+- [x] Verify acceptance flows and desktop/mobile display.
 - [x] Port the four exact repository plans into typed data and validate JSON imports.
 - [x] Rebuild the review screen, independent plan state, locking and JSON handoff.
 - [x] Add theme, routine policy, keyboard help and mobile layout.

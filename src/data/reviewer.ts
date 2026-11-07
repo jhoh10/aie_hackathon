@@ -1,4 +1,4 @@
-export type PacketItem = { id: string; text: string; detail: string; untested: boolean };
+export type PacketItem = { id: string; text: string; detail: string; untested: boolean; changed?: boolean; oldExpectation?: string | undefined };
 export type ReviewPacket = { title: string; summary: string; metrics: string; behaviors: PacketItem[]; tests: PacketItem[]; architecture: PacketItem[] };
 export type Decision = 'APPROVE' | 'REQUEST_CHANGES' | 'COMMENT';
 export type ReviewComment = { id: number; item: string; text: string; blocking: boolean };
@@ -9,7 +9,7 @@ export function parseReviewPacket(markdown: string): ReviewPacket {
   const lines = markdown.split(/\r?\n/);
   const title = lines.find(line => line.startsWith('# Review: '))?.slice(10);
   const summary = lines.find(line => /^\*\*.+\*\*$/.test(line))?.slice(2, -2);
-  const metrics = lines.find(line => line.startsWith('Claims proven '));
+  const metrics = lines.find(line => line.startsWith('Claims proven ') || line.startsWith('No approved claims'));
   if (!title || !summary || !metrics) throw new Error('Expected a review title, summary and Claims proven line.');
   const packet: ReviewPacket = { title, summary, metrics, behaviors: [], tests: [], architecture: [] };
   let section: PacketItem[] | undefined;
@@ -23,10 +23,10 @@ export function parseReviewPacket(markdown: string): ReviewPacket {
       const cells = line.replace(/^\||\|$/g, '').split(/(?<!\\)\|/).map(cell => cell.trim());
       const [id, text, detail] = cells;
       if (!id || !text || !detail || cells.length !== 3 || ids.has(id)) throw new Error('Invalid or duplicate packet row.');
-      ids.add(id); section.push({ id, text, detail, untested: detail.replace(/\*/g, '') === 'No test' });
+      ids.add(id); section.push({ id, text, detail, untested: detail.replace(/\*/g, '') === 'No test', changed: /\bchanged\b/i.test(detail), ...(detail.match(/\(changed; was (.*)\)$/)?.[1] ? { oldExpectation: detail.match(/\(changed; was (.*)\)$/)?.[1] } : {}) });
     }
   }
-  if (!packet.behaviors.length || !packet.tests.length) throw new Error('Expected behavior and test rows.');
+  if (!packet.behaviors.length) throw new Error('Expected behavior rows.');
   return packet;
 }
 export function addReviewComment(state: ReviewerState, item: string): ReviewerState {

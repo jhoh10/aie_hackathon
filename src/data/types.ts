@@ -1,4 +1,4 @@
-export type CategoryId = 'intent' | 'boundaries' | 'integration' | 'conformance' | 'safety' | 'budgets' | 'formal' | 'model' | 'preserved';
+export type CategoryId = 'intent' | 'boundaries' | 'integration' | 'conformance' | 'safety' | 'budgets' | 'formal' | 'model' | 'preserved' | 'review';
 export type Strength = 'proof' | 'generated' | 'failpass' | 'example' | 'static' | 'observed';
 export type Evidence = { type: string; s: Strength; what?: string | undefined; code?: string | undefined };
 export type Claim = {

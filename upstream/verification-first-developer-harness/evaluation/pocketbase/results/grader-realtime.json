@@ -1,0 +1,8 @@
+{
+  "id": "realtime",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestRealtimeRecordHiddenFields (0.12s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t1.868s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t3.075s"
+}

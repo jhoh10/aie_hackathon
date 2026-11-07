@@ -207,3 +207,21 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+.workspace-tab { border-bottom: 2px solid transparent; }
+.workspace-tab-active { border-bottom-color: var(--primary); background: var(--muted); }
+.stat-chip { gap: 6px; padding: 7px 10px; font-size: 11px; font-weight: 500; }
+.packet-focused { box-shadow: inset 2px 0 var(--ring); }
+.test-row { display: grid; grid-template-columns: 32px minmax(0,1fr) minmax(0,1fr) 80px; gap: 12px; align-items: start; }
+.mobile-table-label { display: none; }
+.comment-card { animation: rise 180ms ease-out both; }
+.flow-strip { scrollbar-width: none; }
+@media (max-width: 639px) {
+  .test-table-head { display: none; }
+  .test-row { grid-template-columns: 24px minmax(0,1fr) 32px; }
+  .test-row > :nth-child(2), .test-row > :nth-child(3) { grid-column: 2; }
+  .test-row > :last-child { grid-column: 3; grid-row: 1; padding: 0; width: 32px; }
+  .mobile-table-label { display: block; font-size: 10px; color: var(--muted-foreground); }
+  .phase-strip li span:last-child { font-size: 10px; }
+  .flow-strip { flex-wrap: wrap; gap: 6px 10px; }
+}

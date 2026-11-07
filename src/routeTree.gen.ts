@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DeveloperRouteImport } from './routes/developer'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as ReviewerRouteImport } from './routes/reviewer'
 import { Route as SessionRouteImport } from './routes/session'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +20,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeveloperRoute = DeveloperRouteImport.update({
+  id: '/developer',
+  path: '/developer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewerRoute = ReviewerRouteImport.update({
+  id: '/reviewer',
+  path: '/reviewer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SessionRoute = SessionRouteImport.update({
@@ -31,31 +43,39 @@ const SessionRoute = SessionRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/developer': typeof DeveloperRoute
   '/review': typeof ReviewRoute
+  '/reviewer': typeof ReviewerRoute
   '/session': typeof SessionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/developer': typeof DeveloperRoute
   '/review': typeof ReviewRoute
+  '/reviewer': typeof ReviewerRoute
   '/session': typeof SessionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/developer': typeof DeveloperRoute
   '/review': typeof ReviewRoute
+  '/reviewer': typeof ReviewerRoute
   '/session': typeof SessionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/review' | '/session'
+  fullPaths: '/' | '/developer' | '/review' | '/reviewer' | '/session'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/review' | '/session'
-  id: '__root__' | '/' | '/review' | '/session'
+  to: '/' | '/developer' | '/review' | '/reviewer' | '/session'
+  id: '__root__' | '/' | '/developer' | '/review' | '/reviewer' | '/session'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DeveloperRoute: typeof DeveloperRoute
   ReviewRoute: typeof ReviewRoute
+  ReviewerRoute: typeof ReviewerRoute
   SessionRoute: typeof SessionRoute
 }
 
@@ -68,11 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/developer': {
+      id: '/developer'
+      path: '/developer'
+      fullPath: '/developer'
+      preLoaderRoute: typeof DeveloperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/review': {
       id: '/review'
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviewer': {
+      id: '/reviewer'
+      path: '/reviewer'
+      fullPath: '/reviewer'
+      preLoaderRoute: typeof ReviewerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/session': {
@@ -87,7 +121,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DeveloperRoute: DeveloperRoute,
   ReviewRoute: ReviewRoute,
+  ReviewerRoute: ReviewerRoute,
   SessionRoute: SessionRoute,
 }
 export const routeTree = rootRouteImport

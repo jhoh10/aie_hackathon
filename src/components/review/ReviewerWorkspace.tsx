@@ -1,102 +1,70 @@
-import { useEffect, useState } from 'react';
-import { Link } from '@tanstack/react-router';
-import { AlertTriangle, ArrowRight, Check, ChevronDown, Copy, Download, FileUp, MessageSquare, Moon, ShieldCheck, Sun, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import { AlertTriangle, ArrowRight, Check, Copy, MessageSquare, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { parseReviewPacket, addReviewComment, exportReview, diffForFile, type ReviewerState, type PacketItem, type Decision } from '@/data/reviewer';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { EXAMPLES, type Example } from '@/data/packets';
+import { addReviewComment, exportReview, parseReviewPacket, type ReviewerState, type PacketItem, type Decision } from '@/data/reviewer';
 import { readPreference, savePreference } from '@/data/review-state';
+import { proposedEdits } from '@/data/feedback';
 import { startSourceRefresh } from '@/data/source-refresh';
-import packetSource from '../../../upstream/verification-first-reviewer-harness/examples/pylint-8898/.verify/review-packet.md?raw';
-import diffSource from '../../../upstream/verification-first-reviewer-harness/examples/pylint-8898/pr.diff?raw';
+import { useTrust } from './TrustContext';
 import { cn } from '@/lib/utils';
-
-const BASE = 'https://raw.githubusercontent.com/jhoh10/aie_hackathon/main/verification-first-reviewer-harness/examples/pylint-8898/';
-function InlineText({ text }: { text: string }) {
-  return <>{text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).map((part, i) => part.startsWith('`') ? <code key={i}>{part.slice(1, -1)}</code> : part.startsWith('**') ? <strong key={i}>{part.slice(2, -2)}</strong> : part)}</>;
-}
-export function ReviewerWorkspace() {
-  const [raw, setRaw] = useState(packetSource);
-  const [diff, setDiff] = useState(diffSource);
-  const [review, setReview] = useState<ReviewerState>({ decision: null, comments: [] });
-  const [reviewer, setReviewer] = useState('');
-  const [dark, setDark] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [importDiff, setImportDiff] = useState('');
-  const [error, setError] = useState('');
-  const [output, setOutput] = useState('');
-  const [status, setStatus] = useState('Checking GitHub…');
-  const [imported, setImported] = useState(false);
-  const [pending, setPending] = useState<{ raw: string; diff: string } | null>(null);
-  const packet = parseReviewPacket(raw);
-  const blocking = review.comments.filter(c => c.blocking).length;
-  const untouched = !review.decision && !review.comments.length;
-
+const empty = (): ReviewerState => ({ decision: null, comments: [] });
+function InlineText({ text }: { text: string }) { return <>{text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).map((part,i) => part.startsWith('`') ? <code key={i}>{part.slice(1,-1)}</code> : part.startsWith('**') ? <strong key={i}>{part.slice(2,-2)}</strong> : part)}</>; }
+export function ReviewerWorkspace({ visible = true }: { visible?: boolean }) {
+  const location = useLocation(); const navigate = useNavigate(); const { sendFeedback } = useTrust();
+  const [examples, setExamples] = useState(EXAMPLES); const [active, setActive] = useState('pylint-8898');
+  const [reviews, setReviews] = useState<Record<string, ReviewerState>>({}); const [hydrated, setHydrated] = useState(false);
+  const [reviewer, setReviewer] = useState(''); const [output, setOutput] = useState(''); const [focused, setFocused] = useState('F1'); const [sheet, setSheet] = useState(false);
+  const [status, setStatus] = useState('Checking GitHub…'); const [pending, setPending] = useState<Record<string, Example>>({});
+  const latest = useRef({ examples, reviews });
+  const example = examples.find(e => e.id === active) ?? EXAMPLES[0];
+  if (!example) return null;
+  const packet = example.packet; const review = reviews[active] ?? empty(); const blocking = review.comments.filter(c => c.blocking).length;
+  const items = [...packet.behaviors, ...packet.tests, ...packet.architecture]; const untested = packet.behaviors.filter(i => i.untested).length;
+  useEffect(() => { latest.current = { examples, reviews }; }, [examples,reviews]);
   useEffect(() => {
-    const saved = readPreference('claims-review-theme');
-    const value = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setDark(value); document.documentElement.classList.toggle('dark', value);
+    const saved: Record<string, ReviewerState> = {};
+    for (const e of EXAMPLES) { try { const raw = readPreference(`trust-review:${e.id}`); if (!raw) continue; const parsed = JSON.parse(raw); if (![null,'APPROVE','REQUEST_CHANGES','COMMENT'].includes(parsed.decision) || !Array.isArray(parsed.comments)) continue; if (parsed.comments.every((c: Record<string,unknown>) => typeof c['id'] === 'number' && typeof c['item'] === 'string' && typeof c['text'] === 'string' && typeof c['blocking'] === 'boolean' && [...e.packet.behaviors,...e.packet.tests,...e.packet.architecture].some(i => i.id === c['item']))) saved[e.id] = parsed; } catch { /* Invalid or unavailable storage never blocks review. */ } }
+    setReviews(saved); setHydrated(true);
   }, []);
-  useEffect(() => {
-    if (imported) return;
-    let stopped = false; const controller = new AbortController();
-    const stop = startSourceRefresh(async () => {
-      setStatus('Checking GitHub…');
-      const checkedAt = Date.now();
-      const response = await fetch(`${BASE}.verify/review-packet.md?checked=${checkedAt}`, { cache: 'no-store', signal: controller.signal });
-      if (!response.ok) throw new Error('GitHub unavailable');
-      const next = await response.text(); parseReviewPacket(next);
-      if (next !== raw) {
-        const diffResponse = await fetch(`${BASE}pr.diff?checked=${checkedAt}`, { cache: 'no-store', signal: controller.signal });
-        if (!diffResponse.ok) throw new Error('Diff unavailable');
-        const nextDiff = await diffResponse.text();
-        if (stopped) return;
-        if (untouched) { setRaw(next); setDiff(nextDiff); } else setPending({ raw: next, diff: nextDiff });
-      }
-      if (!stopped) setStatus('GitHub up to date');
-    }, error => setStatus(error instanceof Error && /Expected|Invalid/.test(error.message) ? 'Source packet incomplete · keeping last complete packet' : 'GitHub unavailable · retrying in 1 minute'));
-    return () => { stopped = true; controller.abort(); stop(); };
-  }, [raw, imported, untouched]);
-
-  function comment(item: string) {
-    setReview(current => addReviewComment(current, item)); setOutput('');
-    requestAnimationFrame(() => { const fields = document.querySelectorAll<HTMLTextAreaElement>('[data-review-comment]'); fields[fields.length - 1]?.focus(); });
-  }
-  function exportMarkdown() { return exportReview(packet, review, reviewer, new Date().toISOString().slice(0, 10)); }
-  function rows(items: PacketItem[], section: 'behavior' | 'test' | 'architecture') {
-    return items.map(item => <article key={item.id} id={item.id} className={cn('scroll-mt-24 border-b py-5', item.untested && 'border-l-2 border-l-warn bg-warn-soft/50 px-4')}>
-      <div className="flex items-start gap-3"><span className="w-7 shrink-0 pt-0.5 font-mono text-xs text-muted-foreground">{item.id}</span><div className="min-w-0 flex-1">
-        <p className="break-words text-sm leading-6"><InlineText text={item.text} /></p>
-        {section === 'behavior' && <div className="mt-2 flex flex-wrap gap-2">{item.untested ? <Badge variant="outline" className="border-warn/30 bg-warn-soft text-warn"><AlertTriangle className="mr-1 size-3" />No test</Badge> : item.detail.split(',').map(id => <Button key={id} asChild variant="link" size="sm" className="h-6 px-0 font-mono text-xs"><a href={`#${id.trim()}`}>{id.trim()}<ArrowRight className="size-3" /></a></Button>)}</div>}
-        {section === 'test' && <div className="mt-3 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><ArrowRight className="mt-1 size-3 shrink-0 text-ok" /><p className="min-w-0 break-words"><InlineText text={item.detail} /></p></div>}
-        {section === 'architecture' && <details className="mt-2"><summary className="flex cursor-pointer items-center gap-2 break-all font-mono text-xs text-accent-foreground"><ChevronDown className="size-3 shrink-0" />{item.detail.replace(/`/g, '')}</summary><pre className="mt-3 max-h-96 overflow-auto rounded-md border bg-muted p-3 font-mono text-[11px] leading-5">{diffForFile(diff, item.detail) || 'No matching diff supplied.'}</pre></details>}
-      </div><Button variant="ghost" size="icon" aria-label={`Comment on ${item.id}`} title={`Comment on ${item.id}`} onClick={() => comment(item.id)} className={cn('shrink-0', review.comments.some(c => c.item === item.id) && 'bg-accent text-accent-foreground')}><MessageSquare className="size-4" /></Button></div>
-    </article>);
-  }
-  return <div className="min-h-screen pb-12">
-    <header className="border-b bg-card"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8"><div className="flex items-center gap-3"><div className="brand-mark"><ShieldCheck className="size-5" /></div><div><p className="font-semibold">Trust Issues <span className="hidden font-normal text-muted-foreground sm:inline">/ Reviewer Harness</span></p><p className="text-xs text-muted-foreground">Verification-first review</p></div></div><div className="flex items-center gap-2"><Button asChild variant="ghost" size="sm"><Link to="/">Claims</Link></Button><Button variant="ghost" size="icon" aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'} onClick={() => { setDark(!dark); document.documentElement.classList.toggle('dark', !dark); savePreference('claims-review-theme', dark ? 'light' : 'dark'); }}>{dark ? <Sun /> : <Moon />}</Button><Button variant="outline" size="sm" onClick={() => setImportOpen(true)}><FileUp />Import packet</Button></div></div></header>
-    <main className="mx-auto max-w-6xl px-4 pt-8 sm:px-8">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground"><span className="font-mono">{imported ? 'Imported review packet' : 'pylint-dev/pylint · #8898 · Repository example'}</span><span role="status" aria-label="Reviewer source status">{imported ? 'Local packet' : status}</span></div>
-      {pending && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-l-2 border-warn bg-warn-soft p-4 text-sm"><p>New source packet available. Your current feedback is preserved.</p><Button variant="outline" size="sm" onClick={() => { setRaw(pending.raw); setDiff(pending.diff); setReview({ decision: null, comments: [] }); setOutput(''); setPending(null); }}>Review new version</Button></div>}
-      <h1 className="max-w-4xl break-words text-3xl leading-tight font-semibold">{packet.title}</h1><p className="mt-4 max-w-4xl text-lg leading-7">{packet.summary}</p>
-      <div className="mt-6 grid gap-4 border-y py-5 sm:grid-cols-3">{packet.metrics.split(' · ').map((metric, index) => <div key={metric} className={cn('text-sm leading-6', index === 2 ? 'text-warn' : 'text-muted-foreground')}><span className="mb-1 block text-[10px] font-semibold uppercase text-muted-foreground">{['Verification', 'Test changes', 'Coverage gaps'][index]}</span>{metric}</div>)}</div>
-      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="min-w-0"><section id="behaviors" className="scroll-mt-8"><div className="flex items-center justify-between border-b pb-4"><h2 className="text-lg font-semibold">What the PR does</h2><span className="font-mono text-xs text-muted-foreground">{packet.behaviors.length} behaviors</span></div>{rows(packet.behaviors, 'behavior')}</section><section id="tests" className="mt-10 scroll-mt-8"><div className="flex items-center justify-between border-b pb-4"><h2 className="text-lg font-semibold">Tests</h2><span className="text-xs text-muted-foreground">Input → expected output</span></div>{rows(packet.tests, 'test')}</section>{packet.architecture.length > 0 && <section id="architecture" className="mt-10 scroll-mt-8"><h2 className="border-b pb-4 text-lg font-semibold">Architecture</h2>{rows(packet.architecture, 'architecture')}</section>}</div>
-        <aside className="min-w-0 border-t pt-5 lg:sticky lg:top-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0"><h2 className="mb-4 text-base font-semibold">Your review</h2><div className="grid gap-2">{([['APPROVE','Approve',Check],['REQUEST_CHANGES','Request changes',AlertTriangle],['COMMENT','Comment only',MessageSquare]] as const).map(([value,label,Icon]) => <Button key={value} variant={review.decision === value ? 'default' : 'outline'} aria-pressed={review.decision === value} className="justify-start" onClick={() => { setReview(current => ({ ...current, decision: value as Decision })); setOutput(''); }}><Icon className="size-4" />{label}</Button>)}</div>
-        {review.decision === 'APPROVE' && blocking > 0 && <p role="alert" className="mt-3 text-xs leading-5 text-warn">{blocking} blocking comments remain. Approve only if they can wait.</p>}
-        <div className="mt-6 flex items-center justify-between"><h3 className="text-sm font-semibold">Comments</h3><span className="font-mono text-xs text-muted-foreground">{review.comments.length}</span></div>
-        {review.comments.map(c => <div key={c.id} className="mt-4 border-t pt-3"><div className="mb-2 flex items-center justify-between"><a href={`#${c.item}`} className="font-mono text-xs text-accent-foreground">{c.item}</a><Button variant="ghost" size="icon" className="size-7" aria-label={`Remove comment ${c.item}`} onClick={() => setReview(current => ({ ...current, comments: current.comments.filter(item => item.id !== c.id) }))}><Trash2 className="size-3" /></Button></div><Textarea data-review-comment aria-label={`Feedback on ${c.item}`} value={c.text} placeholder="What should change?" className="min-h-24 text-xs" onChange={event => setReview(current => ({ ...current, comments: current.comments.map(item => item.id === c.id ? { ...item, text: event.target.value } : item) }))} /><div className="mt-2 flex items-center gap-2"><Switch id={`blocking-${c.id}`} checked={c.blocking} onCheckedChange={value => setReview(current => ({ ...current, comments: current.comments.map(item => item.id === c.id ? { ...item, blocking: value } : item) }))} /><label htmlFor={`blocking-${c.id}`} className="text-xs text-muted-foreground">Blocking</label></div></div>)}
-        <label className="mt-6 block text-xs text-muted-foreground" htmlFor="reviewer-name">Reviewer</label><Input id="reviewer-name" value={reviewer} onChange={event => setReviewer(event.target.value)} placeholder="Your name" className="mt-2" />
-        <div className="mt-4 flex gap-2"><Button variant="outline" className="flex-1" disabled={!review.decision} onClick={async () => { const md = exportMarkdown(); setOutput(md); try { await navigator.clipboard.writeText(md); toast.success('Review copied'); } catch { toast.error('Copy the review text below.'); } }}><Copy />Copy review</Button><Button variant="outline" size="icon" aria-label="Download review.md" title="Download review.md" disabled={!review.decision} onClick={() => { const md = exportMarkdown(); setOutput(md); const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'review.md'; anchor.click(); URL.revokeObjectURL(url); }}><Download /></Button></div>
-        {output && <pre aria-label="Exported review" className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-md border bg-muted p-3 font-mono text-[10px] leading-5">{output}</pre>}
-        </aside>
-      </div>
-    </main>
-    <Dialog open={importOpen} onOpenChange={setImportOpen}><DialogContent className="max-h-[90dvh] overflow-auto"><DialogHeader><DialogTitle>Import review packet</DialogTitle><DialogDescription>.verify/review-packet.md and optional pr.diff</DialogDescription></DialogHeader><Input type="file" accept=".md,text/markdown" aria-label="Upload review packet" onChange={async event => { const file = event.target.files?.[0]; if (file) setInput(await file.text()); }} /><Textarea aria-label="Review packet markdown" value={input} onChange={event => setInput(event.target.value)} placeholder="# Review: …" className="min-h-48 font-mono text-xs" /><Input type="file" aria-label="Upload PR diff" accept=".diff,.patch,text/plain" onChange={async event => { const file = event.target.files?.[0]; if (file) setImportDiff(await file.text()); }} />{error && <p role="alert" className="text-xs text-destructive">{error}</p>}<Button disabled={!input} onClick={() => { try { parseReviewPacket(input); setRaw(input); setDiff(importDiff); setReview({ decision: null, comments: [] }); setImported(true); setPending(null); setOutput(''); setImportOpen(false); setError(''); } catch (e) { setError(e instanceof Error ? e.message : 'Invalid packet'); } }}>Import packet<ArrowRight /></Button></DialogContent></Dialog>
-  </div>;
+  useEffect(() => { if (!hydrated) return; for (const [id,state] of Object.entries(reviews)) savePreference(`trust-review:${id}`, JSON.stringify(state)); }, [reviews,hydrated]);
+  useEffect(() => { const requested = new URLSearchParams(location.searchStr).get('example'); if (requested && examples.some(e => e.id === requested)) { setActive(requested); setOutput(''); setFocused('F1'); } }, [location.searchStr]);
+  useEffect(() => { let disposed = false; const controller = new AbortController(); const stop = startSourceRefresh(async () => {
+    const current = latest.current; setStatus('Checking GitHub…');
+    const next = await Promise.all(current.examples.map(async e => { const response = await fetch(`https://raw.githubusercontent.com/jhoh10/aie_hackathon/main/verification-first-reviewer-harness/examples/${e.id}/.verify/review-packet.md`, { cache:'no-store',signal:controller.signal }); if (!response.ok) throw new Error('GitHub unavailable'); const packet = parseReviewPacket(await response.text()); return { ...e, packet, claimsProven: packet.metrics.startsWith('No approved') ? null : packet.metrics.split(' · ')[0]?.replace('Claims proven ','') ?? null }; }));
+    if (disposed) return;
+    setExamples(previous => previous.map(e => { const candidate = next.find(n => n.id === e.id); if (!candidate || JSON.stringify(candidate.packet) === JSON.stringify(e.packet)) return e; const feedback = latest.current.reviews[e.id]; if (feedback?.decision || feedback?.comments.length) { setPending(p => ({ ...p,[e.id]:candidate })); return e; } return candidate; })); setStatus('GitHub up to date');
+  }, () => { if (!disposed) setStatus('GitHub unavailable · retrying in 1 minute'); }); return () => { disposed = true; controller.abort(); stop(); }; }, []);
+  function update(fn: (state: ReviewerState) => ReviewerState) { setReviews(previous => ({ ...previous,[active]:fn(previous[active] ?? empty()) })); setOutput(''); }
+  function comment(id: string) { update(state => addReviewComment(state,id)); setFocused(id); if (window.innerWidth < 1024) setSheet(true); setTimeout(() => { const fields = document.querySelectorAll<HTMLTextAreaElement>('[data-review-comment]'); [...fields].filter(f => f.getClientRects().length).at(-1)?.focus(); },100); }
+  useEffect(() => { const keyboard = (e: KeyboardEvent) => { if (!visible || (e.target instanceof HTMLElement && (e.target.matches('input,textarea,select') || e.target.isContentEditable)) || e.ctrlKey || e.metaKey || e.altKey) return; if (e.key === 'j' || e.key === 'k') { e.preventDefault(); const index = items.findIndex(i => i.id === focused); const next = items[Math.max(0,Math.min(items.length-1,index+(e.key === 'j' ? 1 : -1)))]; if (next) { setFocused(next.id); document.getElementById(`packet-${next.id}`)?.scrollIntoView({ block:'center',behavior:'smooth' }); } } if (e.key === 'c') { e.preventDefault(); comment(focused); } const decision: Record<string,Decision> = { a:'APPROVE',r:'REQUEST_CHANGES',m:'COMMENT' }; const chosen = decision[e.key]; if (chosen) { e.preventDefault(); update(s => ({ ...s,decision:chosen })); } }; window.addEventListener('keydown',keyboard); return () => window.removeEventListener('keydown',keyboard); });
+  function commentButton(item: PacketItem) { return <Button variant="ghost" size="sm" aria-label={`Comment on ${item.id}`} onClick={() => comment(item.id)} onFocus={() => setFocused(item.id)} className="shrink-0 gap-1.5 text-xs text-muted-foreground"><MessageSquare className="size-3.5" /><span className="hidden sm:inline">Comment</span>{review.comments.some(c => c.item === item.id) && <span className="size-1.5 rounded-full bg-primary" />}</Button>; }
+  const panel = <><div className="mb-4 flex items-center justify-between"><h2 className="text-base font-semibold">Your decision</h2><Badge variant="outline" className="font-mono text-[10px]">{review.comments.length} comments</Badge></div><div className="grid gap-2">{([['APPROVE','Approve',Check],['REQUEST_CHANGES','Request changes',AlertTriangle],['COMMENT','Comment only',MessageSquare]] as const).map(([value,label,Icon]) => <Button key={value} variant="outline" aria-pressed={review.decision === value} className={cn('justify-start',review.decision === value && (value === 'APPROVE' ? 'border-ok bg-ok-soft text-ok' : value === 'REQUEST_CHANGES' ? 'border-sec bg-sec-soft text-sec' : 'border-primary bg-muted'))} onClick={() => update(s => ({ ...s,decision:value }))}><Icon className="size-4" />{label}</Button>)}</div>
+    {review.decision === 'APPROVE' && blocking > 0 && <p role="alert" className="mt-3 text-xs leading-5 text-warn">You have {blocking} blocking comments. Approve only if they can wait, or choose Request changes.</p>}
+    <div className="mt-6 border-t pt-4"><h3 className="text-xs font-semibold">Comments</h3>{!review.comments.length && <p className="py-5 text-xs text-muted-foreground">No comments yet.</p>}{review.comments.map(c => <div key={c.id} className="comment-card mt-3 rounded-xl border bg-card p-3"><div className="mb-2 flex items-center justify-between"><Button variant="link" size="sm" className="h-6 p-0 font-mono text-xs" onClick={() => { setSheet(false); document.getElementById(`packet-${c.item}`)?.scrollIntoView({block:'center'}); setFocused(c.item); }}>{c.item}</Button><Button variant="ghost" size="icon" className="size-6" aria-label={`Remove comment ${c.item}`} onClick={() => update(s => ({ ...s,comments:s.comments.filter(i => i.id !== c.id) }))}><X className="size-3" /></Button></div><Textarea data-review-comment aria-label={`Feedback on ${c.item}`} value={c.text} placeholder="What should change?" className="min-h-24 text-xs" onChange={e => update(s => ({ ...s,comments:s.comments.map(i => i.id === c.id ? { ...i,text:e.target.value } : i) }))} /><div className="mt-3 flex items-center gap-2"><Checkbox id={`blocking-${c.id}`} checked={c.blocking} onCheckedChange={value => update(s => ({ ...s,comments:s.comments.map(i => i.id === c.id ? { ...i,blocking:value === true } : i) }))} /><label htmlFor={`blocking-${c.id}`} className="text-xs text-sec">Blocking</label></div></div>)}</div>
+    <label htmlFor="reviewer-name" className="mt-5 block text-xs text-muted-foreground">Reviewer</label><Input id="reviewer-name" className="mt-2" placeholder="Your name" value={reviewer} onChange={e => setReviewer(e.target.value)} />
+    <Button variant="outline" className="mt-4 w-full" disabled={!review.decision} onClick={async () => { const md = exportReview(packet,review,reviewer,new Date().toISOString().slice(0,10)); setOutput(md); try { await navigator.clipboard.writeText(md); toast.success('Review copied'); } catch { toast.error('Select the preview to copy your review.'); } }}><Copy />Copy as review.md</Button>
+    {review.decision === 'REQUEST_CHANGES' && blocking > 0 && <Button className="mt-3 h-auto w-full whitespace-normal py-3 text-xs" onClick={() => { sendFeedback(proposedEdits(review),active); setSheet(false); }}>Send to Developer as claim edits<ArrowRight className="shrink-0" /></Button>}
+    {output && <pre aria-label="Exported review" className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-lg border bg-muted p-3 font-mono text-[10px] leading-5">{output}</pre>}
+  </>;
+  return <main className="reviewer-workspace mx-auto max-w-6xl px-4 py-8 pb-24 sm:px-8">
+    <div className="mb-6 grid grid-cols-2 gap-2 lg:grid-cols-4" aria-label="Review examples">{examples.map(e => <Button key={e.id} variant="outline" aria-pressed={active === e.id} className={cn('h-auto min-w-0 flex-col items-start justify-start gap-2 whitespace-normal px-3 py-3 text-left',active === e.id && 'border-primary bg-card ring-1 ring-primary/15')} onClick={() => { setActive(e.id); setFocused('F1'); setOutput(''); void navigate({to:'/reviewer',search:{example:e.id}}); }}><span className="break-all font-mono text-[11px] font-semibold">{e.id}</span><span className="text-[11px] leading-4 font-normal text-muted-foreground"><InlineText text={e.caption} /></span></Button>)}</div>
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-2"><p className="font-mono text-[10px] text-muted-foreground">Review packet · review the change, not the code</p><span role="status" className="text-[10px] text-muted-foreground">{status}</span></div>
+    {pending[active] && <div className="mb-5 border-l-2 border-warn bg-warn-soft p-4 text-xs">New source packet available. Your feedback is preserved.<Button variant="outline" size="sm" className="ml-2" onClick={() => { const next = pending[active]; if (!next) return; setExamples(es => es.map(e => e.id === active ? next : e)); update(() => empty()); setPending(p => { const next = {...p}; delete next[active]; return next; }); }}>Review new version</Button></div>}
+    <h2 className="max-w-4xl text-2xl leading-tight font-semibold sm:text-3xl">{packet.title}</h2><p className="mt-3 max-w-4xl text-sm leading-6 text-muted-foreground"><InlineText text={packet.summary} /></p>
+    <div className="mt-6 flex flex-wrap gap-2"><Badge variant="outline" className={cn('stat-chip',example.claimsProven ? 'border-ok/25 bg-ok-soft text-ok' : 'bg-muted text-muted-foreground')}>{example.claimsProven ? `${example.claimsProven} · claims proven` : 'None · approved claims'}</Badge><Badge variant="outline" className="stat-chip bg-card font-mono">{packet.metrics.split(' · ')[1]}</Badge><Badge variant="outline" className={cn('stat-chip',untested ? 'border-sec/25 bg-sec-soft text-sec' : 'border-ok/25 bg-ok-soft text-ok')}>{untested ? <AlertTriangle className="size-3" /> : <Check className="size-3" />}{untested} untested behaviours</Badge></div>
+    <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{example.source}{!example.claimsProven && ' · No approved plan: every behaviour is judged by its tests alone.'}</p>
+    <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_290px]"><div className="min-w-0"><section><div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3"><h3 className="text-base font-semibold">What the PR does</h3><span className="font-mono text-[10px] text-muted-foreground">{packet.behaviors.length} behaviour changes · {untested} with no test</span></div><div className="mt-2 space-y-1">{packet.behaviors.map(item => <article key={item.id} id={`packet-${item.id}`} className={cn('packet-item scroll-mt-8 rounded-lg border border-transparent px-3 py-4',item.untested && 'border-warn/20 bg-warn-soft',focused === item.id && 'packet-focused')}><div className="flex items-start gap-3"><span className="mt-1 w-6 shrink-0 font-mono text-xs text-muted-foreground">{item.id}</span><div className="min-w-0 flex-1"><p className="text-sm leading-6"><InlineText text={item.text} /></p><Badge variant="outline" className={cn('mt-2 text-[10px]',item.untested ? 'border-warn/25 bg-warn-soft text-warn' : 'border-ok/25 bg-ok-soft text-ok')}>{item.untested ? 'No test' : item.detail}</Badge></div>{commentButton(item)}</div></article>)}</div></section>
+    {packet.tests.length > 0 && <section className="mt-9"><div className="flex items-center justify-between border-b pb-3"><h3 className="text-base font-semibold">Tests</h3><span className="font-mono text-[10px] text-muted-foreground">{packet.tests.length} rows</span></div><div className="test-table-head mt-3 grid grid-cols-[32px_1fr_1fr_80px] gap-3 px-3 text-[10px] text-muted-foreground"><span>#</span><span>Input</span><span>Expected output</span><span /></div>{packet.tests.map(item => <article key={item.id} id={`packet-${item.id}`} className={cn('test-row scroll-mt-8 border-b px-3 py-4',item.changed && 'bg-warn-soft',focused === item.id && 'packet-focused')}><span className="font-mono text-xs text-muted-foreground">{item.id}</span><div className="min-w-0 break-words text-xs leading-6"><span className="mobile-table-label">Input</span><InlineText text={item.text} /></div><div className="min-w-0 break-words text-xs leading-6"><span className="mobile-table-label">Expected output</span><InlineText text={item.detail} />{item.changed && <Badge variant="outline" className="mt-2 border-warn/25 text-[10px] text-warn">Changed expectation</Badge>}</div>{commentButton(item)}</article>)}</section>}
+    {packet.architecture.length > 0 && <section className="mt-9"><h3 className="border-b pb-3 text-base font-semibold">Architecture changes</h3>{packet.architecture.map(item => <article key={item.id} id={`packet-${item.id}`} className="flex items-start gap-3 border-b py-4"><span className="font-mono text-xs">{item.id}</span><div className="min-w-0 flex-1 text-sm"><InlineText text={item.text} /><p className="mt-2 text-xs text-muted-foreground"><InlineText text={item.detail} /></p></div>{commentButton(item)}</article>)}</section>}</div>
+    <aside className="hidden min-w-0 border-l pl-6 lg:sticky lg:top-6 lg:block">{panel}</aside></div>
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-card px-4 py-3 lg:hidden"><Sheet open={sheet} onOpenChange={setSheet}><SheetTrigger asChild><Button className="w-full"><MessageSquare />Your decision · {review.comments.length} comments</Button></SheetTrigger><SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-xl p-5"><SheetHeader><SheetTitle className="sr-only">Review decision</SheetTitle></SheetHeader>{panel}</SheetContent></Sheet></div>
+  </main>;
 }

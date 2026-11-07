@@ -10,6 +10,7 @@ export const CATEGORY: Record<CategoryId, {name: string; note: string}> = {
   budgets:     {name:'Quality budgets',            note:'Performance, accessibility and cost limits'},
   formal:      {name:'Formal guarantees',          note:'Proved for every input in Lean 4, checked by its kernel'},
   model:       {name:'Code matches the model',     note:'The shipped code agrees with what was proved'},
+  review: {name:'From review', note:'Proposed claim edits · needs approval'},
   preserved:   {name:'Preserved behaviour',        note:'What already worked keeps working'}
 };
 

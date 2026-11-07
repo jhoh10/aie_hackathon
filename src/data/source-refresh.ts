@@ -54,6 +54,7 @@ export function parseSourceHtml(html: string): SourceBundle {
   const rawCategories = z.record(z.object({ name: z.string().min(1), note: z.string().min(1) }).strict()).parse(constants['CATEGORY']);
   const rawStrengths = z.record(z.object({ label: z.string().min(1), tip: z.string().min(1) }).strict()).parse(constants['STRENGTH']);
   for (const id of Object.keys(CATEGORY) as CategoryId[]) {
+    if (id === 'review') continue;
     const value = rawCategories[id]; if (!value) throw new Error('Missing category metadata.'); categories[id] = value;
   }
   for (const id of Object.keys(STRENGTH) as Strength[]) {
@@ -78,7 +79,7 @@ export function reconcileSource(current: Record<string, Plan>, reviews: Record<s
   const plans = { ...source };
   const nextReviews = { ...reviews };
   for (const [id, plan] of Object.entries(current)) {
-    if (id === 'imported' || reviews[id]?.locked) { plans[id] = plan; continue; }
+    if (id === 'imported' || id === 'feedback' || reviews[id]?.locked) { plans[id] = plan; continue; }
     if (JSON.stringify(plan) !== JSON.stringify(source[id])) {
       if (source[id]) nextReviews[id] = freshReview(source[id], policy);
       else delete nextReviews[id];
