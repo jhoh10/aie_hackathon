@@ -42,6 +42,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
+- [ ] Load the claims review page from a real `.verify/plan.md` instead of built-in examples; add `category` and evidence `strength` to the plan template so the agent fills them in phase C
 - [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
@@ -57,6 +58,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 ## Done
 
+- [x] [MA] Claims review page: claims grouped by guarantee category per use case (bug fix, feature, refactor, Lean), evidence strength per check, routine regression collapsible, approve per claim → verifier JSON (verification-first-harness/ui/plan-review.html) (2026-11-07)
 - [x] [JH] Hand the harness's approved claims to the verifier: `verifier/src/handoff.ts` turns `.verify/plan.md` into claims JSON and runs the verifier. PASS on `h-bearer` (checks hand-written, Meta billing blocked) (2026-11-07)
 - [x] Verifier model step points at Muse Spark (`muse-spark-1.3`, `https://api.meta.ai/v1`), reads `META_API_KEY`; "Running it" in the README filled in (2026-11-07)
 - [x] [DT] Harness run end to end on two SWE-bench Verified tasks (sympy-24661, pylint-8898), side by side with default Claude Code; both sides resolved both (2026-11-07)
