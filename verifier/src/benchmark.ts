@@ -41,9 +41,10 @@ async function runCi(c: Case) {
   const files = (await sh('git', ['-C', REPO, 'diff', '--name-only', `${c.base}..${c.head}`, '--', '*.go'])).split('\n').filter(Boolean);
   const pkgs = [...new Set(files.map((f) => './' + f.split('/').slice(0, -1).join('/')).filter((p) => /^\.\/(apis|core|tools)/.test(p)))];
   if (!pkgs.length) return { id: c.id, pass: true, pkgs, note: 'no tested packages touched' };
+  const started = Date.now();
   const script = `mkdir -p /s && git -C /repo archive ${c.head} | tar -x -C /s && cd /s && CGO_ENABLED=0 go test ${pkgs.join(' ')} 2>&1 | tail -15`;
   const out = await sh('docker', ['run', '--rm', '-v', `${REPO}:/repo:ro`, '-v', 'vouch-gomod:/go/pkg/mod', '-v', 'vouch-gocache:/root/.cache/go-build', '-e', 'GOFLAGS=-buildvcs=false', 'golang:1.27-alpine', 'sh', '-c', `apk add -q git >/dev/null; git config --global --add safe.directory '*'; ${script}`]);
-  const r = { id: c.id, pkgs, pass: !/^(FAIL|--- FAIL|panic:)/m.test(out) && /^ok/m.test(out), tail: out.slice(-1200) };
+  const r = { id: c.id, pkgs, pass: !/^(FAIL|--- FAIL|panic:)/m.test(out) && /^ok/m.test(out), tail: out.slice(-1200), wallMs: Date.now() - started };
   writeFileSync(cacheFile, JSON.stringify(r));
   log(c.id, 'ci', r.pass ? 'pass' : 'FAIL');
   return r;
@@ -52,7 +53,9 @@ async function runCi(c: Case) {
 async function each<T>(name: string, n: number, fn: (c: Case) => Promise<T>) {
   const results: Record<string, T | { error: string }> = {};
   await pool(cases, n, async (c) => {
-    try { results[c.id] = await fn(c); }
+    const started = Date.now();
+    // Wall time for this case and approach. CI keeps the time of its original run when read from cache.
+    try { const r: any = await fn(c); results[c.id] = r && typeof r === 'object' && r.wallMs == null ? { ...r, wallMs: Date.now() - started } : r; }
     catch (e: any) {
       if (e instanceof Pending) pending.push(e.message);
       else { results[c.id] = { error: String(e.message ?? e).slice(0, 600) }; log(c.id, name, 'ERROR', String(e.message ?? e).slice(0, 300)); }

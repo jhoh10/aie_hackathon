@@ -41,12 +41,17 @@ Runs that errored are counted separately and left out of the rates.
    - Every other approach: the person still has to read the diff, at 400 changed lines per hour. Diff size counts non-test Go lines and needs the PocketBase clone at `.work/repos/pocketbase`.
 
    The minute figures rest on these assumptions (`ASSUME` in `src/metrics.ts`). The raw counts behind them are in `metrics.json` too: number of claims and words approved, NEEDS_HUMAN verdicts, reasons to read and diff lines.
-6. **Evidence quality (verifier only).** Claims proven out of all claims, the share of changed statements the tests reached, probes with unstable results, and checks that were inconclusive.
+6. **Wall time.** How long each approach takes by the clock, per case. The table shows the median; `metrics.json` also has the maximum and the time for every case.
+   - Each approach: `wallMs`, saved by the benchmark with every result.
+   - Verifier stages: `timings` in each verifier result, in ms: `claims`, `write_checks`, `build`, `run_checks`, `coverage`, `triage` and `total`. The run-checks stage runs every check twice on both versions, so it is usually the largest.
+   - People, from live runs on the PR page (`.work/runs/*.json`): time to approve the claims (`claimsReadyAt` to `approvedAt`) and how long the engineer waits for a verdict after approving (`approvedAt` to `doneAt`). These are real times, unlike the modelled minutes in metric 5.
+7. **Evidence quality (verifier only).** Claims proven out of all claims, the share of changed statements the tests reached, probes with unstable results, and checks that were inconclusive.
 
 ## Limits
 
 - The dev split has 8 cases, so one case moves a rate by 12 points or more. Report counts next to percentages.
-- Effort is modelled, not timed. The server now records `claimsReadyAt`, `approvedAt` and `doneAt` for each run, so a live demo run can show real approval time.
+- Developer effort (metric 5) is modelled. Wall time from live runs (metric 6) is the measured version, but only for runs done on the PR page.
+- Wall time is noisy on a laptop and venue Wi-Fi. Model stages take almost no time when answers come from the cache in `.work/gen`, and a Docker build is much slower the first time than once the image exists. Report the median, and say whether models and images were cached.
 - 400 lines per hour is a common figure for careful code review. Reading speed for claims is a guess. Both are easy to change.
 
 ## In the demo

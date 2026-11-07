@@ -4,6 +4,7 @@ Newest entries at the top. Keep each one short: what happened, who, and anything
 
 ## 2026-11-07
 
+- **Wall time added to the metrics** (JH). The benchmark saves how long each approach takes per case, the verifier saves time per stage (build, run checks and so on), and live PR-page runs give the real time to approve claims and to wait for a verdict. `node src/metrics.ts` shows medians. See verifier/docs/metrics.md, metric 6.
 - **"Claims" replaces "tests" as what the engineer approves** (JH, agreed with DT). The plan is now a list of claims, each with the checks that prove it; the claims are the same JSON the verifier takes. Updated the pitch, the harness README, conversation.md and the templates. See docs/decisions.md.
 - **Harness display at any scale** (JH). The plan and report show one tree: feature → area → claim → evidence. The tree opens further for small tasks and stays rolled up for features, and failures always open to the failing test. Claims gained an optional `group` field (display only). See verification-first-harness/display-scaling.md.
 - **Metrics defined** (JH, merged to main with the verifier). `verifier/docs/metrics.md` defines defects caught, defects that would merge, false alarms, tokens, developer effort and evidence quality. `node src/metrics.ts dev` computes them from benchmark results. Model calls now save token usage. Not run on real results yet, since there are none.

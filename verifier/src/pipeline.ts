@@ -30,17 +30,24 @@ export async function extractClaimsFor(key: string, issue: string, model: Model)
 export async function verify(i: VerifyInput, model: Model) {
   const emit = i.onEvent ?? (() => {});
   const conc = i.concurrency ?? 4;
+  // Wall time per stage in ms. Model stages are near zero when answers come from the cache.
+  const timings: Record<string, number> = {};
+  const t0 = Date.now(); let mark = t0;
+  const lap = (stage: string) => { const now = Date.now(); timings[stage] = (timings[stage] ?? 0) + now - mark; mark = now; };
   // Independent stage: nothing here can read the diff.
   const claims = i.approvedClaims ?? (await extractClaimsFor(i.key, i.issue, model));
+  lap('claims');
   emit('claims', { claims });
   const claimTests = (await model.json('claim_tests', i.key, P.writeClaimTests(claims))).scenarios;
   const diff = diffFor(i.repo, i.base, i.head);
   const probes = (await model.json('probes', i.key, P.writeProbes(diff))).scenarios.map((p: any) => ({ ...p, kind: 'probe' }));
+  lap('write_checks');
   const lock = sha({ claims, claimTests, probes });
   emit('locked', { lock, claimTests: claimTests.length, probes: probes.length });
 
   await ensureNetwork();
   const [baseImg, headImg] = await Promise.all([buildImage(i.repo, i.base), buildImage(i.repo, i.head)]);
+  lap('build');
   emit('built');
   const cov = await newCoverageVolume();
   const runBoth = async (s: any) => {
@@ -50,8 +57,10 @@ export async function verify(i: VerifyInput, model: Model) {
   };
   const claimRuns = await pool(claimTests, conc, runBoth);
   const probeRuns = await pool(probes, conc, runBoth);
+  lap('run_checks');
   const profile = await readCoverage(cov).catch(() => '');
   const reach = reachOfChanged(diff, profile);
+  lap('coverage');
 
   const claimResults: { id: string; text: string; result: ClaimResult; scenarios: any[] }[] = claims.map((c: any) => {
     const mine = claimRuns.filter((r: any) => r.s.claim === c.id);
@@ -68,8 +77,10 @@ export async function verify(i: VerifyInput, model: Model) {
     triage = (await model.json('triage', i.key, P.triageDiff(claims, summary))).findings;
     findings = changed.map((r: any) => { const t = triage.find((x) => x.id === r.s.id); return { id: r.s.id, changed: true, triage: t?.triage ?? 'unknown', severity: t?.severity }; });
   }
+  lap('triage');
+  timings.total = Date.now() - t0;
   const decision = decide({ claims: claimResults, probes: findings, reach, minReach: i.minReach ?? 0.3 });
-  const result = { key: i.key, base: i.base, head: i.head, lock, locked: { claims, claimTests, probes, triage }, ...decision, claims: claimResults, probes: { total: probes.length, changed: findings, triage, unstable, runs: probeRuns.map((r: any) => ({ id: r.s.id, base: r.base.run, head: r.head.run, changed: r.base.print !== r.head.print })) }, reach };
+  const result = { key: i.key, base: i.base, head: i.head, lock, locked: { claims, claimTests, probes, triage }, ...decision, claims: claimResults, probes: { total: probes.length, changed: findings, triage, unstable, runs: probeRuns.map((r: any) => ({ id: r.s.id, base: r.base.run, head: r.head.run, changed: r.base.print !== r.head.print })) }, reach, timings };
   emit('verdict', { verdict: decision.verdict, reasons: decision.reasons });
   return result;
 }

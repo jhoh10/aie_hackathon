@@ -29,6 +29,7 @@ export interface ScoreInput {
   results: Partial<Record<Approach, Record<string, any>>>;
   usage?: Record<string, Usage[]>; // case id -> model calls
   diffLines?: Record<string, number>; // case id -> changed non-test Go lines
+  liveRuns?: any[]; // server runs, for human wall time
 }
 
 export type Decision = 'approve' | 'flag' | 'error' | 'missing';
@@ -46,6 +47,20 @@ export function decision(approach: Approach, r: any): Decision {
 }
 
 const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
+export const median = (xs: number[]) => {
+  if (!xs.length) return null;
+  const s = [...xs].sort((a, b) => a - b), m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const secs = (ms: number | null) => (ms == null ? null : Math.round(ms / 100) / 10);
+
+/** Human wall time from live server runs (.work/runs/*.json): time to approve claims, and time the engineer waits for a verdict. */
+export function liveTimes(runs: any[]) {
+  const gap = (a?: string, b?: string) => (a && b ? Date.parse(b) - Date.parse(a) : null);
+  const approve = runs.map((r) => gap(r.claimsReadyAt, r.approvedAt)).filter((x): x is number => x != null && x >= 0);
+  const wait = runs.map((r) => gap(r.approvedAt, r.doneAt)).filter((x): x is number => x != null && x >= 0);
+  return { runs: runs.length, approveSecondsMedian: secs(median(approve)), verdictWaitSecondsMedian: secs(median(wait)), approved: approve.length, finished: wait.length };
+}
 const rate = (n: number, d: number) => (d ? n / d : null);
 const round = (x: number | null, p = 1) => (x == null ? null : Math.round(x * 10 ** p) / 10 ** p);
 
@@ -59,6 +74,8 @@ export function score(i: ScoreInput) {
     let tokens = 0, estimated = false, tokenCases = 0;
     let planningWords = 0, claimCount = 0, reasonsToRead = 0, humanVerdicts = 0, minutes = 0;
     let proven = 0, claimsTotal = 0, reached = 0, reachTotal = 0, unstable = 0, inconclusive = 0;
+    const wall: number[] = [];
+    const stages: Record<string, number[]> = {};
     for (const c of i.cases) {
       const r = res[c.id];
       const d = decision(a, r);
@@ -68,6 +85,8 @@ export function score(i: ScoreInput) {
       if (c.expected === 'bad') { bad++; if (d === 'flag') caught++; else escaped++; }
       else { good++; if (d === 'flag') falseAlarms++; else cleanPasses++; }
 
+      if (typeof r.wallMs === 'number') wall.push(r.wallMs);
+      for (const [k, ms] of Object.entries(r.timings ?? {})) if (typeof ms === 'number') (stages[k] ??= []).push(ms);
       const calls = (i.usage?.[c.id] ?? []).filter((u) => ROLES[a].includes(u.role));
       if (calls.length) tokenCases++;
       for (const u of calls) { tokens += u.prompt_tokens + u.completion_tokens; estimated ||= u.estimated; }
@@ -90,7 +109,7 @@ export function score(i: ScoreInput) {
         caseMinutes = (i.diffLines[c.id] / ASSUME.reviewLocPerHour) * 60;
       }
       if (caseMinutes != null) minutes += caseMinutes;
-      perCase.push({ id: c.id, group: c.group, expected: c.expected, approach: a, decision: d, verdict: r.verdict, tokens: calls.reduce((n, u) => n + u.prompt_tokens + u.completion_tokens, 0), minutes: round(caseMinutes) });
+      perCase.push({ id: c.id, group: c.group, expected: c.expected, approach: a, decision: d, verdict: r.verdict, tokens: calls.reduce((n, u) => n + u.prompt_tokens + u.completion_tokens, 0), minutes: round(caseMinutes), wallSeconds: secs(r.wallMs ?? null) });
     }
     perApproach[a] = {
       scored, errors,
@@ -98,6 +117,8 @@ export function score(i: ScoreInput) {
       falseAlarms, falseAlarmRate: round(rate(falseAlarms, good), 2), cleanPasses,
       tokens, tokensPerCase: tokenCases ? Math.round(tokens / tokenCases) : null, tokensEstimated: estimated,
       effortMinutes: round(minutes), effortMinutesPerCase: round(scored ? minutes / scored : null),
+      wallSecondsMedian: secs(median(wall)), wallSecondsMax: secs(wall.length ? Math.max(...wall) : null),
+      ...(Object.keys(stages).length ? { stageSecondsMedian: Object.fromEntries(Object.entries(stages).map(([k, v]) => [k, secs(median(v))])) } : {}),
       ...(a === 'verifier' ? {
         planning: { claims: claimCount, words: planningWords },
         review: { needsHuman: humanVerdicts, reasonsToRead },
@@ -105,15 +126,20 @@ export function score(i: ScoreInput) {
       } : {}),
     };
   }
-  return { assumptions: ASSUME, approaches: perApproach, cases: perCase };
+  return { assumptions: ASSUME, approaches: perApproach, cases: perCase, ...(i.liveRuns ? { live: liveTimes(i.liveRuns) } : {}) };
 }
 
 export function toMarkdown(s: ReturnType<typeof score>) {
   const pct = (x: number | null) => (x == null ? 'n/a' : `${Math.round(x * 100)}%`);
   const rows = Object.entries(s.approaches).map(([a, m]: [string, any]) =>
-    `| ${a} | ${m.scored} | ${m.caught} (${pct(m.catchRate)}) | ${m.escaped} | ${m.falseAlarms} (${pct(m.falseAlarmRate)}) | ${m.tokensPerCase ?? 'n/a'}${m.tokensEstimated ? '~' : ''} | ${m.effortMinutesPerCase ?? 'n/a'} |`);
-  return ['| Approach | Cases | Defects caught | Defects merged | False alarms | Tokens / case | Dev minutes / case |', '|---|---|---|---|---|---|---|', ...rows,
-    '', '~ token counts estimated at 4 characters per token. Minutes use the assumptions in src/metrics.ts.'].join('\n');
+    `| ${a} | ${m.scored} | ${m.caught} (${pct(m.catchRate)}) | ${m.escaped} | ${m.falseAlarms} (${pct(m.falseAlarmRate)}) | ${m.tokensPerCase ?? 'n/a'}${m.tokensEstimated ? '~' : ''} | ${m.effortMinutesPerCase ?? 'n/a'} | ${m.wallSecondsMedian ?? 'n/a'} |`);
+  const out = ['| Approach | Cases | Defects caught | Defects merged | False alarms | Tokens / case | Dev minutes / case | Wall seconds (median) |', '|---|---|---|---|---|---|---|---|', ...rows,
+    '', '~ token counts estimated at 4 characters per token. Minutes use the assumptions in src/metrics.ts.'];
+  const st = (s.approaches as any).verifier?.stageSecondsMedian;
+  if (st) out.push('', 'Verifier wall seconds by stage (median): ' + Object.entries(st).map(([k, v]) => `${k} ${v}`).join(', '));
+  const live = (s as any).live;
+  if (live?.runs) out.push('', `Live runs: ${live.runs}. Median time to approve claims: ${live.approveSecondsMedian ?? 'n/a'} s. Median wait for a verdict after approval: ${live.verdictWaitSecondsMedian ?? 'n/a'} s.`);
+  return out.join('\n');
 }
 
 if (import.meta.main) {
@@ -141,7 +167,9 @@ if (import.meta.main) {
       diffLines[c.id] = out.split('\n').filter(Boolean).reduce((n, l) => n + (+l.split('\t')[0] || 0) + (+l.split('\t')[1] || 0), 0);
     } catch {}
   }
-  const s = score({ cases, results, usage, diffLines });
+  const runsDir = join(ROOT, '.work/runs');
+  const liveRuns = existsSync(runsDir) ? readdirSync(runsDir).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(join(runsDir, f), 'utf8'))) : [];
+  const s = score({ cases, results, usage, diffLines, liveRuns });
   writeFileSync(join(dir, 'metrics.json'), JSON.stringify(s, null, 1));
   console.log(toMarkdown(s));
   console.log(`\nFull output: ${join(dir, 'metrics.json')}`);
