@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Chase the Meta prize; skip Fetch.ai and MongoDB for now
+
+- **Chose:** go all in on the Meta Model API ($5k, the only confirmed prize). The verifier's model step is already OpenAI-compatible (verifier/src/model.ts), so Muse Spark is mostly a base URL, key and model name change. If it's cheap once Meta works, add Gemini as a second, independent checker ("two labs agree the claim is proven"). Ask SubQ on site for a key, since whole-codebase context suits verifying a PR.
+- **Over:** Fetch.ai (uAgents and Agentverse are for agents that find and message each other; wrapping the verifier as an agent is thin and adds setup without improving the demo) and MongoDB Atlas (a store of past verdicts with vector search is a side feature that would look bolted on).
+- **Because:** limited time. The Meta integration costs little and is the only prize we know exists. The other $6k split is behind the Cerebral Valley login and unknown.
+- **Revisit if:** the details page shows a sizeable Fetch.ai, MongoDB or DeepMind track.
+
 ## 2026-11-07: Measure cognitive load with agents standing in for the engineer
 
 - **Chose:** agents do the two human steps (approving claims, then the merge decision from the verifier's summary) and today's step (merge decision from the diff). We measure tokens read, evidence opened, right decisions and self-rated effort on the Paas scale at each step (verifier/src/simulate.ts).

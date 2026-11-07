@@ -44,6 +44,10 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
 - [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
+- [ ] Point the verifier's model step (verifier/src/model.ts) at Muse Spark via `https://api.meta.ai/v1`
+- [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
+- [ ] Ask the SubQ team on site for API access (whole-codebase context for verifying a PR)
+- [ ] Check the CV details page for the rest of the $11k prize split; revisit the sponsor decision if Fetch.ai, MongoDB or DeepMind has a big track
 - [ ] Write the demo script (docs/submission.md)
 - [ ] Slides, plus a backup demo video
 - [ ] Fill in the README pitch, team and links, then submit the form (every member listed, repo accessible to judges)
