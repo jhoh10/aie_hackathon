@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Demo in Claude Code; Meta shows up as the independent verifier
+
+- **Chose:** keep building and demoing the developer harness in Claude Code. Meta's models do the verifying: the verifier's claims, claim-test, probe and triage roles call Muse Spark through the Meta Model API.
+- **Over:** moving the harness and demo to Muse Code, Meta's coding agent.
+- **Because:** the prize is "Best Use of Meta Model API", which is about the API in the product. No prize rule mentions Muse Code (resources/event.md). Switching agents three hours before the deadline risks the demo. A Claude-built change checked by a Meta-model verifier is also our answer to the Trust but Verify question of how a verifier avoids the implementer's blind spots: a different lab writes the tests.
+- **Revisit if:** Meta's judges say on site that using Muse Code counts toward the prize.
+
 ## 2026-11-07: The harness runs lean by default
 
 - **Chose:** the lean prompt (verification-first-developer-harness/harness-prompt.md). Phases A and B produce no messages, there are at most 8 claims, a fixed set of regression tests is checked once before and once after building, and the final message is at most 4 lines. It keeps the single approval of the claims and the team's plan format, so the verifier hand-off is unchanged.

@@ -52,7 +52,6 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
 - [ ] Revisit SubQ: it has its own $5k track and gives 100M free tokens at console.subq.ai, so access isn't the blocker we assumed. Decide whether to add it as a whole-PR checker (docs/decisions.md)
-- [ ] Decide whether to run the developer harness in Muse Code (Meta's coding agent) for the Meta track; no prize rule requires it (resources/event.md)
 - [ ] Write the demo script (docs/submission.md)
 - [ ] Slides, plus a backup demo video
 - [ ] Fill in the README pitch, team and links, then submit the form (every member listed, repo accessible to judges)
@@ -76,6 +75,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [x] [SB] Verifier core pipeline written, not yet benchmarked (2026-11-07)
 - [x] [SB] Add deadline, judging criteria and disqualifiers to docs/submission.md (2026-11-07)
 - [x] [JH] Copy schedule, rules, problem statements and full prize list from the CV details page into resources/event.md (2026-11-07)
+- [x] [JH] Decide on Muse Code: demo stays in Claude Code, Meta is the verifier's model (docs/decisions.md) (2026-11-07)
 - [x] [JH] Add resources folder with event and sponsor info (2026-11-07)
 - [x] [JH] Invite collaborators (2026-11-07)
 - [x] [JH] Create the repo (2026-11-07)
