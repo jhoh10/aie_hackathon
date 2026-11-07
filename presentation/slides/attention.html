@@ -1,0 +1,17 @@
+<section id="attention" data-transition="fade" style="background:#F4F3EE;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
+<h2 style="font-size:72px;font-weight:600;line-height:1.1">What a person reads per PR</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+<div style="background:#FBE3D3;border-radius:24px;padding:56px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A3A12;letter-spacing:2px;text-transform:uppercase">Reviewing the diff</p>
+<p style="font-size:200px;font-weight:600;line-height:1;color:#16202B">62</p>
+<p style="font-size:36px;line-height:1.35;color:#3D2A1E">changed lines of Go, typical PR in our set, with no guarantee the reader catches the bug</p>
+</div>
+<div style="background:#DCE7FB;border-radius:24px;padding:56px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#1D4FA8;letter-spacing:2px;text-transform:uppercase">Approving the claims</p>
+<p style="font-size:200px;font-weight:600;line-height:1;color:#16202B">3.3</p>
+<p style="font-size:36px;line-height:1.35;color:#1E2B45">plain-language claims on average, each one proven or flagged by running it, not by reading</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5563">Source: our 20 PocketBase benchmark PRs. Lines are the median added or removed per PR, tests included. Claims were written from each PR’s issue.</p>
+<aside>This is the cognitive load argument. Today the human reads a median of 62 changed lines per PR in our set, and the AI reviewer reads the same diff. With our approach the human reads three or four sentences before any code exists.</aside>
+</section>

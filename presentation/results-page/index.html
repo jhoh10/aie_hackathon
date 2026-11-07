@@ -1,0 +1,244 @@
+<meta name="dash-one-writer">
+<style>
+.vb { display: grid; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); }
+.vb-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.vb-head p { margin: var(--cds-gap-xs) 0 0; color: var(--color-fg-muted); max-width: 70ch; }
+.vb .vb-head b, .vb .vb-key b { font-weight: 600; color: var(--color-fg); font-variant-numeric: tabular-nums; }
+.vb-grid2 { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.vb-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+.vb-card h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.vb-card .vb-note { margin: var(--cds-gap-xs) 0 var(--cds-gap-md); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.vb-chart { position: relative; min-height: 12rem; }
+.vb-chart.tall { min-height: 30rem; }
+.vb-chart svg { display: block; overflow: visible; }
+.vb-chart text { font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-caption); fill: var(--color-fg-muted); }
+.vb-chart text.vb-strong { fill: var(--color-fg); }
+.vb-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); margin: 0 0 var(--cds-gap-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); padding: 0; list-style: none; }
+.vb-legend li { display: flex; align-items: center; gap: var(--cds-gap-xs); }
+.vb-sw { width: .75rem; height: .75rem; border-radius: 2px; flex: none; }
+.vb-sw.ok { background: color-mix(in srgb, var(--color-ok) 30%, transparent); border: 1px solid var(--color-ok); }
+.vb-sw.bad { background: color-mix(in srgb, var(--color-bad) 30%, transparent); border: 1px solid var(--color-bad); }
+.vb-sw.warn { background: color-mix(in srgb, var(--color-warn) 30%, transparent); border: 1px solid var(--color-warn); }
+.vb-sw.s0 { background: var(--vb-s0); } .vb-sw.s1 { background: var(--vb-s1); } .vb-sw.muted { background: var(--cds-chart-muted); } .vb-sw.crit { background: var(--cds-chart-status-critical); }
+.vb-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); max-width: 16rem; z-index: 2; }
+.vb-tip .t { color: var(--cds-text-secondary); }
+.vb details { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.vb details summary { cursor: pointer; color: var(--color-fg); }
+.vb details dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--cds-gap-xs) var(--cds-gap-md); margin: var(--cds-gap-sm) 0; }
+.vb details dt { color: var(--color-fg); }
+.vb details dd { margin: 0; max-width: 70ch; }
+.vb-err { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.vb-err::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+
+<div class="vb">
+  <header class="vb-head">
+    <h1 id="title">Verifier benchmark on PocketBase</h1>
+    <p>On <b data-draw="n-bad" data-source="summary" data-field="bad_total" data-where="approach=review">—</b> bad PRs, AI review stopped <b data-draw="rev-bad" data-source="summary" data-field="bad_blocked" data-where="approach=review">—</b> and the verifier stopped <b data-draw="ver-bad" data-source="summary" data-field="bad_stopped" data-where="approach=verifier">—</b>. On <b data-draw="n-good" data-source="summary" data-field="good_total" data-where="approach=review">—</b> honest PRs, the verifier wrongly blocked <b data-draw="ver-fb" data-source="summary" data-field="good_blocked" data-where="approach=verifier">—</b> and sent <b data-draw="ver-fh" data-source="summary" data-field="good_human" data-where="approach=verifier">—</b> to a human.</p>
+  </header>
+
+  <div class="vb-grid2">
+    <section class="vb-card" id="bad-stopped">
+      <h2>Bad PRs stopped</h2>
+      <p class="vb-note">Higher is better. Real reverted fixes, subtly wrong fixes and PRs that try to game the checks.</p>
+      <ul class="vb-legend"><li><span class="vb-sw s0"></span>Blocked</li><li><span class="vb-sw s1"></span>Sent to a human</li></ul>
+      <div class="vb-chart" data-draw="bars-bad" data-source="summary"></div>
+    </section>
+    <section class="vb-card" id="honest-stopped">
+      <h2>Honest PRs stopped</h2>
+      <p class="vb-note">Lower is better. Real upstream fixes that should merge.</p>
+      <ul class="vb-legend"><li><span class="vb-sw s0"></span>Wrongly blocked</li><li><span class="vb-sw s1"></span>Sent to a human</li></ul>
+      <div class="vb-chart" data-draw="bars-good" data-source="summary"></div>
+    </section>
+  </div>
+
+  <section class="vb-card" id="every-case">
+    <h2>Every case, every approach</h2>
+    <p class="vb-note">Each cell is what that approach did with that PR. The color says whether it was right.</p>
+    <ul class="vb-legend"><li><span class="vb-sw ok"></span>Right call</li><li><span class="vb-sw bad"></span>Wrong call</li><li><span class="vb-sw warn"></span>Honest PR sent to a human</li></ul>
+    <div class="vb-chart tall" data-draw="grid" data-source="cases"></div>
+  </section>
+
+  <section class="vb-card" id="evidence">
+    <h2>Verifier evidence per case</h2>
+    <p class="vb-note">Approved claims and what the sandbox showed for each. The percentage is how much of the changed code the checks ran.</p>
+    <ul class="vb-legend"><li><span class="vb-sw s0"></span>Proven on old vs new</li><li><span class="vb-sw muted"></span>Not proven</li><li><span class="vb-sw crit"></span>Failed on the new version</li></ul>
+    <div class="vb-chart tall" data-draw="evidence" data-source="cases"></div>
+  </section>
+
+  <details>
+    <summary>How this was run, and what it leaves out</summary>
+    <dl>
+      <dt>Cases</dt><dd>20 PRs on PocketBase (MIT): 8 real upstream fixes, 4 real fixes reverted under a "no behaviour change" description, and 8 bad PRs written by a separate agent that never saw the verifier. 8 development cases, 12 held out.</dd>
+      <dt>Stopped</dt><dd>CI or the implementer's tests failing, review requesting changes, or the verifier blocking or sending to a human.</dd>
+      <dt>Verifier</dt><dd>Writes checks from approved claims without seeing the code, runs them on old and new versions in a sealed sandbox, and compares probes near the diff. "Claims only" ignores the probes.</dd>
+      <dt>Models</dt><dd>Claude subagents wrote claims, tests, probes, reviews and the implementer's tests. Meta's model wasn't available yet.</dd>
+      <dt>Tuning</dt><dd>After the development run, undeclared changes rated minor (such as a reworded error) became a note instead of a reason to ask a person. A rule for unstable probes was tried and dropped. One held-out verdict was seen before this change; all verdicts are recomputed from recorded evidence.</dd>
+      <dt>Approval</dt><dd>In the benchmark nobody edited the claims before approving them. In real use a person would, which could prevent some wrong blocks but not all of them.</dd>
+      <dt>Left out</dt><dd>Probe and review answers were written in batches, so writers saw related cases. That can flatter both. A sample this small shows direction, not significance.</dd>
+    </dl>
+  </details>
+</div>
+
+<script>
+(() => {
+  dash.calc('summary', {
+    inputs: ['cases'],
+    title: 'Outcomes per approach',
+    description: 'How many bad and honest PRs each approach blocked or sent to a human.',
+    fn: (cases) => ['ci', 'agent_tests', 'review', 'claims_only', 'verifier'].map((k) => {
+      const bad = cases.filter((c) => c.expected === 'bad');
+      const good = cases.filter((c) => c.expected === 'good');
+      return {
+        approach: k,
+        bad_total: bad.length,
+        bad_blocked: bad.filter((c) => c[k] === 'stop').length,
+        bad_human: bad.filter((c) => c[k] === 'human').length,
+        bad_stopped: bad.filter((c) => c[k] === 'stop' || c[k] === 'human').length,
+        good_total: good.length,
+        good_blocked: good.filter((c) => c[k] === 'stop').length,
+        good_human: good.filter((c) => c[k] === 'human').length,
+      };
+    }),
+  });
+
+  const NAME = { ci: 'Existing CI', agent_tests: "Implementer's tests", review: 'AI review', claims_only: 'Verifier, claims only', verifier: 'Verifier' };
+  const ORDER = ['ci', 'agent_tests', 'review', 'claims_only', 'verifier'];
+  const GROUPS = [['honest', 'Honest fixes'], ['revert', 'Reverted fixes'], ['injected', 'Subtly wrong fixes'], ['gaming', 'Gaming attempts']];
+  const C = () => ({ s0: dash.colors[0], s1: dash.colors[1] });
+  document.querySelectorAll('.vb').forEach((el) => { el.style.setProperty('--vb-s0', dash.colors[0]); el.style.setProperty('--vb-s1', dash.colors[1]); });
+
+  const value = (id, pick) => (el) => {
+    const d = dash.data(id);
+    const row = d.status === 'ok' ? d.data.find((r) => r.approach === pick.approach) : null;
+    el.textContent = row ? String(row[pick.field]) : '—';
+  };
+  dash.draw('n-bad', value('summary', { approach: 'review', field: 'bad_total' }));
+  dash.draw('rev-bad', value('summary', { approach: 'review', field: 'bad_blocked' }));
+  dash.draw('ver-bad', value('summary', { approach: 'verifier', field: 'bad_stopped' }));
+  dash.draw('n-good', value('summary', { approach: 'review', field: 'good_total' }));
+  dash.draw('ver-fb', value('summary', { approach: 'verifier', field: 'good_blocked' }));
+  dash.draw('ver-fh', value('summary', { approach: 'verifier', field: 'good_human' }));
+
+  const failed = (el, d) => {
+    if (d.status === 'error') { const m = document.createElement('div'); m.className = 'vb-err'; m.textContent = 'Failed to load'; el.replaceChildren(m); }
+    else el.replaceChildren();
+  };
+  const tipFor = (el) => { const t = document.createElement('div'); t.className = 'vb-tip'; t.hidden = true; el.appendChild(t); return t; };
+  const showTip = (el, tip, ev, title, lines) => {
+    tip.replaceChildren();
+    const h = document.createElement('div'); h.className = 't'; h.textContent = title; tip.appendChild(h);
+    for (const l of lines) { const p = document.createElement('div'); p.textContent = l; tip.appendChild(p); }
+    tip.hidden = false;
+    const box = el.getBoundingClientRect();
+    const x = Math.min(ev.clientX - box.left + 12, box.width - tip.offsetWidth - 4);
+    tip.style.left = Math.max(0, x) + 'px'; tip.style.top = (ev.clientY - box.top + 12) + 'px';
+  };
+  const measure = (svg, texts) => {
+    const t = svg.append('text').attr('class', 'vb-strong');
+    let w = 0; for (const s of texts) { t.text(s); w = Math.max(w, t.node().getComputedTextLength()); }
+    t.remove(); return w;
+  };
+
+  const bars = (kind) => (el) => {
+    const d = dash.data('summary');
+    if (d.status !== 'ok') return failed(el, d);
+    el.replaceChildren();
+    const rows = ORDER.map((k) => d.data.find((r) => r.approach === k)).filter(Boolean);
+    const W = Math.max(280, el.clientWidth), rowH = 34, H = rows.length * rowH + 8;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img');
+    const left = measure(svg, rows.map((r) => NAME[r.approach])) + 12;
+    const right = measure(svg, ['12 of 12']) + 10;
+    const total = kind === 'bad' ? rows[0].bad_total : rows[0].good_total;
+    const x = d3.scaleLinear([0, Math.max(1, total)], [left, W - right]);
+    const tip = tipFor(el);
+    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', H - 8).attr('stroke', 'var(--cds-chart-axis)');
+    rows.forEach((r, i) => {
+      const y = i * rowH + 6, a = kind === 'bad' ? r.bad_blocked : r.good_blocked, b = kind === 'bad' ? r.bad_human : r.good_human;
+      const g = svg.append('g');
+      g.append('rect').attr('x', x(0)).attr('y', y).attr('width', x(total) - x(0)).attr('height', 20).attr('fill', 'var(--cds-chart-grid)').attr('rx', 2);
+      if (a) g.append('rect').attr('x', x(0)).attr('y', y).attr('width', x(a) - x(0)).attr('height', 20).attr('fill', C().s0).attr('rx', 2);
+      if (b) g.append('rect').attr('x', x(a) + (a ? 2 : 0)).attr('y', y).attr('width', Math.max(0, x(a + b) - x(a) - (a ? 2 : 0))).attr('height', 20).attr('fill', C().s1).attr('rx', 2);
+      g.append('text').attr('class', r.approach === 'verifier' ? 'vb-strong' : null).attr('x', left - 12).attr('y', y + 14).attr('text-anchor', 'end').text(NAME[r.approach]);
+      g.append('text').attr('class', 'vb-strong').attr('x', W - right + 8).attr('y', y + 14).text(`${a + b} of ${total}`);
+      g.append('rect').attr('x', 0).attr('y', y - 6).attr('width', W).attr('height', rowH).attr('fill', 'transparent')
+        .on('mousemove', (ev) => showTip(el, tip, ev, NAME[r.approach], kind === 'bad'
+          ? [`Blocked: ${a}`, `Sent to a human: ${b}`, `Let through: ${total - a - b}`]
+          : [`Wrongly blocked: ${a}`, `Sent to a human: ${b}`, `Passed: ${total - a - b}`]))
+        .on('mouseleave', () => { tip.hidden = true; });
+    });
+  };
+  dash.draw('bars-bad', bars('bad'));
+  dash.draw('bars-good', bars('good'));
+
+  const verdictTone = (c, v) => {
+    if (v === 'missing') return 'none';
+    if (c.expected === 'bad') return v === 'pass' ? 'bad' : 'ok';
+    return v === 'pass' ? 'ok' : v === 'human' ? 'warn' : 'bad';
+  };
+  const WORD = { stop: 'Block', human: 'Human', pass: 'Pass', missing: '—' };
+  const ordered = (rows) => GROUPS.flatMap(([g, label]) => { const r = rows.filter((x) => x.group === g); return r.length ? [{ header: label }, ...r] : []; });
+
+  dash.draw('grid', (el) => {
+    const d = dash.data('cases');
+    if (d.status !== 'ok') return failed(el, d);
+    el.replaceChildren();
+    const items = ordered(d.data);
+    const W = Math.max(320, el.clientWidth), rowH = 24, headH = 34;
+    const H = headH + items.length * rowH + 4;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img');
+    const left = measure(svg, d.data.map((r) => r.case).concat(GROUPS.map((g) => g[1]))) + 16;
+    const colW = (W - left) / ORDER.length;
+    const tip = tipFor(el);
+    const short = { ci: 'CI', agent_tests: 'Impl. tests', review: 'AI review', claims_only: 'Claims only', verifier: 'Verifier' };
+    ORDER.forEach((k, j) => svg.append('text').attr('class', k === 'verifier' ? 'vb-strong' : null).attr('x', left + j * colW + colW / 2).attr('y', 18).attr('text-anchor', 'middle').text(colW > 90 ? NAME[k] : short[k]));
+    items.forEach((r, i) => {
+      const y = headH + i * rowH;
+      if (r.header) { svg.append('text').attr('class', 'vb-strong').attr('x', 0).attr('y', y + 16).text(r.header); return; }
+      svg.append('text').attr('x', 12).attr('y', y + 16).text(r.case + (r.split === 'dev' ? ' · dev' : ''));
+      ORDER.forEach((k, j) => {
+        const tone = verdictTone(r, r[k]);
+        const fill = tone === 'none' ? 'transparent' : `color-mix(in srgb, var(--color-${tone}) 22%, transparent)`;
+        const g = svg.append('g');
+        g.append('rect').attr('x', left + j * colW + 2).attr('y', y + 2).attr('width', colW - 4).attr('height', rowH - 4).attr('rx', 3)
+          .attr('fill', fill).attr('stroke', tone === 'none' ? 'var(--cds-chart-grid)' : `var(--color-${tone})`).attr('stroke-width', 1);
+        g.append('text').attr('class', 'vb-strong').attr('x', left + j * colW + colW / 2).attr('y', y + 16).attr('text-anchor', 'middle').text(WORD[r[k]] ?? r[k]);
+        g.on('mousemove', (ev) => showTip(el, tip, ev, `${r.case} · ${NAME[k]}`, [`Should ${r.expected === 'bad' ? 'be stopped' : 'merge'}`, `Got: ${WORD[r[k]] ?? r[k]}`, tone === 'ok' ? 'Right call' : tone === 'bad' ? 'Wrong call' : tone === 'warn' ? 'Costs a person a look' : 'No result']))
+          .on('mouseleave', () => { tip.hidden = true; });
+      });
+    });
+  });
+
+  dash.draw('evidence', (el) => {
+    const d = dash.data('cases');
+    if (d.status !== 'ok') return failed(el, d);
+    el.replaceChildren();
+    const items = ordered(d.data);
+    const W = Math.max(300, el.clientWidth), rowH = 24;
+    const H = items.length * rowH + 8;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img');
+    const left = measure(svg, d.data.map((r) => r.case).concat(GROUPS.map((g) => g[1]))) + 16;
+    const right = measure(svg, ['100% reached']) + 12;
+    const max = d3.max(d.data, (r) => r.claims_proven + r.claims_unproven + r.claims_failed) || 1;
+    const x = d3.scaleLinear([0, max], [left, W - right]);
+    const tip = tipFor(el);
+    items.forEach((r, i) => {
+      const y = i * rowH + 4;
+      if (r.header) { svg.append('text').attr('class', 'vb-strong').attr('x', 0).attr('y', y + 14).text(r.header); return; }
+      svg.append('text').attr('x', 12).attr('y', y + 14).text(r.case);
+      let at = 0;
+      const g = svg.append('g');
+      [['claims_proven', C().s0], ['claims_unproven', 'var(--cds-chart-muted)'], ['claims_failed', 'var(--cds-chart-status-critical)']].forEach(([f, color]) => {
+        const n = r[f]; if (!n) return;
+        g.append('rect').attr('x', x(at) + (at ? 2 : 0)).attr('y', y).attr('width', Math.max(0, x(at + n) - x(at) - (at ? 2 : 0))).attr('height', 16).attr('fill', color).attr('rx', 2);
+        at += n;
+      });
+      svg.append('text').attr('x', W - right + 8).attr('y', y + 13).text(r.reach_pct == null ? 'no changed code' : `${r.reach_pct}% reached`);
+      g.append('rect').attr('x', 0).attr('y', y - 4).attr('width', W).attr('height', rowH).attr('fill', 'transparent')
+        .on('mousemove', (ev) => showTip(el, tip, ev, r.case, [`Proven: ${r.claims_proven}`, `Not proven: ${r.claims_unproven}`, `Failed on new: ${r.claims_failed}`, `Verdict: ${WORD[r.verifier] ?? r.verifier}`]))
+        .on('mouseleave', () => { tip.hidden = true; });
+    });
+  });
+})();
+</script>

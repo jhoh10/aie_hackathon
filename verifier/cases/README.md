@@ -28,7 +28,7 @@ Base is the fix commit; the PR reverses its Go changes and their tests.
 
 ## Bad PRs written for the benchmark
 
-A separate agent wrote these against the parent of a real fix, as an agent answering that issue would. It never saw the verifier. Each keeps the project's Go tests green, and its author reproduced each bug over HTTP. Patches are in `authored/`; defect notes are held back until the held-out run is done.
+A separate agent wrote these against the parent of a real fix, as an agent answering that issue would. It never saw the verifier. Each keeps the project's Go tests green, and its author reproduced each bug over HTTP. Patches are in `authored/`, each with a `secret.md` describing its defect and how to reproduce it over HTTP.
 
 | Case | Split | Kind | Based on issue from | PR title |
 |---|---|---|---|---|

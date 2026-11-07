@@ -33,8 +33,8 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue, blocks demo materials**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
 - [ ] Chase Meta on site for billing or hackathon credits (402 `billing_not_configured`, see Blocked). Without it the Meta prize story and the "real model" claim are weak.
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
-- [ ] [SB] Find evals and datasets we can use
-- [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/). **Handed over from a Claude run on Jon's machine that died at 2:15.** Done there: Go-version fix pushed (each commit builds with its own go.mod Go version; old commits broke on 1.27), CI on h-number and h-cascade pass, h-bearer CI fails, verifier on h-cascade gave NEEDS_HUMAN (16/20 reached). Review answers there were written by Claude knowing which cases were reverts, so don't count them. Not done: verifier on r-number, r-secret, h-bearer (the BLOCK-a-revert demo result), metrics. Suggest: `node src/benchmark.ts dev verifier` on those three first. Watch for the superuser-email normalize issue (see log). **Run now, don't wait on the reviewer harness.**
+- [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
+- [ ] [SB] Verifier: test the PR page and GitHub status end to end (not tried yet)
 - [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo. Candidates: developer harness lean vs default (cost $0.42 vs $0.74, time 1.3 vs 2.5 min, words read), BLOCK on the revert cases, and reviewer load from `simulate.ts` (claims plus verifier summary vs reading the diff). That last one is the reviewer-experience number and can run before the reviewer harness exists.
 - [ ] [MA] Research Lean for software verification. Decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
@@ -64,6 +64,8 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 ## Done
 
+- [x] [SB] Benchmark run on all 20 cases against CI, implementer tests and AI review; results in verifier/results/summary.md (2026-11-07)
+- [x] [SB] Presentation graphics: 6-slide deck and results diagrams, sources in presentation/ (2026-11-07)
 - [x] [DT] Rename the harness to the developer harness (verification-first-developer-harness/), links and paths updated (2026-11-07)
 - [x] [MA] Claims review page: claims grouped by guarantee category per use case (bug fix, feature, refactor, Lean), evidence strength per check, routine regression collapsible, approve per claim → verifier JSON (verification-first-developer-harness/ui/plan-review.html) (2026-11-07)
 - [x] [JH] Hand the harness's approved claims to the verifier: `verifier/src/handoff.ts` turns `.verify/plan.md` into claims JSON and runs the verifier. PASS on `h-bearer` (checks hand-written, Meta billing blocked) (2026-11-07)

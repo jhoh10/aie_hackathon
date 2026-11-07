@@ -1,0 +1,17 @@
+<section id="evidence" data-transition="fade" style="background:#16202B;color:#F4F3EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8FB3F5;letter-spacing:2px;text-transform:uppercase">Proof, not opinion</p>
+<h2 style="font-size:64px;font-weight:600;line-height:1.15;color:#F4F3EE;width:1600px">A plausible login fix that locks people out of their own account</h2>
+<p style="font-size:30px;line-height:1.4;color:#AEB8C4;width:1600px">Alpha’s username is <span style="color:#F4F3EE">beta@probe.io</span>. Beta’s email is <span style="color:#F4F3EE">beta@probe.io</span>. CI is green. Same three requests, old version and new:</p>
+<table style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F4F3EE;border:1px solid #33414F">
+<tr style="background:#22303E"><th style="width:52%;text-align:left">Login request</th><th style="width:16%;text-align:left">Old</th><th style="width:32%;text-align:left">New</th></tr>
+<tr><td style="width:52%">beta@probe.io + Alpha’s password</td><td style="width:16%">400</td><td style="width:32%;color:#F0A272">200, signs in Alpha</td></tr>
+<tr><td style="width:52%">beta@probe.io + Beta’s password</td><td style="width:16%">200</td><td style="width:32%;color:#F0A272">400, Beta locked out</td></tr>
+<tr><td style="width:52%">betauser + Beta’s password</td><td style="width:16%">200</td><td style="width:32%">200</td></tr>
+</table>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:28px;color:#16202B;background:#F0A272;padding:10px 24px;border-radius:999px;font-weight:600">BLOCK</p>
+<p style="font-size:30px;line-height:1.4;color:#AEB8C4">Undeclared breaking change: contradicts the approved claim “signing in with the account email still succeeds”.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8A97A6">Recorded verifier run on benchmark case inj2 (PocketBase, MIT). Anyone can rerun it from the locked checks.</p>
+<aside>This is a real recorded run, not a mockup. The bad PR was written by a separate agent to fix the "usernames that look like emails" issue. It passes the project's Go tests. The verifier's probe ran the same three logins on both versions in a sealed sandbox. The middle row is the bug: the real owner of the email can't log in any more.</aside>
+</section>

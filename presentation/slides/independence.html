@@ -1,0 +1,22 @@
+<section id="independence" data-transition="fade" style="background:#F4F3EE;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:72px;font-weight:600;line-height:1.1">Built so the verifier is hard to fool</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="background:#FBFBF8;border:1px solid #DAD7CC;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:40px;font-weight:600;line-height:1.2">Blind to the code</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5563">Checks are written from the approved claims alone, so they don’t inherit the implementer’s blind spots.</p>
+</div>
+<div style="background:#FBFBF8;border:1px solid #DAD7CC;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:40px;font-weight:600;line-height:1.2">Must fail on the old version</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5563">A check only counts as proof if it fails before the change and passes after. Checks that can’t fail prove nothing.</p>
+</div>
+<div style="background:#FBFBF8;border:1px solid #DAD7CC;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:40px;font-weight:600;line-height:1.2">Locked before it runs</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5563">Claims and checks are fixed and hashed. A new commit reruns the same checks, so an agent can’t move the goalposts.</p>
+</div>
+<div style="background:#FBFBF8;border:1px solid #DAD7CC;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:40px;font-weight:600;line-height:1.2">Sealed and honest about gaps</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5563">No network in the sandbox. Coverage shows which changed lines no check reached, and those go to a person.</p>
+</div>
+</div>
+<aside>These four rules answer the hackathon's question directly: how can a verifier write its own tests without sharing the implementer's blind spots, and stay independent, reproducible and hard to game. Our benchmark includes PRs that try to game it: special-casing test inputs, deleting the test that would catch the bug, and comments telling automated reviewers to approve.</aside>
+</section>
