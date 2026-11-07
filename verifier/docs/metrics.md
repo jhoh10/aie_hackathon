@@ -59,11 +59,25 @@ Runs that errored are counted separately and left out of the rates.
    - People, from live runs on the PR page (`.work/runs/*.json`): time to approve the claims (`claimsReadyAt` to `approvedAt`) and how long the engineer waits for a verdict after approving (`approvedAt` to `doneAt`). These are real times, unlike the modelled minutes in metric 5.
 7. **Evidence quality (verifier only).** Claims proven out of all claims, the share of changed statements the tests reached, probes with unstable results, and checks that were inconclusive.
 
+## Developer side: the harness, before any PR exists
+
+Metrics 1–7 judge a finished PR. These two judge the developer harness, which runs earlier: from the issue to the change.
+
+8. **Harness overhead (lean vs default).** Cost, time and words the engineer reads, for the same task with and without the harness. From Deepak's SWE-bench side-by-sides (verification-first-developer-harness/evaluation/), 3 runs each on pylint-8898: lean harness $0.42, 1.3 min, 280 words read; default agent $0.74, 2.5 min. Pass rate doesn't separate the two there (that task's hidden test rewards one specific design, and 8 of 9 runs failed it on every side), so this shows cost only, not quality.
+9. **Built the right thing (developer-side eval).** From verification-first-developer-harness/evaluation/pocketbase/ (`run.ts all both`, then `--report`), per task and arm:
+   - **Hidden tests pass:** the upstream fix's own test functions, applied on top of the agent's change. Reported separately for the 7 ambiguous and 3 control tasks.
+   - **Surfaced the open question:** did the agent ask about the task's `ambiguity`, or decide it explicitly in its plan? Marked by hand in `results/report.md`.
+   - **Engineer effort:** replies the simulated engineer gave and words of agent messages it read.
+   - **Cost and time:** `total_cost_usd` and wall time from `claude -p`, agent only. The simulated engineer's cost is kept separately.
+
+   The headline we hope for: on ambiguous issues the harness asks the question that decides the fix and passes where the default agent guesses wrong, at a known extra cost on the clear ones. One run per arm shows a pattern, not a rate.
+
 ## Limits
 
 - The dev split has 8 cases, so one case moves a rate by 12 points or more. Report counts next to percentages.
 - Developer effort (metric 5) is modelled or simulated, not measured on people. An agent's reading and self-rated effort stand in for a person's, so present them as a simulated engineer. Wall time from live runs (metric 6) is the only human measurement, and only for runs on the PR page.
 - Wall time is noisy on a laptop and venue Wi-Fi. Model stages take almost no time when answers come from the cache in `.work/gen`, and a Docker build is much slower the first time than once the image exists. Report the median, and say whether models and images were cached.
+- Metric 9 grades against what PocketBase's maintainer chose. On some tasks another answer would be reasonable too, which counts against both arms equally.
 - 400 lines per hour is a common figure for careful code review. Reading speed for claims is a guess. Both are easy to change.
 
 ## In the demo
