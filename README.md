@@ -42,6 +42,7 @@ Secrets go in `.env` (git-ignored). List the variable names, never the values, i
 ├── README.md          # this file: pitch, team, how to run
 ├── TASKS.md           # now / next / done board
 ├── CLAUDE.md          # instructions for Claude Code sessions in this repo
+├── resources/         # event info, sponsor docs, anything worth linking (add freely)
 └── docs/
     ├── ideas.md       # idea backlog and scoring
     ├── log.md         # timestamped progress log (newest first)
@@ -51,7 +52,8 @@ Secrets go in `.env` (git-ignored). List the variable names, never the values, i
 
 ## Links
 
-- Hackathon page:
+- Hackathon page: https://cerebralvalley.ai/e/aie-code-2026-hackathon (logistics, theme and prizes summarized in [resources/event.md](resources/event.md))
+- Sponsor docs: [resources/sponsors.md](resources/sponsors.md)
 - Submission form:
 - Demo video:
 - Slides:
