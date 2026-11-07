@@ -1,0 +1,18 @@
+[
+ {
+  "agent": "Regexes in `bad-names-rgxs` (and the other regexp-list options) can now contain a comma inside braces. `(foo{1,3})` is no longer cut at the comma. All 76 tests in `tests/config` pass. I only ran that directory, not the full suite.\n\n- **Cause:** the regex-list options split their value on every comma. `(foo{1,3})` became `(foo{1` and `3})`, and the first half isn't a valid regex.\n- **Fix:** a new `_check_regexp_csv` in `pylint/utils/utils.py` splits on commas but skips any comma between `{` and `}`. `_regexp_csv_transfomer` in `pylint/config/argument.py` now uses it. I also exported it from `pylint/utils/__init__.py`.\n- **Check:** `(foo{1,3}),bar, baz{2}` now parses into three patterns.\n\n**Tests:** `test_csv_regex_error` in `tests/config/test_config.py` expected `(foo{1,3})` to fail, which was the bug. It now uses the genuinely invalid `(foo{1,3}`. I added `test_csv_regex_comma_in_quantifier`, which passes `(foo{1,3})` and checks it is kept whole.\n\n**Limitation:** only commas inside `{\u2026}` are protected. A comma in a character class, such as `[a,b]`, still splits. The issue only asked for quantifiers. Protecting `[]` as well is a small change if you want it.",
+  "engineer": "Yes, please protect `[...]` as well. The issue asks for any valid regex to be expressible, so `[a,b]` shouldn't split. Commas inside parenthesized groups, such as `(a,b)`, shouldn't split either. Add a test for each case, then re-run the config tests.",
+  "agent_cost": 0.2008734,
+  "agent_secs": 57.906189918518066,
+  "agent_turns": 19,
+  "engineer_cost": 0.0479826
+ },
+ {
+  "agent": "Commas inside `[...]` and `(...)` no longer split a regex, and the config tests pass (83 passed, up from 76).\n\n- **Splitter:** `_check_regexp_csv` in `pylint/utils/utils.py` now keeps a comma when it sits inside:\n  - a character class: `[a,b]`\n  - a group, nested ones included: `(a,(b,c))`\n  - braces: `{1,3}`\n  - an escaped comma: `a\\,b`\n\n  Inside a character class, `(` and `{` are treated as literal characters.\n- **A bug I fixed on the way:** my first version of the escape handling cleared its flag before the comma check, so `a\\,b` would still have split. I caught it before running the tests.\n- **Tests:** in `tests/config/test_config.py`, a parametrized test calls the splitter directly with `[a,b]`, `[a,b]x,foo`, `(a,b)`, `(a,(b,c)),d` and `a\\,b,c`. Two end-to-end tests pass `--bad-names-rgx=[a,b]` and `--bad-names-rgx=(a,b)` through `Run` and check the compiled pattern is kept whole.\n\nAn unbalanced `(` or `[` swallows every later comma, so the rest of the value stays in one pattern. For example, `(foo,bar` is passed on as a single, invalid regex and gets the usual \"Error in provided regular expression\" message.",
+  "engineer": "DONE",
+  "agent_cost": 0.2813084,
+  "agent_secs": 29.706066131591797,
+  "agent_turns": 8,
+  "engineer_cost": 0.041644799999999996
+ }
+]

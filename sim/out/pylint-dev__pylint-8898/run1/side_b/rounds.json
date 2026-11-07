@@ -1,0 +1,26 @@
+[
+ {
+  "agent": "Plan is in `.verify/plan.md`. The fix: when splitting a `regexp_csv` value on commas, re-join neighbouring pieces until they compile as a regex. So `(foo{1,3})` survives, while a truly invalid regex still errors.\n\n| # | Type | Check |\n|---|------|-------|\n| 1 | Unit | `\"(foo{1,3})\"` gives one pattern (the issue case) |\n| 2 | Unit | `\"foo,bar\"` gives two patterns |\n| 3 | Unit | `\"(foo{1,3}),bar\"` gives two, the first keeping its comma |\n| 4 | Unit | `\"a{1,2},b{2,3}\"` gives two |\n| 5 | Unit | `\"[a,b],c\"` gives `[a,b]` and `c` |\n| 6 | Unit | Whitespace, trailing comma and empty string behave as before |\n| 7 | Error | `\"(foo\"` still raises ArgumentTypeError |\n| 8 | Unit | list/tuple input passes through unchanged |\n| 9 | Integration | `--bad-names-rgxs=\"(foo{1,3})\"` on the CLI: no crash, one pattern |\n| 10 | Integration | Same via a toml config (the issue's setup) |\n| 11 | Regression | Existing tests/config and tests/utils suites |\n\nSkipped: a comma-escape syntax, plain `csv` options, and `regexp_paths_csv`. The reasons are in the plan file.\n\nI'll also add a whatsnew fragment.\n\nApprove, or edit?",
+  "engineer": "Approved. Go ahead.",
+  "agent_cost": 0.11916110000000002,
+  "agent_secs": 26.773756980895996,
+  "agent_turns": 7,
+  "engineer_cost": 0.0461026
+ },
+ {
+  "agent": "`bad-names-rgxs` and the other regex-list options now keep commas that belong to a regex, so `(foo{1,3})` is accepted instead of crashing. All 11 plan rows pass. The wider run (tests/config, utils, test_self, checkers, lint) gave 695 passed, 47 skipped, 5 xfailed.\n\n- **How it works:** `regexp_csv` values are now split only on commas outside `()`, `[]`, `{m,n}` and backslash escapes. The new splitter is `_split_regexp_csv` in `pylint/utils/utils.py`, and `_regexp_csv_transfomer` calls it. Plain `csv` options are unchanged.\n- **Design change:** I dropped the plan's \"re-join until it compiles\" idea. `a{1` compiles as a literal, so `a{1,2},b` would have split wrongly.\n- **One existing test changed:** `tests/config/test_config.py::test_csv_regex_error` expected `(foo{1,3})` to crash, which is the bug itself. I switched its input to the genuinely invalid `(foo{1,3}` and updated the expected message to match, so it still checks that invalid regexes are reported. It isn't one of the plan's rows, but please confirm you're fine with it.\n- **Known limit:** a single unbalanced `(` or `[` in one regex swallows the commas after it. That regex is invalid anyway, so it errors.\n- **Other additions:** the new tests are in `tests/config/test_regexp_csv.py`, and there's a whatsnew fragment. I named it `7229.bugfix` and wrote \"Closes #7229\" in it, but I guessed that issue number, so please check it. The write-up is in `.verify/report.md`.",
+  "engineer": "The test change is fine. `(foo{1,3})` is the bug case, so it should no longer be the error input. I can't confirm the issue number, because the issue text doesn't include one. Keep the whatsnew fragment but drop the \"Closes #\u2026\" line unless you can verify the number from the repo. Then report back.",
+  "agent_cost": 0.3209043000000001,
+  "agent_secs": 112.52646827697754,
+  "agent_turns": 22,
+  "engineer_cost": 0.0446308
+ },
+ {
+  "agent": "I removed the \"Closes #7229\" line from the whatsnew fragment. I couldn't verify that number from the repo. A search of `doc/whatsnew` found nothing tying the issue to a number. I didn't rerun the tests, since only that text changed.\n\nThe fragment is still named `7229.bugfix`, because pylint names fragments by issue number. That number is also a guess. Rename the file once you know the real number, for example to `<real-number>.bugfix`.\n\nThe test change to `test_csv_regex_error` stands, as you confirmed.\n\nThe code change is in `pylint/utils/utils.py` and `pylint/config/argument.py`. The new tests are in `tests/config/test_regexp_csv.py`, and the full write-up is in `.verify/report.md`.",
+  "engineer": "DONE",
+  "agent_cost": 0.3672722000000001,
+  "agent_secs": 16.32559609413147,
+  "agent_turns": 3,
+  "engineer_cost": 0.043296799999999996
+ }
+]

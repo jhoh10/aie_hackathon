@@ -1,0 +1,26 @@
+[
+ {
+  "agent": "Here is the test plan, also saved at `.verify/plan.md`. The fix splits `regexp_csv` values only on commas outside `{}`, `()` and `[]` and not preceded by a backslash. I won't change `_check_csv`, so other csv options behave as before.\n\n| # | Type | Check | Proves |\n|---|------|-------|--------|\n| 1 | Unit | `\"(foo{1,3})\"` gives one pattern | The issue case no longer crashes |\n| 2 | Unit | `\"foo{1,3}\"` gives one pattern | A comma inside braces is kept |\n| 3 | Unit | `\"[a,b]x\"` gives one pattern | A comma inside a character class is kept |\n| 4 | Unit | `\"(a,b)\"` gives one pattern | A comma inside a group is kept |\n| 5 | Unit | `r\"a\\,b\"` gives one pattern | The escape workaround the issue asks for |\n| 6 | Unit | `\"a,b\"` gives two patterns | Plain comma separation still works |\n| 7 | Unit | `\"(foo{1,3}),bar,[x,y]{2,4}\"` gives three patterns | Mixed top-level and nested commas |\n| 8 | Edge | `\"\"`, `\",\"`, `\" a , b ,\"` | Whitespace and empty entries are handled as before |\n| 9 | Edge | Unbalanced `\"(a,b\"` raises `ArgumentTypeError` | A bad regex gives a clean error, not a crash |\n| 10 | Regression | Existing `tests/config` and `tests/test_self.py` pass | Nothing else broke |\n| 11 | Integration | `pylint --bad-names-rgxs=\"(foo{1,3})\"` and an rcfile with the same value, on a file with a `fooo` variable | CLI and config-file paths work end to end |\n| 12 | Backward compat | List or tuple input passes through unchanged | Programmatic callers are unaffected |\n\nSkipped:\n- **Property-based test:** there is no oracle beyond the examples above.\n- **Changing `_check_csv` for all csv options:** it would change other options, and the issue is only about regexes.\n- **`regexp_paths_csv`:** its values are paths, so it is out of scope.\n\nApprove, or edit?",
+  "engineer": "Approved. Go ahead.",
+  "agent_cost": 0.1332035,
+  "agent_secs": 31.66073203086853,
+  "agent_turns": 8,
+  "engineer_cost": 0.047026599999999995
+ },
+ {
+  "agent": "Regexes in options like `bad-names-rgxs` can now contain commas, so `(foo{1,3})` no longer crashes pylint. All 12 plan rows pass. The new tests plus the `tests/config`, `tests/test_self.py` and base/design checker tests give 233 passed, 1 xfailed.\n\n- **Fix:** the new `_split_regexp_csv` in `pylint/config/argument.py` splits the value only on commas outside `()`, `{}` and `[]`. A backslash-escaped comma (`a\\,b`) also stays inside its regex. Plain `a,b` lists work as before, and other csv options are untouched.\n- **New tests:** `tests/config/test_regexp_csv.py` covers the plan rows. That includes a run through the command line and through a TOML rcfile.\n- **Report and changelog:** the full report is in `.verify/report.md`. I added a changelog fragment, `doc/whatsnew/fragments/7229.bugfix`. I took 7229 as the issue number from memory, not from anything in the repo, so please check it.\n- **Needs your look:** I edited one existing test that wasn't in the plan, `tests/config/test_config.py::test_csv_regex_error`. It used `(foo{1,3})` and expected the mangled error, which is the bug itself. I changed it to the unbalanced `(foo{1,3}` and the matching message, so it still checks that an invalid regex gives a clean error.",
+  "engineer": "The test edit is fine: `(foo{1,3}` is the right way to keep checking the invalid-regex error. I can't verify the issue number from here, so keep 7229 unless something in the repo says otherwise.",
+  "agent_cost": 0.34593949999999996,
+  "agent_secs": 107.18627095222473,
+  "agent_turns": 19,
+  "engineer_cost": 0.0447468
+ },
+ {
+  "agent": "I'm keeping 7229 in the changelog fragment, and I'm leaving the `test_csv_regex_error` edit as it is.\n\nThe fix is done. Nothing is committed, so the changes are in the working tree.",
+  "engineer": "DONE",
+  "agent_cost": 0.35672529999999997,
+  "agent_secs": 5.731670141220093,
+  "agent_turns": 1,
+  "engineer_cost": 0.043004799999999996
+ }
+]

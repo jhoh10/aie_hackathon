@@ -32,7 +32,6 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [ ] [DT] Reviewer harness: scoped in docs/decisions.md and first version built (verification-first-reviewer-harness/, with a real pylint-8898 example). Next: show the packet on the verifier PR page next to the verdict, and measure it against a raw-diff review. Checkpoint at 3:30 PM.
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue, blocks demo materials**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
 - [ ] **Everyone: claim the $100 Meta credits before 3:00 PM PT** (form on the CV details page; needs billing set up at dev.meta.ai and your Team ID, see resources/sponsors.md). Billing setup is likely also the fix for our 402 `billing_not_configured`. Without it the Meta prize story and the "real model" claim are weak.
-- [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
 - [ ] [SB] Verifier: test the PR page and GitHub status end to end (not tried yet)
 - [ ] [SB, JH] Run the 19 new `extended` cases (verifier/cases/README.md): `node src/benchmark.ts extended`, after the holdout run. CI step done (19/19 pass, reverts included), so run `verifier`, `agent_tests`, `review`, `sim`. Report extended next to holdout if it finishes by 3:30 PM.
@@ -66,6 +65,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 ## Done
 
+- [x] [DT] Make the harness runnable from the repo: the SWE-bench side-by-side simulation is in sim/ (run.py, viewer.py, summary.py, README), and "Running it" shows the harness and review prompts (2026-11-07)
 - [x] [SB] Benchmark run on all 20 cases against CI, implementer tests and AI review; results in verifier/results/summary.md (2026-11-07)
 - [x] [SB] Presentation graphics: 6-slide deck and results diagrams, sources in presentation/ (2026-11-07)
 - [x] [DT] Rename the harness to the developer harness (verification-first-developer-harness/), links and paths updated (2026-11-07)

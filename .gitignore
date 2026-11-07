@@ -25,3 +25,6 @@ venv/
 
 # Logs
 *.log
+
+# Simulation checkouts and envs
+sim/work/

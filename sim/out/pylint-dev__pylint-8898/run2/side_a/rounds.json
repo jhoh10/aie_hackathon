@@ -1,0 +1,18 @@
+[
+ {
+  "agent": "Regexes like `(foo{1,3})` now work in `bad-names-rgxs` and the other regex-list options. Commas inside `{...}` are no longer treated as separators. `tests/config` and `tests/test_self.py` pass: 214 passed, 1 xfailed.\n\n- **The fix:** I added `_check_regexp_csv` in `pylint/utils/utils.py` and exported it from `pylint.utils`. It splits on commas that are outside braces. `_regexp_csv_transfomer` in `pylint/config/argument.py` now uses it. For example, `(foo{1,3}), bar,baz` becomes `(foo{1,3})`, `bar` and `baz`.\n- **Limitation:** a comma inside a character class, such as `[a,b]`, is still treated as a separator. There is still no way to escape a comma.\n- **Existing test changed:** `test_csv_regex_error` asserted the buggy behavior. It expected `--bad-names-rgx=(foo{1,3})` to fail with a `(foo{1` error, but that pattern is valid. I changed it to use a genuinely invalid pattern, `(foo{1,3}`, with the matching expected message.\n- **New test:** `test_csv_regex_comma_in_quantifier` checks that `(foo{1,3}),bar` parses into two patterns.\n\nI didn't add a changelog entry.",
+  "engineer": "Your fix leaves commas in `[a,b]` as separators. A comma in a group like `(a,b)` is also unclear. The issue asks that any valid regex be expressible, or that there be a way to escape a comma. Please handle commas inside character classes and parentheses too, or add an escape. Then add tests for those cases and re-run.",
+  "agent_cost": 0.1753089,
+  "agent_secs": 67.3087158203125,
+  "agent_turns": 17,
+  "engineer_cost": 0.049754599999999996
+ },
+ {
+  "agent": "Commas inside `[a,b]` and `(a,b)` no longer split a regex, and `\\,` works as an escape. `tests/config` and `tests/test_self.py` pass (224 passed, 1 xfailed).\n\n**How it works.** `_check_regexp_csv` in `pylint/utils/utils.py` is now a small scanner. It splits only on commas that are not:\n- inside `(...)` or `{...}`, including nested groups;\n- inside a character class `[...]`. A leading `]` (as in `[],]` and `[^],]`) is treated as a literal, as in Python's `re`;\n- preceded by a backslash, so `\\,` is the escape for a literal comma. `re` reads `\\,` as a plain comma, so it stays valid in the compiled pattern. `\\(`, `\\[` and `\\]` don't open or close anything.\n\nUnbalanced brackets are clamped, so a stray `)` can't break later splitting. An unclosed `(` or `[` keeps the rest of the string in one pattern. That pattern is invalid anyway and gets the normal \"Error in provided regular expression\" message.\n\n**Tests.** I replaced the single quantifier test with a parametrized `test_csv_regex_commas_in_regex` in `tests/config/test_config.py`. It has 11 cases:\n- quantifier, character class and group, with nested groups;\n- negated class and leading-`]` edge cases;\n- escaped comma, escaped `]` and escaped `(`;\n- whitespace and empty entries.\n\nI also added doctests to the function. The `--doctest-modules` run fails on the existing `_splitstrip` docstring, which has an inconsistent-whitespace line I didn't touch, so my doctests didn't run through that path. The same cases are covered by the pytest cases.\n\nI first got the `^` handling in negated classes wrong (off by one) and fixed it before the test run.",
+  "engineer": "DONE",
+  "agent_cost": 0.2947791,
+  "agent_secs": 60.951574087142944,
+  "agent_turns": 9,
+  "engineer_cost": 0.042156799999999994
+ }
+]

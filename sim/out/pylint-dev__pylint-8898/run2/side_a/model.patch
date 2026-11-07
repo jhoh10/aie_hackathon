@@ -1,0 +1,153 @@
+diff --git a/pylint/config/argument.py b/pylint/config/argument.py
+index 30a5fd17..2d2a46a3 100644
+--- a/pylint/config/argument.py
++++ b/pylint/config/argument.py
+@@ -114,7 +114,7 @@ def _regex_transformer(value: str) -> Pattern[str]:
+ def _regexp_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions."""
+     patterns: list[Pattern[str]] = []
+-    for pattern in _csv_transformer(value):
++    for pattern in pylint_utils._check_regexp_csv(value):
+         patterns.append(_regex_transformer(pattern))
+     return patterns
+ 
+diff --git a/pylint/utils/__init__.py b/pylint/utils/__init__.py
+index 61833a59..eecb3cbe 100644
+--- a/pylint/utils/__init__.py
++++ b/pylint/utils/__init__.py
+@@ -14,6 +14,7 @@ from pylint.utils.utils import (
+     HAS_ISORT_5,
+     IsortDriver,
+     _check_csv,
++    _check_regexp_csv,
+     _splitstrip,
+     _unquote,
+     decoding_stream,
+@@ -32,6 +33,7 @@ __all__ = [
+     "HAS_ISORT_5",
+     "IsortDriver",
+     "_check_csv",
++    "_check_regexp_csv",
+     "_splitstrip",
+     "_unquote",
+     "decoding_stream",
+diff --git a/pylint/utils/utils.py b/pylint/utils/utils.py
+index fa7f7b92..fbe9bf32 100644
+--- a/pylint/utils/utils.py
++++ b/pylint/utils/utils.py
+@@ -22,7 +22,7 @@ import sys
+ import textwrap
+ import tokenize
+ import warnings
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
+ from io import BufferedReader, BytesIO
+ from typing import (
+     TYPE_CHECKING,
+@@ -253,6 +253,58 @@ def _check_csv(value: list[str] | tuple[str] | str) -> Sequence[str]:
+     return _splitstrip(value)
+ 
+ 
++def _check_regexp_csv(value: list[str] | tuple[str] | str) -> Iterable[str]:
++    r"""Split a comma-separated list of regexps.
++
++    Commas inside ``(...)``, ``[...]`` or ``{...}`` and commas escaped with a
++    backslash (``\,``) do not separate regexps.
++
++    >>> list(_check_regexp_csv("(foo{1,3}), bar"))
++    ['(foo{1,3})', 'bar']
++    >>> list(_check_regexp_csv("[a,b]+,(x,y)"))
++    ['[a,b]+', '(x,y)']
++    >>> list(_check_regexp_csv(r"a\,b,c"))
++    ['a\\,b', 'c']
++    """
++    if isinstance(value, (list, tuple)):
++        yield from value
++        return
++    current: list[str] = []
++    depth = 0  # nesting of (), {} outside of a character class
++    in_class = False
++    class_start = 0  # index in `current` of the first char after "[" / "[^"
++    escaped = False
++    for char in value:
++        if escaped:
++            escaped = False
++        elif char == "\\":
++            escaped = True
++        elif in_class:
++            # A "]" directly after "[" or "[^" is a literal.
++            if char == "]" and len(current) > class_start:
++                in_class = False
++        elif char == "[":
++            in_class = True
++            class_start = len(current) + 1
++        elif char in "({":
++            depth += 1
++        elif char in ")}":
++            depth = max(depth - 1, 0)
++        elif char == "," and depth == 0:
++            word = "".join(current).strip()
++            if word:
++                yield word
++            current = []
++            continue
++        current.append(char)
++        # Account for the optional "^" negating a character class.
++        if in_class and char == "^" and len(current) == class_start + 1:
++            class_start += 1
++    word = "".join(current).strip()
++    if word:
++        yield word
++
++
+ def _comment(string: str) -> str:
+     """Return string as a comment."""
+     lines = [line.strip() for line in string.splitlines()]
+diff --git a/tests/config/test_config.py b/tests/config/test_config.py
+index 83c8b072..8584d371 100644
+--- a/tests/config/test_config.py
++++ b/tests/config/test_config.py
+@@ -137,16 +137,41 @@ def test_csv_regex_error(capsys: CaptureFixture) -> None:
+     """
+     with pytest.raises(SystemExit):
+         Run(
+-            [str(EMPTY_MODULE), r"--bad-names-rgx=(foo{1,3})"],
++            [str(EMPTY_MODULE), r"--bad-names-rgx=(foo{1,3}"],
+             exit=False,
+         )
+     output = capsys.readouterr()
+     assert (
+-        r"Error in provided regular expression: (foo{1 beginning at index 0: missing ), unterminated subpattern"
++        r"Error in provided regular expression: (foo{1,3} beginning at index 0: missing ), unterminated subpattern"
+         in output.err
+     )
+ 
+ 
++@pytest.mark.parametrize(
++    "value, expected",
++    [
++        ("(foo{1,3}),bar", ["(foo{1,3})", "bar"]),
++        ("[a,b]+,bar", ["[a,b]+", "bar"]),
++        ("(a,b),c", ["(a,b)", "c"]),
++        ("((a,b),c),d", ["((a,b),c)", "d"]),
++        ("[^,]+,x", ["[^,]+", "x"]),
++        ("[],]+,x", ["[],]+", "x"]),
++        ("[^],]+,x", ["[^],]+", "x"]),
++        (r"a\,b,c", [r"a\,b", "c"]),
++        (r"[\]],x", [r"[\]]", "x"]),
++        (r"\(,x", [r"\(", "x"]),
++        ("a, b ,,c", ["a", "b", "c"]),
++    ],
++)
++def test_csv_regex_commas_in_regex(value: str, expected: list[str]) -> None:
++    """Commas inside quantifiers, groups, character classes or escaped with a
++    backslash are not treated as separators.
++    """
++    run = Run([str(EMPTY_MODULE), f"--bad-names-rgx={value}"], exit=False)
++    patterns = [p.pattern for p in run.linter.config.bad_names_rgxs]
++    assert patterns == expected
++
++
+ def test_short_verbose(capsys: CaptureFixture) -> None:
+     """Check that we correctly handle the -v flag."""
+     Run([str(EMPTY_MODULE), "-v"], exit=False)

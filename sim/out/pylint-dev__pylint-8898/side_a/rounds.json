@@ -1,0 +1,18 @@
+[
+ {
+  "agent": "`bad-names-rgxs` (the issue calls it `bad-name-rgxs`) no longer splits a regex on commas inside braces, so `(foo{1,3})` now parses as one pattern. The `tests/config` suite passes (76 tests). I didn't run the full test suite, and I didn't run pylint end to end with the issue's `.toml` config.\n\n- **Fix:** I added `_check_regexp_csv` in `pylint/utils/utils.py`, which splits on commas but ignores any comma between `{` and `}`. `_regexp_csv_transfomer` in `pylint/config/argument.py` now uses it instead of the generic comma splitter.\n- **Other regex options:** the same change applies to every `regexp_csv` option, such as `good-names-rgxs`.\n- **Still not possible:** a regex with a comma outside braces, such as `[a,b]`, still gets split. There is also no escape syntax for commas. I kept the fix to the quantifier case from the issue.\n- **Tests:** `test_csv_regex_error` in `tests/config/test_config.py` was asserting the buggy behaviour, because it expected `(foo{1,3})` to fail. I changed it to use a genuinely invalid regex, `(foo{1,3}`. I also added `test_csv_regex_comma_in_quantifier`, which checks that `(foo{1,3}),bar` yields two patterns.\n\nI made no commit.",
+  "engineer": "Please go a bit further. The issue asks for any valid regex to be expressible, or else a way to escape commas. Handling only `{}` leaves `[a,b]` and `(a,b)` broken, with no workaround.\n\nMake commas inside `[]` and `()` not split, or add a comma escape. Then run pylint end to end with the issue's config and report the result.",
+  "agent_cost": 0.175175,
+  "agent_secs": 55.56608581542969,
+  "agent_turns": 17,
+  "engineer_cost": 0.042260500000000006
+ },
+ {
+  "agent": "Commas inside `[]` and `()` no longer split a regex, and escaped commas also work. The issue's config now runs without a crash. The `tests/config` and `tests/checkers/base` suites pass (92 passed, 1 skipped), but I didn't run the full test suite.\n\n**Splitter change** (`_check_regexp_csv` in `pylint/utils/utils.py`):\n- A comma doesn't split inside `(...)` or `{...}`, including nested groups.\n- A comma inside a character class `[...]` doesn't split either. That covers `[^,]` and a literal `]` right after the `[`.\n- A backslash-escaped comma doesn't split, so `a\\,b` stays one pattern. This gives a workaround for any case the bracket tracking misses.\n\n**Tests:** I replaced the quantifier-only test with a parametrized `test_csv_regex_commas` in `tests/config/test_config.py`. It has nine cases covering all of the above plus whitespace and empty entries.\n\n**End-to-end run:** I used the issue's `(foo{1,3})` with a second pattern, `[a,b]ar`, in a `pyproject.toml` (`[tool.pylint.basic] bad-names-rgxs = \"(foo{1,3}),[a,b]ar\"`). Pylint ran normally and exited with code 16. The setup files are in the scratchpad `e2e` folder.\n\nOutput:\n- `foo` (lines 1 and 2) and `fooo` (line 3) were flagged `disallowed-name`.\n- `bar` (line 4) was also flagged `disallowed-name`.\n\n`foo` is on pylint's default bad-names list, so it was flagged regardless. The matches that show the fix are `fooo`, which `(foo{1,3})` caught, and `bar`, which `[a,b]ar` caught. Before the fix, the config crashed with `re.error`.\n\n**Limitation:** a regex that opens a `(`, `{` or `[` and never closes it swallows everything after it into one pattern. That regex is invalid anyway, so it still fails with the regular-expression error, but the message now shows the whole remaining string.\n\nI made no commit.",
+  "engineer": "DONE",
+  "agent_cost": 0.2890954,
+  "agent_secs": 42.119521141052246,
+  "agent_turns": 10,
+  "engineer_cost": 0.042612500000000005
+ }
+]

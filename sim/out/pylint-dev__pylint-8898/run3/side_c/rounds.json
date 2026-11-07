@@ -1,0 +1,18 @@
+[
+ {
+  "agent": "**Task:** `bad-names-rgxs` and other `regexp_csv` options: `\"(foo{1,3})\"` \u2192 one valid compiled regex (commas inside `{}`, `()`, `[]` no longer split) instead of a crash.\n\n| # | Check | Proves |\n|---|-------|--------|\n| 1 | `bad-names-rgxs=\"(foo{1,3})\"` loads without error and yields one pattern `(foo{1,3})` | Reported crash fixed |\n| 2 | Commas inside `{}`, `[]`, `()` are kept (`a{1,3}`, `[a,b]`, `(x,y)`) | Bracket-aware splitting |\n| 3 | Commas outside brackets still split: `foo,bar` \u2192 2; `a{1,3},b` \u2192 2; whitespace stripped, empty items dropped, as before | Existing splitting unchanged |\n| 4 | Escaped brackets/commas (`\\{1,3\\}`, `[,]`, `\\,`) don't unbalance the split | Edge cases |\n| 5 | Truly invalid regex (`(foo`) still gives \"Error in provided regular expression\" | Error reporting unchanged |\n| 6 | Same pattern works from a toml config file | Config path works too |\n| 7 | Other csv types (`csv`, `glob_paths_csv`, `regexp_paths_csv`) still split on every comma | Not changed |\n\nRegression scope: `tests/config` \u00b7 baseline: 75 passed, 0 failed\nSkipped: full suite and checker tests (change is confined to the `regexp_csv` transformer).\nNote: existing `test_csv_regex_error` asserts the buggy split (`(foo{1`). It must change to use a genuinely invalid regex; I'll list it in the report.\n\nApprove, or edit?",
+  "engineer": "Approved. Also add a check that a regex which uses commas only inside brackets across multiple comma-separated entries (e.g. `(foo{1,3}),(bar{2,4})`) yields two patterns.",
+  "agent_cost": 0.14577059999999997,
+  "agent_secs": 33.43746089935303,
+  "agent_turns": 11,
+  "engineer_cost": 0.0469606
+ },
+ {
+  "agent": "`regexp_csv` options such as `bad-names-rgxs` now keep commas inside `()`, `[]` and `{}`, so `(foo{1,3})` loads as one valid pattern. Your extra case, `(foo{1,3}),(bar{2,4})`, gives two patterns.\n\nThe `tests/config` scope passes with 91 tests, against 75 passing at baseline, so no new failures.\n\n- **Escaped braces:** `\\{1,3\\}` is still split at the comma, because escaped braces don't count as brackets. Writing `\\{1\\,3\\}` keeps it whole.\n- **Existing test changed:** I changed `test_csv_regex_error`, which asserted the old buggy split. It now uses the genuinely invalid `(foo`.\n\nDetails are in `.verify/report.md`.",
+  "engineer": "DONE",
+  "agent_cost": 0.2786006,
+  "agent_secs": 44.98406505584717,
+  "agent_turns": 9,
+  "engineer_cost": 0.0428008
+ }
+]

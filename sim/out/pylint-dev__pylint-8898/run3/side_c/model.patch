@@ -1,0 +1,131 @@
+diff --git a/pylint/config/argument.py b/pylint/config/argument.py
+index 30a5fd17..02fd67da 100644
+--- a/pylint/config/argument.py
++++ b/pylint/config/argument.py
+@@ -114,11 +114,46 @@ def _regex_transformer(value: str) -> Pattern[str]:
+ def _regexp_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions."""
+     patterns: list[Pattern[str]] = []
+-    for pattern in _csv_transformer(value):
++    for pattern in _split_regexps(value):
+         patterns.append(_regex_transformer(pattern))
+     return patterns
+ 
+ 
++def _split_regexps(value: str) -> list[str]:
++    """Split on commas that are not inside (), [] or {} and not escaped.
++
++    Surrounding whitespace is stripped and empty items are dropped.
++    """
++    items: list[str] = []
++    current: list[str] = []
++    stack: list[str] = []
++    closers = {"(": ")", "[": "]", "{": "}"}
++    i = 0
++    while i < len(value):
++        char = value[i]
++        if char == "\\" and i + 1 < len(value):
++            current.append(value[i : i + 2])
++            i += 2
++            continue
++        if stack and stack[-1] == "[":
++            # Inside a character class only "]" is special.
++            if char == "]":
++                stack.pop()
++        elif char in closers:
++            stack.append(char)
++        elif stack and char == closers[stack[-1]]:
++            stack.pop()
++        elif char == "," and not stack:
++            items.append("".join(current))
++            current = []
++            i += 1
++            continue
++        current.append(char)
++        i += 1
++    items.append("".join(current))
++    return [item.strip() for item in items if item.strip()]
++
++
+ def _regexp_paths_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions paths."""
+     patterns: list[Pattern[str]] = []
+diff --git a/tests/config/test_config.py b/tests/config/test_config.py
+index 83c8b072..a61af025 100644
+--- a/tests/config/test_config.py
++++ b/tests/config/test_config.py
+@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
+ import pytest
+ from pytest import CaptureFixture
+ 
++from pylint.config.argument import _TYPE_TRANSFORMERS
+ from pylint.config.exceptions import ArgumentPreprocessingError
+ from pylint.interfaces import CONFIDENCE_LEVEL_NAMES
+ from pylint.lint import Run as LintRun
+@@ -137,16 +138,64 @@ def test_csv_regex_error(capsys: CaptureFixture) -> None:
+     """
+     with pytest.raises(SystemExit):
+         Run(
+-            [str(EMPTY_MODULE), r"--bad-names-rgx=(foo{1,3})"],
++            [str(EMPTY_MODULE), r"--bad-names-rgx=(foo"],
+             exit=False,
+         )
+     output = capsys.readouterr()
+     assert (
+-        r"Error in provided regular expression: (foo{1 beginning at index 0: missing ), unterminated subpattern"
++        r"Error in provided regular expression: (foo beginning at index 0: missing ), unterminated subpattern"
+         in output.err
+     )
+ 
+ 
++def test_regexp_csv_commas_in_brackets_cli() -> None:
++    """A comma inside a regex quantifier must not split the regex."""
++    runner = Run([str(EMPTY_MODULE), r"--bad-names-rgxs=(foo{1,3})"], exit=False)
++    assert [p.pattern for p in runner.linter.config.bad_names_rgxs] == ["(foo{1,3})"]
++
++
++@pytest.mark.parametrize(
++    "value,expected",
++    [
++        # commas inside {}, [], () are kept
++        ("a{1,3}", ["a{1,3}"]),
++        ("[a,b]", ["[a,b]"]),
++        ("(x,y)", ["(x,y)"]),
++        # commas outside brackets still split
++        ("foo,bar", ["foo", "bar"]),
++        ("a{1,3},b", ["a{1,3}", "b"]),
++        (" foo , bar ,, ", ["foo", "bar"]),
++        # multiple entries, each with commas only in brackets
++        ("(foo{1,3}),(bar{2,4})", ["(foo{1,3})", "(bar{2,4})"]),
++        # escaped brackets / commas
++        (r"\{1,3\}", [r"\{1", r"3\}"]),
++        (r"a\,b", [r"a\,b"]),
++        (r"[,]", [r"[,]"]),
++        (r"[\]],x", [r"[\]]", "x"]),
++        (r"\(a,b", [r"\(a", "b"]),
++    ],
++)
++def test_regexp_csv_splitting(value: str, expected: list[str]) -> None:
++    patterns = _TYPE_TRANSFORMERS["regexp_csv"](value)
++    assert [p.pattern for p in patterns] == expected  # type: ignore[attr-defined]
++
++
++def test_regexp_csv_commas_in_brackets_config_file(tmp_path: Path) -> None:
++    rcfile = tmp_path / "pyproject.toml"
++    rcfile.write_text('[tool.pylint.basic]\nbad-names-rgxs = "(foo{1,3}),(bar{2,4})"\n')
++    runner = Run([str(EMPTY_MODULE), f"--rcfile={rcfile}"], exit=False)
++    assert [p.pattern for p in runner.linter.config.bad_names_rgxs] == [
++        "(foo{1,3})",
++        "(bar{2,4})",
++    ]
++
++
++@pytest.mark.parametrize("type_name", ["csv", "regexp_paths_csv"])
++def test_other_csv_types_still_split_on_every_comma(type_name: str) -> None:
++    result = _TYPE_TRANSFORMERS[type_name]("a{1,3},b")
++    assert len(result) == 3
++
++
+ def test_short_verbose(capsys: CaptureFixture) -> None:
+     """Check that we correctly handle the -v flag."""
+     Run([str(EMPTY_MODULE), "-v"], exit=False)

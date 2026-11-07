@@ -154,7 +154,13 @@ Without a model key, answer the prompts in `.work/gen/<case>/` (we used isolated
 
 ### Verification-first harness
 
-There is no CLI. The harness is a way of running a coding agent: [verification-first-developer-harness/README.md](verification-first-developer-harness/README.md) explains it and [conversation.md](verification-first-developer-harness/conversation.md) is the five-phase script (discuss → read code and ask → claims and checks → engineer approves → build until every claim is proven). Deepak ran it by giving Claude Code that script on SWE-bench tasks, then compared it with a plain Claude Code run. The side-by-side reports are in [verification-first-developer-harness/evaluation/](verification-first-developer-harness/evaluation/) (open the HTML files in a browser). To try it, open Claude Code in the target repo, point it at conversation.md and the templates in that folder, and give it the task.
+There is no CLI. The harness is a way of running a coding agent: [verification-first-developer-harness/README.md](verification-first-developer-harness/README.md) explains it and [conversation.md](verification-first-developer-harness/conversation.md) is the five-phase script (discuss → read code and ask → claims and checks → engineer approves → build until every claim is proven). Deepak ran it by giving Claude Code that script on SWE-bench tasks, then compared it with a plain Claude Code run. The side-by-side reports are in [verification-first-developer-harness/evaluation/](verification-first-developer-harness/evaluation/) (open the HTML files in a browser). To try it, run Claude Code in the target repo with the harness prompt appended:
+
+```bash
+claude --append-system-prompt "$(cat path/to/verification-first-developer-harness/harness-prompt.md)"
+```
+
+The reviewer side works the same way with [verification-first-reviewer-harness/review-prompt.md](verification-first-reviewer-harness/review-prompt.md) (see its README). To rerun the side-by-side SWE-bench simulation (default agent vs harness, with a simulated engineer and the hidden tests as referee), see [sim/README.md](sim/README.md).
 
 ## Repo layout
 

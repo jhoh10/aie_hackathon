@@ -1,0 +1,41 @@
+{
+ "patch_applied": true,
+ "fail_to_pass": {
+  "test_issue_24288": "PASSED"
+ },
+ "pass_to_pass": {
+  "test_sympy_parser": "PASSED",
+  "test_rationalize": "PASSED",
+  "test_factorial_fail": "PASSED",
+  "test_repeated_fail": "PASSED",
+  "test_repeated_dot_only": "PASSED",
+  "test_local_dict": "PASSED",
+  "test_local_dict_split_implmult": "PASSED",
+  "test_local_dict_symbol_to_fcn": "PASSED",
+  "test_global_dict": "PASSED",
+  "test_no_globals": "PASSED",
+  "test_issue_2515": "PASSED",
+  "test_issue_7663": "PASSED",
+  "test_recursive_evaluate_false_10560": "PASSED",
+  "test_function_evaluate_false": "PASSED",
+  "test_issue_10773": "PASSED",
+  "test_split_symbols": "PASSED",
+  "test_split_symbols_function": "PASSED",
+  "test_functional_exponent": "PASSED",
+  "test_match_parentheses_implicit_multiplication": "PASSED",
+  "test_convert_equals_signs": "PASSED",
+  "test_parse_function_issue_3539": "PASSED",
+  "test_split_symbols_numeric": "PASSED",
+  "test_unicode_names": "PASSED",
+  "test_python3_features": "PASSED",
+  "test_issue_19501": "PASSED",
+  "test_parsing_definitions": "PASSED",
+  "test_builtins": "PASSED"
+ },
+ "resolved": true,
+ "own_tests": {
+  "passed": 29,
+  "total": 29
+ },
+ "pytest_tail": ".............................                                            [100%]\n==================================== PASSES ====================================\n=========================== short test summary info ============================\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_sympy_parser\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_rationalize\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_factorial_fail\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_repeated_fail\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_repeated_dot_only\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_local_dict\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_local_dict_split_implmult\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_local_dict_symbol_to_fcn\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_global_dict\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_no_globals\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_2515\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_7663\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_recursive_evaluate_false_10560\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_function_evaluate_false\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_10773\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_split_symbols\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_split_symbols_function\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_functional_exponent\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_match_parentheses_implicit_multiplication\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_convert_equals_signs\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_parse_function_issue_3539\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_24288\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_split_symbols_numeric\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_unicode_names\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_python3_features\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_19501\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_parsing_definitions\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_builtins\nPASSED sympy/parsing/tests/test_sympy_parser.py::test_issue_22822\n29 passed in 0.17s\n"
+}
