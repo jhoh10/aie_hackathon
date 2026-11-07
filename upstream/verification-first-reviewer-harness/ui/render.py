@@ -228,12 +228,21 @@ def render(p, files, diff_name):
     n_func = len(frows)
     data = json.dumps({"title": p["title"]})
 
+    n_tests, n_arch = len(trows), len(p["sections"].get("arch", []))
+    tests_section = (f'<section id="tests"><div class="sh"><h2>Tests</h2><span class="muted">{n_tests} cases</span></div>'
+                     f'<div class="tw"><table class="t"><thead><tr>{thead}</tr></thead><tbody>{tests}</tbody></table></div>{test_notes}</section>'
+                     if n_tests else "")
+    arch_section = (f'<section id="arch"><div class="sh"><h2>Architecture changes</h2><span class="muted">{n_arch} items</span></div>'
+                    f'<div class="tw"><table class="t"><thead><tr><th>#</th><th>Change</th><th>Where</th><th></th></tr></thead><tbody>{arch}</tbody></table></div>{arch_notes}</section>'
+                    if n_arch else "")
+    toc_extra = ((f'<a href="#tests">Tests <span class="n">{n_tests}</span></a>' if n_tests else "")
+                 + (f'<a href="#arch">Architecture <span class="n">{n_arch}</span></a>' if n_arch else ""))
     return fill(
         PAGE, title=esc(p["title"]), summary=inline(p["summary"]), chips=chips,
-        source=esc(src.group(1)) if src else "", func=func, tests=tests, thead=thead, test_notes=test_notes,
+        source=esc(src.group(1)) if src else "", func=func, tests_section=tests_section, arch_section=arch_section, toc_extra=toc_extra, test_notes=test_notes,
         arch=arch, arch_notes=arch_notes, footer=inline(p["footer"]), n_func=n_func, n_unc=n_unc,
         n_tests=len(p["sections"].get("tests", [])), n_arch=len(p["sections"].get("arch", [])),
-        diffnote=(f"Click any file reference to see those lines of <code>{esc(diff_name)}</code>." if files else ""),
+        diffnote=(f"Click any file reference to see those lines of <code>{esc(diff_name)}</code>." if files and n_arch else ""),
         data=data, css=CSS, js=JS)
 
 
@@ -371,16 +380,11 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=
 </header>
 <main>
   <section id="func"><div class="sh"><h2>What the PR does</h2><span class="muted">{n_func} behaviour changes · <b style="color:var(--warn)">{n_unc} with no test</b></span></div><ul class="flist">{func}</ul></section>
-  <section id="tests"><div class="sh"><h2>Tests</h2><span class="muted">{n_tests} cases</span></div>
-    <div class="tw"><table class="t"><thead><tr>{thead}</tr></thead><tbody>{tests}</tbody></table></div>{test_notes}</section>
-  <section id="arch"><div class="sh"><h2>Architecture changes</h2><span class="muted">{n_arch} items</span></div>
-    <div class="tw"><table class="t"><thead><tr><th>#</th><th>Change</th><th>Where</th><th></th></tr></thead><tbody>{arch}</tbody></table></div>{arch_notes}</section>
+  {tests_section}
+  {arch_section}
   <p class="foot">{footer}</p>
 </main>
 <aside class="side">
-  <div class="panel"><h3>On this page</h3><nav class="toc">
-    <a href="#func">What the PR does <span class="n">{n_func}</span></a>
-    <a href="#tests">Tests <span class="n">{n_tests}</span></a><a href="#arch">Architecture <span class="n">{n_arch}</span></a></nav></div>
   <div class="panel"><h3>Your decision</h3>
     <div class="dec" role="group" aria-label="Decision">
       <button class="approve" data-d="APPROVE">✓ Approve</button>

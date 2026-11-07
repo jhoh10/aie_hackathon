@@ -18,6 +18,8 @@ Claims proven <n>/<m> (<verifier | author's report>) · Tests <new> new, <change
 
 ## Tests
 
+<only if the PR adds, changes or removes tests>
+
 | # | Input | Expected output |
 | --- | --- | --- |
 | T1 | <input> · <input> | <output> |
@@ -25,10 +27,14 @@ Claims proven <n>/<m> (<verifier | author's report>) · Tests <new> new, <change
 
 ## Architecture
 
+<only for high-level changes: components, public APIs, config, dependencies, data or schema>
+
 | # | Change | Where |
 | --- | --- | --- |
 | A1 | <at most 10 words> | `file` |
 ```
+
+Sections: the header and "What the PR does" are always there. **Tests** appears only when the PR adds, changes or removes tests. **Architecture** appears only for high-level changes (a component added or removed, a public API, CLI, config, dependency, schema or data format change, a new connection between components); private helpers and internal refactors never count. A section with nothing to say is left out, not filled with "no change".
 
 Limits: summary 15 words. What the PR does: at most 3 covered rows plus one row per untested behaviour, 10 words each. Tests: at most 6 rows, similar cases grouped. Architecture: at most 3 rows of 10 words.
 

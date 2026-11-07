@@ -26,7 +26,7 @@ export function parseReviewPacket(markdown: string): ReviewPacket {
       ids.add(id); section.push({ id, text, detail, untested: detail.replace(/\*/g, '') === 'No test' });
     }
   }
-  if (!packet.behaviors.length || !packet.tests.length || !packet.architecture.length) throw new Error('Expected behavior, tests and architecture rows.');
+  if (!packet.behaviors.length || !packet.tests.length) throw new Error('Expected behavior and test rows.');
   return packet;
 }
 export function addReviewComment(state: ReviewerState, item: string): ReviewerState {

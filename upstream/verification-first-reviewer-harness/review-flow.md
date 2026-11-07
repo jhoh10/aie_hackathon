@@ -22,9 +22,11 @@ A PR with no `.verify/` folder still gets a packet; its header says "No approved
 
 **What the PR does (F1…).** At most 3 rows for tested behaviour (related cases grouped) plus **one row for every behaviour no test covers**, marked **No test**. Each row at most 10 words, *before → after*, with the T rows whose inputs trigger it. A test of `{}` doesn't cover `()`.
 
-**Tests (T1…).** At most 6 rows, similar cases grouped, input → expected output. A changed existing test says `(changed; was <old>)` in its output.
+**Tests (T1…).** Only if the PR touches tests. At most 6 rows, similar cases grouped, input → expected output. A changed existing test says `(changed; was <old>)` in its output.
 
-**Architecture (A1…).** At most 3 rows of 10 words, with the file.
+**Architecture (A1…).** Only for high-level changes: a component added, removed or moved; a public API, CLI, config, dependency, schema or data format change; a new connection between components. Private helpers and internal refactors don't count. At most 3 rows of 10 words, with the file.
+
+Sections with nothing to say are left out. A bug fix inside one module is usually just a header, "What the PR does" and its tests.
 
 ## 3. Check
 
@@ -40,7 +42,7 @@ The reviewer reads the packet (on the page from [ui/render.py](ui/render.py)) an
 - "T2: add the case with an escaped comma."
 - "A1: the helper belongs in `utils`."
 
-Raw code is opened only for an architecture row the reviewer doubts.
+Raw code is opened only for an architecture row the reviewer doubts, when there is one.
 
 ## 5. Feedback goes back as claims
 

@@ -4,9 +4,9 @@ import { addReviewComment, exportReview, parseReviewPacket } from './reviewer';
 
 describe('Source reviewer contract', () => {
   const packet = parseReviewPacket(source);
-  it('retains all five behaviors, six grouped tests and three architecture rows', () => {
-    expect(packet.behaviors).toHaveLength(5); expect(packet.tests).toHaveLength(6); expect(packet.architecture).toHaveLength(3);
-    expect(packet.behaviors.filter(item => item.untested).map(item => item.id)).toEqual(['F3', 'F4', 'F5']);
+  it('retains the latest six behaviors and six tests without inventing architecture rows', () => {
+    expect(packet.behaviors).toHaveLength(6); expect(packet.tests).toHaveLength(6); expect(packet.architecture).toHaveLength(0);
+    expect(packet.behaviors.filter(item => item.untested).map(item => item.id)).toEqual(['F4', 'F5', 'F6']);
   });
   it('defaults behavior feedback to blocking and requests changes', () => {
     const state = addReviewComment({ decision: null, comments: [] }, 'F3');

@@ -5,4 +5,6 @@
 - [x] Test all four approval flows, imports, locking and responsive display.
 - [x] Refresh GitHub source claims every minute while open, without overlapping updates or altering locked plans.
 - [x] Test live refresh, failure recovery and locked handoff preservation.
-- [ ] Pull the current source repository and build an interactive app based on verification-first-reviewer-harness.
+- [x] Pull the current source repository and build an interactive app based on verification-first-reviewer-harness.
+- [x] Verify reviewer comments, decision warnings, Markdown export/download, packet import and mobile/dark display.
+- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.

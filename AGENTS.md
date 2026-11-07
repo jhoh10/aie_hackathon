@@ -36,3 +36,4 @@ use the editor.
 - Render plan explanations through a bold-only text renderer, never arbitrary HTML, because imported plans are untrusted.
 - Keep review state per plan in memory and guard browser preference storage; approval locks mutation controls to preserve verifier handoff integrity.
 - Poll the public GitHub HTML with a completion-scheduled minute timer and validate data-only AST literals before atomic plan replacement; never execute upstream scripts, carry approvals onto changed plans, or overwrite locked handoffs.
+- The reviewer workspace parses repository Markdown packets into typed rows and exports the harness review decision format; diff citations are secondary, feedback stays in memory, and changed remote packets never overwrite active feedback.
