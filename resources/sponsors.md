@@ -2,6 +2,18 @@
 
 Gathered from public docs on 2026-11-07. APIs in preview change fast, so check the official docs before relying on a model name or endpoint.
 
+## Getting access and credits
+
+Check the event details page, Discord and the kickoff first: sponsors often hand out credit codes there. Keys go in `.env`, never in the repo (it's public).
+
+| Provider | How to get access | Free credits | Notes |
+| --- | --- | --- | --- |
+| Meta Model API | Self-serve signup via the [product page](https://developer.meta.com/ai/products/meta-model-api/) | Reportedly $20 per new account | US developers only during preview. Each teammate can sign up. Ask Meta on site for hackathon credits. Set a spending cap before running evals. |
+| Google Gemini | Google AI Studio, "Get API key" | Free tier with rate limits | Some new accounts may start on a prepaid plan. Ask DeepMind on site. |
+| Subquadratic (SubQ) | Waitlist form at [subq.ai](https://www.subq.ai/) | Unknown | Won't come through today. Ask their team on site. |
+| Fetch.ai | Agentverse: sign in, generate key in profile. ASI:One: developer portal account | Unknown | Save the Agentverse key right away; it can't be shown again. |
+| MongoDB | Atlas free tier | Free tier is enough | Nothing to apply for. |
+
 ## Meta Model API
 
 The $5,000 prize is for the best use of this one.
