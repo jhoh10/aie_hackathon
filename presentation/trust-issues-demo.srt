@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:07,241
+AI writes more code than anyone can read. We're Trust Issues. Our idea: stop reading diffs, and check the proof instead.
+
+2
+00:00:07,541 --> 00:00:16,606
+An engineer approves a few plain-language claims. Our verifier writes its own checks without seeing the code, and runs them on the old and new versions in a sealed sandbox.
+
+3
+00:00:16,906 --> 00:00:23,509
+Here's a real run we built today. A plausible login fix passes the project's own tests. The verifier blocks it.
+
+4
+00:00:23,809 --> 00:00:31,187
+Because it replays the same logins on both versions, and shows the email's real owner is now locked out. Anyone can rerun this evidence.
+
+5
+00:00:31,487 --> 00:00:39,669
+Under the hood: a no-network Docker sandbox, blind check writing, and a rule that a check only counts if it fails before the change and passes after.
+
+6
+00:00:39,969 --> 00:00:52,048
+On twenty real PocketBase pull requests, CI stopped none of twelve bad ones. Our verifier stopped ten, including all three built to game it. AI review did better still, and we flag too many honest fixes.
+
+7
+00:00:52,348 --> 00:00:59,450
+Next: tighter evidence summaries, so the engineer reads less. Trust Issues. Code and full results are in our repo.

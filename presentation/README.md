@@ -17,3 +17,9 @@ Every number on the slides comes from `verifier/results/`.
 ## Rebuilding the PDF
 
 After changing `deck.json` or `slides/`, run `python3 presentation/build_pdf.py` (needs Google Chrome and a network connection for the fonts). It writes `slides.pdf`.
+
+## Demo video
+
+`trust-issues-demo.mp4`: 59.8 seconds, 1080p, with a generated voiceover (macOS Samantha voice) and captions in `trust-issues-demo.srt`. It shows the process, a real recorded verifier run (case inj2), the code behind the verdict rule, and the benchmark results, including where we fall short.
+
+Rebuild it with `python3 video/build.py slides presentation/trust-issues-demo.mp4` from this folder (needs ffmpeg, Google Chrome and macOS `say`). The narration is in `video/script.json`.

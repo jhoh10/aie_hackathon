@@ -1,0 +1,30 @@
+[
+ {
+  "frame": "slide:cover",
+  "text": "AI writes more code than anyone can read. We're Trust Issues. Our idea: stop reading diffs, and check the proof instead."
+ },
+ {
+  "frame": "slide:process",
+  "text": "An engineer approves a few plain-language claims. Our verifier writes its own checks without seeing the code, and runs them on the old and new versions in a sealed sandbox."
+ },
+ {
+  "frame": "custom:run",
+  "text": "Here's a real run we built today. A plausible login fix passes the project's own tests. The verifier blocks it."
+ },
+ {
+  "frame": "slide:evidence",
+  "text": "Because it replays the same logins on both versions, and shows the email's real owner is now locked out. Anyone can rerun this evidence."
+ },
+ {
+  "frame": "custom:code",
+  "text": "Under the hood: a no-network Docker sandbox, blind check writing, and a rule that a check only counts if it fails before the change and passes after."
+ },
+ {
+  "frame": "slide:results",
+  "text": "On twenty real PocketBase pull requests, CI stopped none of twelve bad ones. Our verifier stopped ten, including all three built to game it. AI review did better still, and we flag too many honest fixes."
+ },
+ {
+  "frame": "slide:attention",
+  "text": "Next: tighter evidence summaries, so the engineer reads less. Trust Issues. Code and full results are in our repo."
+ }
+]
