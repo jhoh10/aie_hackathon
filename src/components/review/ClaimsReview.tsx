@@ -104,7 +104,7 @@ export function ClaimsReview() {
     localStorage.setItem(POLICY, policy ? "1" : "0");
   }, [reviews, imported, planId, policy, hydrated]);
 
-  const plan = plans.find((p) => p.id === planId) ?? plans[0];
+  const plan: Plan = plans.find((p) => p.id === planId) ?? H_BEARER;
   const r = reviews[plan.id] ?? fresh(plan, policy);
   const approved = new Set(r.approved);
   const claims = allClaims(plan);

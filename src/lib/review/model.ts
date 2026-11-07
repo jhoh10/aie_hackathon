@@ -19,7 +19,7 @@ export type Category = {
   tone: string; // colour family: intent | boundaries | formal | safety | conformance | preserved | other
   name: string;
   note: string;
-  routine?: boolean;
+  routine?: boolean | undefined;
   open: boolean;
   claims: Claim[];
 };
@@ -75,12 +75,12 @@ const cells = (line: string) =>
 
 function tableAfter(md: string, heading: RegExp): string[][] {
   const lines = md.split(/\r?\n/);
-  const start = lines.findIndex((l) => heading.test(l));
+  const start = lines.findIndex((l) => heading.test(l ?? ""));
   if (start < 0) return [];
   const rows: string[][] = [];
   let seenHeader = false;
   for (let i = start + 1; i < lines.length; i++) {
-    const l = lines[i];
+    const l = lines[i] ?? "";
     if (/^#{1,6}\s/.test(l)) break;
     if (!l.trim().startsWith("|")) {
       if (rows.length || seenHeader) break;
@@ -126,7 +126,7 @@ export function parsePlanMd(md: string, id = "imported"): Plan {
   const skipRows = tableAfter(md, /^#{2,}\s*Considered and skipped\b/i);
 
   const evidenceBy = new Map<string, Evidence[]>();
-  for (const [claim, type = "Check", what = ""] of checkRows) {
+  for (const [claim = "", type = "Check", what = ""] of checkRows) {
     for (const cid of claim.split(/[,\s]+/).filter(Boolean)) {
       const list = evidenceBy.get(cid) ?? [];
       list.push({ type, what: what.replace(/`/g, ""), s: guessStrength(type, what) });
@@ -154,7 +154,7 @@ export function parsePlanMd(md: string, id = "imported"): Plan {
     title,
     why: request ? `<b>Request:</b> ${escapeHtml(request.replace(/`/g, ""))}` : "<b>Imported plan:</b> review each claim before the agent builds.",
     categories: [...groups.values()],
-    skipped: skipRows.filter((r) => r.length >= 2).map((r) => [r[0], r[1]] as [string, string]),
+    skipped: skipRows.filter((r) => r.length >= 2).map((r) => [r[0] ?? "", r[1] ?? ""] as [string, string]),
   };
 }
 
