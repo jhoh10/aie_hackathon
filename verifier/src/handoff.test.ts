@@ -6,7 +6,7 @@ import { planToClaims } from './handoff.ts';
 import { ROOT } from './sandbox.ts';
 
 test('the h-bearer example plan becomes contract claims', () => {
-  const { approvedBy, claims } = planToClaims(readFileSync(join(ROOT, '../verification-first-harness/examples/h-bearer/.verify/plan.md'), 'utf8'));
+  const { approvedBy, claims } = planToClaims(readFileSync(join(ROOT, '../verification-first-developer-harness/examples/h-bearer/.verify/plan.md'), 'utf8'));
   assert.equal(approvedBy, 'Jon');
   assert.deepEqual(claims.map((c) => [c.id, c.kind, c.group]), [['c1', 'behavior_change', 'Auth header'], ['c2', 'no_behavior_change', 'Auth header'], ['c3', 'no_behavior_change', 'Auth header']]);
 });

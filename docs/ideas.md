@@ -6,7 +6,7 @@
 
 ## Idea 1: Talk through the tests before writing the code (picked)
 
-Expanded in [verification-first-harness/](../verification-first-harness/README.md): the five-phase conversation, a catalog of every kind of test, and templates.
+Expanded in [verification-first-developer-harness/](../verification-first-developer-harness/README.md): the five-phase conversation, a catalog of every kind of test, and templates.
 
 Get engineers into a conversation about testing *before* they start coding. Working out the inputs, outputs and how to verify them makes people understand what they're building before they build it.
 

@@ -8,7 +8,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 - [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
 - [ ] **12:30 PM: stack and skeleton (overdue, nearly done).** "Running it" in the README filled in and the verifier wired to Muse Spark. Left: Meta billing (key accepted, but chat calls return 402 `billing_not_configured`).
-- [ ] **1:30 PM: hello world end to end (done with hand-written checks).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-harness/evaluation/). Hand-off done: `src/handoff.ts` runs an approved plan through the verifier, PASS on `h-bearer` (verification-first-harness/README.md, "End to end"). Still missing: the real model instead of hand-written answers (blocked on Meta billing), and the demo scenario named in the README's "Demo moment".
+- [ ] **1:30 PM: hello world end to end (done with hand-written checks).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-developer-harness/evaluation/). Hand-off done: `src/handoff.ts` runs an approved plan through the verifier, PASS on `h-bearer` (verification-first-developer-harness/README.md, "End to end"). Still missing: the real model instead of hand-written answers (blocked on Meta billing), and the demo scenario named in the README's "Demo moment".
 - [ ] **2:00 PM: benchmark running (started, handed to SB at 2:20).** A first dev run got partway on Jon's machine; see SB's Now line for what's left.
 - [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
 - [ ] **3:30 PM: numbers in.** The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier).
@@ -43,7 +43,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
 - [ ] Load the claims review page from a real `.verify/plan.md` instead of built-in examples; add `category` and evidence `strength` to the plan template so the agent fills them in phase C
-- [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
+- [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-developer-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
 - [ ] Ask the SubQ team on site for API access (whole-codebase context for verifying a PR)
@@ -58,7 +58,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 ## Done
 
-- [x] [MA] Claims review page: claims grouped by guarantee category per use case (bug fix, feature, refactor, Lean), evidence strength per check, routine regression collapsible, approve per claim → verifier JSON (verification-first-harness/ui/plan-review.html) (2026-11-07)
+- [x] [MA] Claims review page: claims grouped by guarantee category per use case (bug fix, feature, refactor, Lean), evidence strength per check, routine regression collapsible, approve per claim → verifier JSON (verification-first-developer-harness/ui/plan-review.html) (2026-11-07)
 - [x] [JH] Hand the harness's approved claims to the verifier: `verifier/src/handoff.ts` turns `.verify/plan.md` into claims JSON and runs the verifier. PASS on `h-bearer` (checks hand-written, Meta billing blocked) (2026-11-07)
 - [x] Verifier model step points at Muse Spark (`muse-spark-1.3`, `https://api.meta.ai/v1`), reads `META_API_KEY`; "Running it" in the README filled in (2026-11-07)
 - [x] [DT] Harness run end to end on two SWE-bench Verified tasks (sympy-24661, pylint-8898), side by side with default Claude Code; both sides resolved both (2026-11-07)

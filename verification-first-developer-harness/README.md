@@ -59,7 +59,7 @@ One command takes an approved harness plan, turns its Claims table into the veri
 
 ```bash
 git clone https://github.com/pocketbase/pocketbase .work/repos/pocketbase   # once
-node --no-warnings src/handoff.ts ../verification-first-harness/examples/h-bearer/.verify/plan.md --case h-bearer
+node --no-warnings src/handoff.ts ../verification-first-developer-harness/examples/h-bearer/.verify/plan.md --case h-bearer
 ```
 
 - **Input:** [examples/h-bearer/.verify/plan.md](examples/h-bearer/.verify/plan.md), the plan the harness writes in phase C and the engineer approves in phase D (PocketBase: accept the `Bearer` prefix in any letter case). Plans without `Status: APPROVED by ...` are refused.

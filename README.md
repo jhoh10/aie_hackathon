@@ -16,7 +16,7 @@ Team Trust Issues at the AIE Code Summit 2026 Hackathon.
 ## The idea
 
 - **Problem:** AI writes more code than anyone can read, so reviewing it line by line doesn't scale.
-- **What we're building:** a verification-first harness for coding agents. The engineer and the agent agree on claims (what must be true, in plain language) and the checks that prove them before any code is written, and the agent isn't done until every approved claim is proven. Details in [verification-first-harness/](verification-first-harness/README.md).
+- **What we're building:** a verification-first harness for coding agents. The engineer and the agent agree on claims (what must be true, in plain language) and the checks that prove them before any code is written, and the agent isn't done until every approved claim is proven. Details in [verification-first-developer-harness/](verification-first-developer-harness/README.md).
 - **Demo moment:** _The one thing judges should see that makes them go "oh nice"._
 
 We picked idea 1 from [docs/ideas.md](docs/ideas.md).
@@ -83,7 +83,7 @@ node --no-warnings src/metrics.ts dev           # numbers from the saved results
 
 ### Verification-first harness
 
-There is no CLI. The harness is a way of running a coding agent: [verification-first-harness/README.md](verification-first-harness/README.md) explains it and [conversation.md](verification-first-harness/conversation.md) is the five-phase script (discuss → read code and ask → claims and checks → engineer approves → build until every claim is proven). Deepak ran it by giving Claude Code that script on SWE-bench tasks, then compared it with a plain Claude Code run. The side-by-side reports are in [verification-first-harness/evaluation/](verification-first-harness/evaluation/) (open the HTML files in a browser). To try it, open Claude Code in the target repo, point it at conversation.md and the templates in that folder, and give it the task.
+There is no CLI. The harness is a way of running a coding agent: [verification-first-developer-harness/README.md](verification-first-developer-harness/README.md) explains it and [conversation.md](verification-first-developer-harness/conversation.md) is the five-phase script (discuss → read code and ask → claims and checks → engineer approves → build until every claim is proven). Deepak ran it by giving Claude Code that script on SWE-bench tasks, then compared it with a plain Claude Code run. The side-by-side reports are in [verification-first-developer-harness/evaluation/](verification-first-developer-harness/evaluation/) (open the HTML files in a browser). To try it, open Claude Code in the target repo, point it at conversation.md and the templates in that folder, and give it the task.
 
 ## Repo layout
 

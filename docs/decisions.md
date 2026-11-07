@@ -15,7 +15,7 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 ## 2026-11-07: The harness runs lean by default
 
-- **Chose:** the lean prompt (verification-first-harness/harness-prompt.md). Phases A and B produce no messages, there are at most 8 claims, a fixed set of regression tests is checked once before and once after building, and the final message is at most 4 lines. It keeps the single approval of the claims and the team's plan format, so the verifier hand-off is unchanged.
+- **Chose:** the lean prompt (verification-first-developer-harness/harness-prompt.md). Phases A and B produce no messages, there are at most 8 claims, a fixed set of regression tests is checked once before and once after building, and the final message is at most 4 lines. It keeps the single approval of the claims and the team's plan format, so the verifier hand-off is unchanged.
 - **Over:** the full five-phase conversation, where every phase talks to the engineer and the full suite runs during the build loop.
 - **Because:** over 3 runs each on a SWE-bench task, cost fell from $0.88 to $0.42 and time from 2.5 to 1.3 minutes. The engineer read half as many words (542 to 280) and always gave exactly one reply. The old prompt cost more than the default agent ($0.74), and lean is cheaper.
 - **Revisit if:** lean plans start missing claims that the full conversation would have caught. Check this on tasks where the pass rate actually separates the two.
@@ -57,7 +57,7 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 ## 2026-11-07: The harness display scales by grouping claims, not by mode
 
-- **Chose:** one tree for every task (feature → optional area → claim → evidence). The engineer approves claims; tests sit under them as evidence. How far the tree opens by default depends on the number of claims, and failures always open down to the failing test. Details in verification-first-harness/display-scaling.md.
+- **Chose:** one tree for every task (feature → optional area → claim → evidence). The engineer approves claims; tests sit under them as evidence. How far the tree opens by default depends on the number of claims, and failures always open down to the failing test. Details in verification-first-developer-harness/display-scaling.md.
 - **Over:** a separate "bug fix" and "feature" view, or a scale setting the user picks; and showing every unit test as a plan row.
 - **Because:** claims are the same kind of thing at any scale, so the gate stays the same. A feature plan stays readable, and a bug fix still shows its tests.
 - **Revisit if:** real plans don't group cleanly into areas, or engineers keep opening the evidence to approve a plan.
@@ -71,7 +71,7 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 ## 2026-11-07: Build idea 1, the verification-first harness
 
-- **Chose:** Idea 1: talk through the tests before writing the code. The agent and the engineer agree on inputs, outputs and the test plan first, then the agent builds until the approved tests pass (verification-first-harness/).
+- **Chose:** Idea 1: talk through the tests before writing the code. The agent and the engineer agree on inputs, outputs and the test plan first, then the agent builds until the approved tests pass (verification-first-developer-harness/).
 - **Over:** Idea 2: the LLM picks the lines worth reviewing.
 - **Because:** The team settled on it. It fits the "verification" theme directly and has already been worked out furthest (five-phase conversation, testing catalog, templates).
 - **Revisit if:** The core loop (approved plan → build → green report) isn't working end to end by the 2:30 PM milestone.
