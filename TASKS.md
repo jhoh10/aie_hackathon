@@ -15,18 +15,34 @@ Planned backwards from an **assumed 6:00 PM submission deadline**. Nobody has co
 - [ ] **5:45 PM: submitted.** Form in, every member listed, repo accessible to judges. 15 minutes of buffer.
 - [ ] **After submitting: rehearse.** Run the pitch twice before demos.
 
+## Who's on what
+
+- **DT (Deepak):** core product: the harness itself
+- **SB (Sebastian):** evals, and datasets we can use
+- **JH (Jon):** metrics
+- **MA (Mauricio):** research on Lean for software verification
+- **Unowned:** demo, pitch and submission; event details. Pick these up when your own workstream allows.
+
 ## Now
 
-_Nothing in progress. Next up: split roles and put owner initials on the tasks below._
+- [ ] [DT] Core product: pick the stack and fill in "Running it" in the README
+- [ ] [SB] Find evals and datasets we can use
+- [ ] [JH] Metrics: what we measure and show the judges
+- [ ] [MA] Research Lean for software verification. Decide by **2:30 PM** whether it goes in the demo or becomes a "what's next" slide.
 
 ## Next
 
-- [ ] Confirm the real submission deadline and demo time, then move the milestone times above to match
-- [ ] Copy schedule, judging criteria and submission rules from the CV details page into resources/event.md
-- [ ] Get Meta Model API keys for everyone (the $5k prize track)
-- [ ] Pick the stack and fill in "Running it" in the README
-- [ ] Get a hello-world version deployed end to end
+- [ ] **Urgent:** confirm the real submission deadline and demo time, then move the milestone times above to match (needs a Cerebral Valley login, about 10 min)
+- [ ] Copy the schedule, judging criteria and submission rules from the CV details page into resources/event.md
+- [ ] [DT] Get Meta Model API keys for everyone (the $5k prize track)
+- [ ] [DT] Get a hello-world version running end to end, using the Meta Model API
+- [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. Due by **1:30 PM**.
+- [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
+- [ ] Decide how evals, metrics and Lean show up in the product or the demo
+- [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Write the demo script (docs/submission.md)
+- [ ] Slides, plus a backup demo video
+- [ ] Fill in the README pitch, team and links, then submit the form (every member listed, repo accessible to judges)
 
 ## Blocked
 
