@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Evaluate the developer harness on ambiguous PocketBase issues, with a simulated engineer
+
+- **Chose:** 10 real PocketBase fixes as tasks (7 ambiguous, 3 clear controls). Each agent sees only the issue. A simulated engineer who knows the intent answers only what the agent asks or gets wrong, and the upstream fix's own test functions grade the result.
+- **Over:** more SWE-bench Verified tasks, or grading on the whole test package.
+- **Because:** SWE-bench Verified filtered out underspecified issues, which is exactly where the harness should help; in our two runs both agents passed. PocketBase reuses the verifier's Docker and Go setup. Grading only the changed test functions avoids unrelated, environment-dependent failures elsewhere in the package. An engineer who answers only questions keeps it fair: the default agent gets the same answers if it asks.
+- **Revisit if:** the brief (taken from upstream's fix) rewards one particular design on more tasks than oauth, or runs vary too much to read anything from one run per arm.
+
 ## 2026-11-07: Grow the benchmark to 39 cases in a separate `extended` split
 
 - **Chose:** 19 more PocketBase cases (10 real upstream fixes, 9 reverts), mostly built as fix/revert pairs from the same commit, in a new `extended` split. 18 good and 21 bad in total.

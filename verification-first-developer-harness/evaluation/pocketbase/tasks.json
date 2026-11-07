@@ -1,0 +1,90 @@
+{
+  "repo": "pocketbase/pocketbase (clone at verifier/.work/repos/pocketbase)",
+  "about": "Developer-side eval: the agent gets only `issue` at the commit before the upstream fix. The simulated engineer knows `brief` and answers only what the agent asks or gets wrong. The upstream fix's own tests are the hidden grader. `ambiguity` is the decision the issue leaves open; it is used only for scoring whether the agent's questions or plan surfaced it. `control` tasks are clear issues where the harness shouldn't help, so they show its overhead honestly. `graderTests`, when set, limits the hidden grader to those test functions; otherwise it runs every test function the upstream fix added or changed.",
+  "tasks": [
+    {
+      "id": "number",
+      "kind": "ambiguous",
+      "fix": "f8687567",
+      "issue": "Number field settings ignore a `max` of 0. For example, setting min 1 and max 0 on a number field saves without any error.",
+      "brief": "A max of 0 is a real limit, not 'no limit'. Only an empty (unset) max means no limit, and the same goes for min. Saving the field settings must reject max < min, including when either one is 0: min 1 with max 0 is an error on max, min 0 with max -1 is an error on max. min equal to max is fine. Records with a value above a max of 0 are rejected. Error wording should read 'greater or equal than' / 'less or equal than', since the limits are inclusive.",
+      "ambiguity": "Does 0 mean 'unset' or a real limit, and do min and max get the same treatment?"
+    },
+    {
+      "id": "onlyint",
+      "kind": "ambiguous",
+      "fix": "eb28f898",
+      "issue": "Number fields generated for a View collection are never marked as integer-only, even when the column can only hold integers (for example a `count(*)` column), so the dashboard and API treat them as decimals.",
+      "brief": "Mark a generated view number field as integer-only only when the column expression is known to return integers: `count(...)`, and casts to `int` or `integer`. `total(...)` returns a decimal in SQLite, so it stays decimal, and so do casts to `real`, `decimal` or `numeric`. Anything we can't tell from the expression stays as it is now.",
+      "ambiguity": "Which expressions are 'known' to be integer-only (count, sum, total, which casts), and what happens when we can't tell?"
+    },
+    {
+      "id": "oauth",
+      "kind": "ambiguous",
+      "fix": "d763d3df",
+      "issue": "Adding an OAuth2 provider to an auth collection removes the client secret of the other, already configured providers.",
+      "brief": "The API never returns client secrets, so the dashboard sends the existing providers back without `clientSecret` when you add a new one. Merge per provider, matched by provider name: fields that were sent replace the stored ones, fields that weren't sent (like clientSecret) keep their stored value. A brand-new provider is stored as sent. The submitted list still decides which providers exist and in what order, so a provider left out is removed. Explicitly sending a new clientSecret replaces it.",
+      "ambiguity": "Merge or replace? What identifies 'the same provider', and what happens to fields that weren't sent and to providers left out of the list?",
+      "graderTests": [
+        "TestCollectionUpdate"
+      ],
+      "graderNote": "Upstream also unit-tests a new OAuth2Config.UnmarshalJSON method, which a correct fix placed elsewhere wouldn't have, so only the API-level test grades."
+    },
+    {
+      "id": "idchars",
+      "kind": "ambiguous",
+      "fix": "6184b31d",
+      "issue": "Record ids can contain characters that break filesystem paths when a collection's id pattern is loosened (for example a wildcard pattern). Files are stored in directories named after the record id.",
+      "brief": "Whatever the id pattern says, always reject these characters in a record id: . / \\ | \" ' ` < > : ? * % $, the NUL character, tab, newline, carriage return and space. Also reject ids that are exactly a reserved Windows file name, in any letter case: CON, PRN, AUX, NUL, COM1-COM9, LPT1-LPT9 (an id like `console` is fine, only exact matches). The default id pattern already rules all of this out, so the extra check matters only for custom patterns. The error goes on the id field and names the offending character.",
+      "ambiguity": "Which characters and names are forbidden, is it exact-match or substring for reserved names, and does it apply regardless of the configured pattern?"
+    },
+    {
+      "id": "refresh",
+      "kind": "ambiguous",
+      "fix": "a9c42d02",
+      "issue": "Calling the `/auth-refresh` endpoint with an impersonate token fails with 403 'The current auth token is not refreshable.' Clients that call auth-refresh on startup to load fresh user data break when they hold an impersonate token.",
+      "brief": "auth-refresh with a nonrenewable token (impersonate tokens, or long-lived superuser 'API key' tokens) should succeed with 200 and return the same token unchanged, together with the up-to-date record data. Don't mint a new token for it: that would turn a fixed-duration impersonate token into one that never expires. Renewable tokens keep getting a new token, as before.",
+      "ambiguity": "Should a nonrenewable token get refreshed, be returned as-is, or keep failing?"
+    },
+    {
+      "id": "redirect",
+      "kind": "ambiguous",
+      "fix": "28182089",
+      "issue": "The OAuth2 code->token exchange endpoint (`auth-with-oauth2`) rejects requests without `redirectURL`, but some OAuth2 apps are configured to allow an empty redirect URL.",
+      "brief": "Make redirectURL optional in our own validation of the code exchange request. The OAuth2 provider does its own checks, and whether an empty redirect URL is allowed depends on the configured OAuth2 app, so leave that decision to the provider. The other required fields (provider and code) stay required.",
+      "ambiguity": "Optional everywhere, optional per provider, or keep required with a default? Do the other fields stay required?"
+    },
+    {
+      "id": "realtime",
+      "kind": "ambiguous",
+      "fix": "1c3a9125",
+      "issue": "Superusers see hidden record fields through the REST API, but not in realtime events for the same records.",
+      "brief": "Superuser realtime subscribers get record events with all fields, hidden ones included, the same as the REST API gives them. Regular users and guests still don't get hidden fields. Everything else about the event data (email visibility, expand) stays as it is.",
+      "ambiguity": "Who gets hidden fields in realtime (superusers only, or the record owner too), and does anything else in the event change?"
+    },
+    {
+      "id": "bearer",
+      "kind": "control",
+      "fix": "bc725250",
+      "issue": "The optional `Bearer` prefix in the Authorization header is case-sensitive, which breaks clients that send `bearer` or `BEARER`.",
+      "brief": "Accept the Bearer prefix in any letter case. A bare token without any prefix keeps working as before, and invalid tokens are still rejected.",
+      "ambiguity": "None to speak of; a clear fix."
+    },
+    {
+      "id": "excerpt",
+      "kind": "control",
+      "fix": "3c880378",
+      "issue": "The `:excerpt(max)` fields modifier accepts a negative `max` instead of rejecting it with 'max argument must be > 0'.",
+      "brief": "A max of 0 or below is rejected with the existing error; positive values work as before.",
+      "ambiguity": "None to speak of; a clear fix."
+    },
+    {
+      "id": "cascade",
+      "kind": "control",
+      "fix": "44f817e7",
+      "issue": "Nested cascade delete fails for self-referenced relation records: deleting a record whose children (in the same collection, through a cascade-delete relation) have children of their own errors or leaves records behind.",
+      "brief": "Deleting a record cascade-deletes everything that references it through a cascade-delete relation, at any depth, including chains inside the same collection (a → b → c). No errors, no leftover records, and records that were already deleted earlier in the cascade are skipped.",
+      "ambiguity": "Little; the expected behaviour is clear, the work is in the implementation."
+    }
+  ]
+}

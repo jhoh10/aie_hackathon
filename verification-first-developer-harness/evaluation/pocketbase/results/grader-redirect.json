@@ -1,0 +1,8 @@
+{
+  "id": "redirect",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestRecordAuthWithOAuth2 (10.82s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t10.839s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t8.393s"
+}
