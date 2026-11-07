@@ -36,7 +36,7 @@ export async function startRun(init: any) {
   try {
     r.claims = r.claims ?? await extractClaimsFor(r.key, r.issue, model);
     if (r.autoRun) return execute(r);
-    r.phase = 'awaiting_approval'; touch(r);
+    r.phase = 'awaiting_approval'; r.claimsReadyAt = new Date().toISOString(); touch(r);
     await report(r, 'pending', 'Waiting for a person to approve the intent');
   } catch (e: any) { fail(r, e); }
 }
@@ -49,7 +49,7 @@ async function execute(r: any) {
   try {
     const result = await verify({ key: r.key, repo: r.repo, base: r.base, head: r.head, issue: r.issue, approvedClaims: r.claims,
       onEvent: (e, d: any) => { if (e === 'scenario') r.scenarios.push(d); if (e === 'locked') r.lock = d; r.lastEvent = e; touch(r); } }, model);
-    r.result = result; r.phase = 'done'; touch(r);
+    r.result = result; r.phase = 'done'; r.doneAt = new Date().toISOString(); touch(r);
     const pass = result.verdict === 'PASS';
     await report(r, pass ? 'success' : 'failure', pass ? 'All approved claims proven' : `${result.verdict}: ${result.reasons[0] ?? ''}`);
     if (r.github) await GH.comment(r.github.repo, r.github.number, `**vouch: ${result.verdict}**\n\n${result.claims.map((c: any) => `- ${c.result}: ${c.text}`).join('\n')}${result.reasons.length ? `\n\n${result.reasons.map((x: string) => `- ${x}`).join('\n')}` : ''}\n\nChanged statements reached: ${result.reach.reached}/${result.reach.total}. Evidence lock: \`${result.lock.slice(0, 12)}\``).catch(() => {});

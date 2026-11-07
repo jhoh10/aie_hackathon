@@ -4,6 +4,7 @@ Newest entries at the top. Keep each one short: what happened, who, and anything
 
 ## 2026-11-07
 
+- **Metrics defined** (JH, merged to main with the verifier). `verifier/docs/metrics.md` defines defects caught, defects that would merge, false alarms, tokens, developer effort and evidence quality. `node src/metrics.ts dev` computes them from benchmark results. Model calls now save token usage. Not run on real results yet, since there are none.
 - **Roles split** (JH). Deepak: core product. Sebastian: evals and datasets. Jon: metrics. Mauricio: Lean research for software verification. TASKS.md now has owners, plus new tasks for gaps nobody owns yet: demo, pitch and submission; confirming the deadline; picking the demo scenario; the Meta API track; and how the four workstreams fit together.
 - **Idea 1 picked.** We're building the verification-first harness (verification-first-harness/). Idea 2 is shelved. Recorded in docs/decisions.md. Still open for the 12:45 milestone: split roles, confirm the deadline.
 - **Milestones set** (JH, 12:30 PM). Time-boxed plan at the top of TASKS.md: idea locked by 12:45, demo moment working by 4:00, feature freeze at 5:00, submitted by 5:45. Planned against an assumed 6:00 PM deadline that nobody has confirmed yet.

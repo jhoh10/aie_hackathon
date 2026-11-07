@@ -15,13 +15,21 @@ function parse(text: string) {
 }
 const hash = (s: string) => createHash('sha256').update(s).digest('hex').slice(0, 12);
 
+// Token use per model call, saved next to the answer so metrics can read it later.
+// When the endpoint reports no usage (or answers come from files), tokens are estimated at 4 characters each.
+export interface Usage { role: string; model: string; prompt_tokens: number; completion_tokens: number; estimated: boolean; }
+export const estimateTokens = (text: string) => Math.ceil(text.length / 4);
+function saveUsage(base: string, role: string, u: Usage) { writeFileSync(join(base, `${role}.usage.json`), JSON.stringify(u)); }
+
 export function fileModel(dir = CACHE): Model {
   return { name: 'files', async json(role, key, prompt) {
     const base = join(dir, key); mkdirSync(base, { recursive: true });
     writeFileSync(join(base, `${role}.prompt.txt`), prompt);
     const answer = join(base, `${role}.json`);
     if (!existsSync(answer)) throw new Pending(`${key}/${role}`);
-    return parse(readFileSync(answer, 'utf8'));
+    const text = readFileSync(answer, 'utf8');
+    saveUsage(base, role, { role, model: 'files', prompt_tokens: estimateTokens(prompt), completion_tokens: estimateTokens(text), estimated: true });
+    return parse(text);
   } };
 }
 
@@ -41,8 +49,13 @@ export function openaiModel(baseUrl: string, apiKey: string, model: string): Mod
       await new Promise((r) => setTimeout(r, 500 * 2 ** attempt + Math.random() * 300));
     }
     if (!res!.ok) throw new Error(`model ${res!.status}: ${(await res!.text()).slice(0, 300)}`);
-    const text = (await res!.json()).choices[0].message.content;
+    const data = await res!.json();
+    const text = data.choices[0].message.content;
     writeFileSync(answer, text);
+    const u = data.usage;
+    saveUsage(base, role, u?.prompt_tokens != null
+      ? { role, model, prompt_tokens: u.prompt_tokens, completion_tokens: u.completion_tokens ?? 0, estimated: false }
+      : { role, model, prompt_tokens: estimateTokens(prompt), completion_tokens: estimateTokens(text), estimated: true });
     return parse(text);
   } };
 }
