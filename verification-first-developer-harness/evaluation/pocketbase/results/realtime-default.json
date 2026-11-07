@@ -1,0 +1,37 @@
+{
+  "task": "realtime",
+  "kind": "ambiguous",
+  "arm": "default",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.5668,
+  "engineerCostUsd": 0,
+  "agentMs": 114030,
+  "wallMs": 115438,
+  "agentTurns": 15,
+  "engineerReplies": 0,
+  "wordsRead": 204,
+  "diffLines": 80,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "Fixed: superusers now get hidden fields in realtime events, the same as they do through the REST API. Regular users and guests still don't see them.\n\n**Cause:** the REST API runs records through `autoResolveRecordsFlags` (`apis/record_helpers.go:442`). For a superuser, that function shows the hidden fields and skips the email visibility check. The realtime broadcast in `realtimeBroadcastRecord` builds its own copy of each record with `record.Fresh()` and never does this. It only handled email visibility for the record's owner or a manager in auth collections. So hidden fields were always left out of realtime messages, even for superusers.\n\n**Fix** (`apis/realtime.go`, inside the enrich callback): if the subscribing client is a superuser, the record copy now shows all fields and ignores email visibility. That matches the REST behaviour. It runs before the `fields` filter, so `?fields=` still works on top of it.\n\n**Test:** I added `TestRealtimeBroadcastHiddenFields` to `apis/realtime_test.go`. It sets up a collection with a hidden `secret` field and three subscribers: a superuser, a regular user and a guest. Only the superuser should receive `secret`. The test failed before the fix (the superuser got no `secret`) and passes after it. The whole `apis` test package passes, and `go vet` and `gofmt` report nothing.\n\nI haven't committed anything."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "apis/realtime_test.go"
+    ],
+    "funcs": [
+      "TestRealtimeAuthRecordDeleteEvent",
+      "TestRealtimeAuthRecordUpdateEvent",
+      "TestRealtimeRecordHiddenFields",
+      "TestRealtimeAuthRecordUnsetOnTokenKeyRefresh",
+      "TestRealtimeAuthRecordUnsetOnCollectionSecretChange",
+      "TestRealtimeAuthRecordUnsetOnCollectionDelete",
+      "TestRealtimeCustomAuthModelDeleteEvent",
+      "TestRealtimeCustomAuthModelUpdateEvent"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t0.732s"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "task": "excerpt",
+  "kind": "control",
+  "arm": "default",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.3321,
+  "engineerCostUsd": 0,
+  "agentMs": 15438,
+  "wallMs": 19795,
+  "agentTurns": 6,
+  "engineerReplies": 0,
+  "wordsRead": 67,
+  "diffLines": 7,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "A negative `max` in `:excerpt(max)` is now rejected with the existing 'max argument must be > 0' error. The excerpt tests in `tools/picker` pass.\n\n- **Fix:** in `tools/picker/excerpt_modifier.go:56`, the check was `max == 0`, so negative values got through. It is now `max <= 0`.\n- **Test:** I added a \"negative max argument\" case to `tools/picker/excerpt_modifier_test.go` that passes `\"-1\"` and expects an error.\n\nI haven't committed anything."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "tools/picker/excerpt_modifier_test.go"
+    ],
+    "funcs": [
+      "TestNewExcerptModifier"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/tools/picker\t0.002s"
+  }
+}

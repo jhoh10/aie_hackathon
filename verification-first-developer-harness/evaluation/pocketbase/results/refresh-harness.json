@@ -1,0 +1,38 @@
+{
+  "task": "refresh",
+  "kind": "ambiguous",
+  "arm": "harness",
+  "model": "claude-opus-5-5",
+  "costUsd": 1.2432,
+  "engineerCostUsd": 4.2344,
+  "agentMs": 130506,
+  "wallMs": 148136,
+  "agentTurns": 17,
+  "engineerReplies": 1,
+  "wordsRead": 436,
+  "diffLines": 96,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "# Plan: auth-refresh with impersonate (non-refreshable) token → 200 with fresh record + the same token\n\nStatus: DRAFT\n\n## Claims\n\n| # | Claim | Kind | Blocks done? |\n| --- | --- | --- | --- |\n| c1 | `POST /auth-refresh` with a valid non-refreshable token returns 200 with the current `record` (expand still works). This covers impersonate tokens, tokens with `refreshable:false` and tokens with no `refreshable` claim. The returned `token` is exactly the request token: no new or longer-lived token is created. | behavior_change | Yes |\n| c2 | A non-refreshable refresh still triggers the `OnRecordAuthRefreshRequest` and `OnRecordAuthRequest` hooks and is still checked against the collection auth rule. Example: an unverified record in an onlyVerified collection still gets 403. | behavior_change | Yes |\n| c3 | These stay as they are: <br>• refreshable tokens still get a newly created token <br>• the 401/403 cases (no auth, wrong collection, superuser on another collection) <br>• rate limits <br>• the transaction-error case | no_behavior_change | Yes |\n\n## Checks\n\n| Claim | Type | Check | New? |\n| --- | --- | --- | --- |\n| c1 | API scenario | In `TestRecordAuthRefresh`, the static-token case expects 200, `\"token\":\"<same token>\"` and the record id. A second case gets a token from `/impersonate/{id}`, refreshes with it and expects the same token back. | Changed existing + New |\n| c2 | API scenario | A static token for an unverified `clients` record → 403. The c1 case also asserts the hook counts. | New |\n| c3 | API scenario | The existing `TestRecordAuthRefresh` cases, plus a check that the refreshable case returns a token different from the request token | Existing + New assertion |\n\nRegression scope: `./apis` (`TestRecordAuthRefresh`, `TestRecordAuthImpersonate`) · baseline: all passed, 0 failed\nSkipped: a unit test on a helper (the logic is in the handler, so the API scenarios cover it); JS SDK changes (outside this repo).\n\nOne existing test will change: the \"static/unrefreshable\" case currently expects 403, which is the reported bug.\n\nApprove, or edit?"
+    },
+    {
+      "who": "engineer",
+      "text": "Approved."
+    },
+    {
+      "who": "agent",
+      "text": "`/auth-refresh` now returns 200 for impersonate and other non-refreshable tokens. The response has the current user record, and the token in it is the one the client sent. No new token is created, so an impersonate token can't be refreshed into a longer-lasting one. Tests pass, including the existing refresh and impersonate tests. One existing test expected the old 403 (the reported bug) and now expects 200.\n\nUnrelated bug I left alone: `apis/record_auth_impersonate.go:37` creates an error when token creation fails but never returns it. Nothing is committed.\n\nDetails are in `.verify/report.md`."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "apis/record_auth_refresh_test.go"
+    ],
+    "funcs": [
+      "TestRecordAuthRefresh"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t0.482s"
+  }
+}

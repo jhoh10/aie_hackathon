@@ -1,0 +1,38 @@
+{
+  "task": "excerpt",
+  "kind": "control",
+  "arm": "harness",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.9266,
+  "engineerCostUsd": 0.0361,
+  "agentMs": 69169,
+  "wallMs": 82811,
+  "agentTurns": 17,
+  "engineerReplies": 1,
+  "wordsRead": 256,
+  "diffLines": 47,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "# Plan: `:excerpt(max)` with negative max → error \"max argument must be > 0\"\n\nStatus: DRAFT\n\n## Claims\n\n| # | Claim | Kind | Blocks done? |\n| --- | --- | --- | --- |\n| c1 | `newExcerptModifier` returns an error when `max` is negative (e.g. `\"-1\"`, `\"-100\"`, and also when a withEllipsis arg is given) | behavior_change | Yes |\n| c2 | These cases behave as before: no args, more than 2 args, `\"0\"` and non-numeric max still return an error. Positive max (`\"1\"`, `\"12\"`) is still accepted with any withEllipsis. `Modify` output doesn't change. | no_behavior_change | Yes |\n\n## Checks\n\n| Claim | Type | Check | New? |\n| --- | --- | --- | --- |\n| c1 | Unit | New scenarios in `TestNewExcerptModifier` (`\"-1\"`, `\"-100\"`, `\"-5\",\"true\"`) expect an error | New |\n| c2 | Unit | Existing `TestNewExcerptModifier` + `TestExcerptModifierModify` scenarios, plus new boundary scenarios for `\"0\"` and `\"1\"` | Partly new |\n\nRegression scope: `./tools/picker/` · baseline: all passed, 0 failed\nSkipped: integration/API tests. The check happens only inside the constructor, so unit tests are enough.\n\nApprove, or edit?"
+    },
+    {
+      "who": "engineer",
+      "text": "Negative values should get the same error message that 0 already gets, not a new one. Otherwise approved."
+    },
+    {
+      "who": "agent",
+      "text": "`:excerpt(max)` now rejects a negative `max` with the same \"max argument must be > 0\" error that 0 gets. The fix is a one-line change in `tools/picker/excerpt_modifier.go:56`, where `max == 0` became `max <= 0`.\n\nThe new tests failed before the fix and pass after it. All tests in `./tools/picker/` pass, the same as before the change.\n\nNothing is committed. Details are in `.verify/report.md`."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "tools/picker/excerpt_modifier_test.go"
+    ],
+    "funcs": [
+      "TestNewExcerptModifier"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/tools/picker\t0.002s"
+  }
+}

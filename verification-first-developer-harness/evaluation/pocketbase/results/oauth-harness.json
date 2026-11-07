@@ -1,0 +1,47 @@
+{
+  "task": "oauth",
+  "kind": "ambiguous",
+  "arm": "harness",
+  "model": "claude-opus-5-5",
+  "costUsd": 2.8683,
+  "engineerCostUsd": 0.075,
+  "agentMs": 336072,
+  "wallMs": 356498,
+  "agentTurns": 32,
+  "engineerReplies": 2,
+  "wordsRead": 563,
+  "diffLines": 218,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "# Plan: collection update with providers that have no `clientSecret` → the existing secrets are kept\n\nStatus: DRAFT\n\n## Claims\n\n| # | Claim | Kind | Blocks done? |\n| --- | --- | --- | --- |\n| c1 | You update an auth collection and send its existing providers without `clientSecret` (the UI does this), plus a new provider with a secret. The update succeeds, every existing provider keeps its stored secret, and the new provider gets its own. | behavior_change | Yes |\n| c2 | Secrets are matched by provider name, not by position. Reordering providers, or inserting one before the existing ones, still leaves each provider with its own secret. | behavior_change | Yes |\n| c3 | A non-empty `clientSecret` that is sent explicitly replaces the stored one. A provider removed from the list stays removed. | no_behavior_change | Yes |\n| c4 | Collection JSON responses still hide the secrets, and the cached collection is not changed. The existing `TestCollectionSerialize*` tests pass without edits. | no_behavior_change | Yes |\n\n## Checks\n\n| Claim | Type | Check | New? |\n| --- | --- | --- | --- |\n| c1 | API | `TestCollectionUpdate` scenario: PATCH `users` with `gitlab` and `google` (no secret) plus `github` (with a secret). Expect 200. Then load the collection from the DB: gitlab and google still have `test2`, github has the new secret. | New |\n| c2 | Unit | `core` test: unmarshal JSON into the loaded `users` collection with providers reordered or inserted. Each provider name keeps its own secret. | New |\n| c3 | Unit | Same test: the provider sent with a new secret gets it, and the omitted provider is not in the result. | New |\n| c4 | Unit | Existing `TestCollectionSerialize` and `TestCollectionSerializeNotModifyingCache` | Existing |\n\nRegression scope: `./core -run TestCollection`, `./apis -run TestCollection` · baseline: both packages pass, 0 failures\nSkipped: UI/e2e tests, because the bug is on the server side and the UI already leaves out secrets for providers that didn't change.\n\nApprove, or edit?"
+    },
+    {
+      "who": "engineer",
+      "text": "It shouldn't be only about the secret: for an existing provider, any field I don't send should keep its stored value, and any field I do send should replace it. Approved for the rest."
+    },
+    {
+      "who": "agent",
+      "text": "I've updated `.verify/plan.md`:\n\n- **c2:** for an existing provider, matched by name and not by position, every field you don't send keeps its stored value. That covers `clientSecret`, `authURL`, `displayName`, `pkce`, `extra` and the rest.\n- **c3:** a field you do send replaces the stored value completely. That includes `\"\"` and `null`, and `extra` is replaced as a whole rather than merged key by key.\n\nThis changes current behaviour. Today, leaving a field out of a provider (say `displayName`) clears it. After this change it keeps its old value, and the only way to clear a field is to send `\"\"` or `null` explicitly. API clients that clear fields by leaving them out would notice the difference.\n\nConfirm, and I'll mark the plan approved and start building?"
+    },
+    {
+      "who": "engineer",
+      "text": "Approved. Keeping omitted fields is the behaviour I want, and sending `\"\"` or `null` to clear a field is fine."
+    },
+    {
+      "who": "agent",
+      "text": "Fixed: adding an OAuth2 provider no longer wipes the other providers' client secrets. On a collection update, any field you leave out of an existing provider (matched by name) keeps its stored value, and any field you send replaces it. That includes `\"\"`, `null`, and `extra`, which is replaced as a whole. The new tests pass, and the collection tests in `core` and `apis` pass as they did before, with no new failures. The fix is in `core/collection_model.go`; nothing is committed yet. Details are in `.verify/report.md`."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "apis/collection_test.go",
+      "core/collection_model_auth_options_test.go"
+    ],
+    "funcs": [
+      "TestCollectionUpdate"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t1.441s\nok  \tgithub.com/pocketbase/pocketbase/core\t0.030s [no tests to run]"
+  }
+}

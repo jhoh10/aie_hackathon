@@ -1,0 +1,30 @@
+{
+  "task": "bearer",
+  "kind": "control",
+  "arm": "default",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.5846,
+  "engineerCostUsd": 0,
+  "agentMs": 96171,
+  "wallMs": 100380,
+  "agentTurns": 14,
+  "engineerReplies": 0,
+  "wordsRead": 185,
+  "diffLines": 50,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "The `Bearer` prefix is now matched without regard to case, so `bearer` and `BEARER` work like `Bearer`. The new tests pass, and so does the full `apis` package test suite.\n\n**The fix** (`apis/middlewares.go:208`, `getAuthTokenFromRequest`): it used to strip only the exact text `\"Bearer \"`. With any other casing the whole header value was treated as the token, which failed to validate, so the request was handled as a guest (401 on protected routes). It now checks the first 7 characters against `\"Bearer \"` ignoring case, then removes them. RFC 9110 defines auth schemes as case-insensitive, and the code comment now says so. Tokens sent with no prefix behave as before.\n\n**Tests** (`apis/middlewares_test.go`, `TestRequireAuth`): there was no test for the prefix at all, so I added three cases with a valid token and the prefixes `Bearer `, `bearer ` and `BEARER `. Each expects a 200. I didn't run the new tests against the old code to watch them fail; with the old code, the lowercase and uppercase cases would have sent the whole header as the token and got a 401.\n\nI haven't committed anything."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "apis/middlewares_test.go"
+    ],
+    "funcs": [
+      "TestRequireAuth"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t0.772s"
+  }
+}

@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Demo: wrong guess vs one-line fix, then the review packet
+
+- **Chose:** A, then D, with C as the fallback. A: on `idchars`, default Claude guesses its own list of forbidden id characters and fails the maintainer's hidden tests; our harness shows a plan, the engineer adds one line, and it passes. D: the reviewer packet on pylint-8898, where all 11 approved checks passed but the packet flagged the untested `( )` handling that failed the real hidden test. C: `h-bearer`, harness plan to verifier PASS, fully live.
+- **Over:** B, the verifier blocking `r-number` while CI passes.
+- **Because:** A is new, uses today's results and needs no Meta API (default fails 2 of 7 ambiguous issues, harness 0). D is a static page, so it can't fail on stage. B is real, but plain AI review also stops `r-number` and beats the verifier on false alarms, which invites the hardest Q&A question.
+- **Revisit if:** the remaining eval tasks change the 2-vs-0 picture, or Meta billing starts working and a live model call becomes worth showing.
+
 ## 2026-11-07: Evaluate the developer harness on ambiguous PocketBase issues, with a simulated engineer
 
 - **Chose:** 10 real PocketBase fixes as tasks (7 ambiguous, 3 clear controls). Each agent sees only the issue. A simulated engineer who knows the intent answers only what the agent asks or gets wrong, and the upstream fix's own test functions grade the result.

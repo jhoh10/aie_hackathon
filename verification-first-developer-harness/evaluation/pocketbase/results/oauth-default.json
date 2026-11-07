@@ -1,0 +1,31 @@
+{
+  "task": "oauth",
+  "kind": "ambiguous",
+  "arm": "default",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.6303,
+  "engineerCostUsd": 0,
+  "agentMs": 213728,
+  "wallMs": 217926,
+  "agentTurns": 18,
+  "engineerReplies": 0,
+  "wordsRead": 242,
+  "diffLines": 58,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "I fixed the bug: adding an OAuth2 provider no longer wipes the client secrets of the providers already configured. I reproduced it with a new test, and the full `./core` and `./apis` test packages pass with the fix.\n\n**Cause:** The API never sends client secrets back to the client, so when the collection is saved again the existing providers come back with an empty `clientSecret`. When an update request is applied, the stored collection is overwritten with what was sent. The only thing that kept the old secrets was the JSON decoder filling the existing list entry at the same position. Once a new provider changes the order, the secrets end up on the wrong entries or are lost.\n\n**Fix** (`Collection.UnmarshalJSON` in `core/collection_model.go`): before applying the request, it now records each existing provider's secret by provider name. Afterwards, any submitted provider with an empty `clientSecret` gets its old secret back, matched by name rather than position. A secret that is actually submitted still replaces the old one.\n\n**Test:** `TestCollectionUnmarshalJSONPreserveOAuth2ClientSecrets` in `core/collection_model_test.go` puts a new provider first and changes the order of the existing ones. It checks that a provider sent without a secret keeps its old one and that a newly sent secret replaces the old one. It failed before the fix and passes now.\n\nOne side effect: a secret can't be cleared by sending it empty. That was already true before, since the secret is required anyway. I haven't committed anything."
+    }
+  ],
+  "grade": {
+    "pass": false,
+    "tests": [
+      "apis/collection_test.go",
+      "core/collection_model_auth_options_test.go"
+    ],
+    "funcs": [
+      "TestCollectionUpdate"
+    ],
+    "tail": "--- FAIL: TestCollectionUpdate (0.55s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t0.556s\nok  \tgithub.com/pocketbase/pocketbase/core\t0.004s [no tests to run]\nFAIL"
+  }
+}

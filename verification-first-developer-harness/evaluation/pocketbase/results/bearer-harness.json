@@ -1,0 +1,38 @@
+{
+  "task": "bearer",
+  "kind": "control",
+  "arm": "harness",
+  "model": "claude-opus-5-5",
+  "costUsd": 1.1793,
+  "engineerCostUsd": 0.1823,
+  "agentMs": 134428,
+  "wallMs": 144241,
+  "agentTurns": 23,
+  "engineerReplies": 1,
+  "wordsRead": 394,
+  "diffLines": 47,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "# Plan: Authorization header \"bearer\"/\"BEARER <token>\" → token accepted like \"Bearer <token>\"\n\nStatus: DRAFT\n\n## Claims\n\n| # | Claim | Kind | Blocks done? |\n| --- | --- | --- | --- |\n| c1 | A valid token after `Bearer `, `bearer `, `BEARER ` or mixed case (`bEaReR `) authenticates the request (RequireAuth route → 200) | behavior_change | Yes |\n| c2 | A valid bare token with no prefix still authenticates. Expired or invalid tokens, with or without a prefix in any case, still return 401 | no_behavior_change | Yes |\n| c3 | A value that starts with \"Bearer\" but has no space before the token (`Bearer<token>`) is not stripped and still returns 401 | no_behavior_change | Yes |\n| c4 | The existing guest, superuser and auth-refresh middleware tests still pass | no_behavior_change | Yes |\n\n## Checks\n\n| Claim | Type | Check | New? |\n| --- | --- | --- | --- |\n| c1 | API scenario | New `TestRequireAuth` scenarios: valid user token with `Bearer `, `bearer `, `BEARER `, `bEaReR ` → 200 `test123` | New |\n| c2 | API scenario | Existing bare-token, expired and invalid scenarios, plus new `bearer <expired token>` → 401 | Existing + New |\n| c3 | API scenario | `Bearer<valid token>` (no space) → 401 | New |\n| c4 | Regression | `go test ./apis -run 'TestRequireAuth\\|TestRequireGuestOnly\\|TestRequireSuperuser\\|TestRecordAuthRefresh'` | Existing |\n\nRegression scope: `./apis` tests matching `TestRequireAuth|TestRequireGuestOnly|TestRequireSuperuser|TestRecordAuthRefresh` · baseline: 38 passed, 0 failed\nSkipped: the full `./apis` suite (slow under Docker, and only `getAuthTokenFromRequest` changes); a unit test of the unexported helper (there's no internal test package, and the API scenarios cover it).\n\nApprove, or edit?"
+    },
+    {
+      "who": "engineer",
+      "text": "Approved."
+    },
+    {
+      "who": "agent",
+      "text": "The `Bearer` prefix in the Authorization header now works in any case: `bearer`, `BEARER` and mixed case all authenticate like `Bearer`. All four claims pass, and details are in `.verify/report.md`.\n\n- **Fix:** `getAuthTokenFromRequest` in `apis/middlewares.go` now compares the prefix without regard to case. Normal requests and the auth-refresh endpoint both read the token through this function, so both are fixed.\n- **Tests:** I added 6 scenarios to `TestRequireAuth`. Before the fix, the `bearer`, `BEARER` and `bEaReR` cases returned 401.\n- **Regression scope:** 44 tests ran (the 38 from the baseline plus the 6 new ones) and none failed, same as the baseline.\n\nNothing is committed yet."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "apis/middlewares_test.go"
+    ],
+    "funcs": [
+      "TestRequireAuth"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t0.375s"
+  }
+}

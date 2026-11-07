@@ -1,0 +1,31 @@
+{
+  "task": "onlyint",
+  "kind": "ambiguous",
+  "arm": "default",
+  "model": "claude-opus-5-5",
+  "costUsd": 0.542,
+  "engineerCostUsd": 0,
+  "agentMs": 77929,
+  "wallMs": 81250,
+  "agentTurns": 15,
+  "engineerReplies": 0,
+  "wordsRead": 200,
+  "diffLines": 46,
+  "transcript": [
+    {
+      "who": "agent",
+      "text": "View collections now mark number fields as integer-only (`OnlyInt`) when the column can only hold integers. The full `core` package tests pass, including a new test for this. I haven't committed anything.\n\n**What changed** (in `parseQueryToFields`, `core/view.go`):\n- **`count(...)` columns** are now integer-only. This works in any letter case, since matching already ignored case.\n- **`cast(... as int)` and `cast(... as integer)` columns** are now integer-only.\n- **Left as decimals:** `total(...)` (SQLite's `total()` always returns a float) and casts to `real`, `decimal` or `numeric`.\n- **Columns that point straight at a field in another collection** already kept that field's own setting, so they didn't need a change.\n\n**Test:** `TestCreateViewFieldsNumberOnlyInt` in `core/view_test.go` checks the flag for each of these column kinds, including upper-case `COUNT(*)` and `CAST(... AS INTEGER)`. The existing view test only checked field types, which is why it never caught this. I didn't run the new test against the old code to watch it fail, but it expects `OnlyInt` to be true for the count and int columns, and that was false before.\n\n**One limit:** other integer cast names such as `bigint` are still treated as decimals. The pattern that reads casts only accepts the type names listed above."
+    }
+  ],
+  "grade": {
+    "pass": true,
+    "tests": [
+      "core/view_test.go"
+    ],
+    "funcs": [
+      "TestCreateViewFields",
+      "TestCreateViewFieldsWithNumberOnlyInt"
+    ],
+    "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t0.132s"
+  }
+}
