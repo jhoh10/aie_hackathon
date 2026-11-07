@@ -1,6 +1,8 @@
-# aie_hackathon
+# Trust Issues
 
-> **Pitch:** _One sentence on what we're building and who it's for. (TBD)_
+> AI writes more code than anyone can read. We treat code as a black box: settle the inputs, outputs and tests up front, then verify the result against them.
+
+Team Trust Issues at the AIE Code Summit 2026 Hackathon.
 
 ## Team
 
