@@ -36,6 +36,7 @@ Without `MODEL_API_KEY`, the model step reads saved answers from `.work/gen`, an
 - `src/verdict.ts`: decision logic with no model and no I/O
 - `src/sandbox.ts`, `src/runner.mjs`: containers without internet access and the HTTP check runner
 - `src/benchmark.ts`, `cases/`: comparison against existing CI, agent-written tests and LLM review
+- `src/simulate.ts`: agents standing in for the engineer at each human step, to measure cognitive load
 - `src/metrics.ts`, `docs/metrics.md`: catch rate, defects that would merge, false alarms, tokens and developer effort from benchmark results
 - `src/server.ts`, `src/github.ts`, `ui/`: per-PR page and commit status
 - `docs/claims-contract.md`: the hand-off from the tests-first conversation

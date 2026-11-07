@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Measure cognitive load with agents standing in for the engineer
+
+- **Chose:** agents do the two human steps (approving claims, then the merge decision from the verifier's summary) and today's step (merge decision from the diff). We measure tokens read, evidence opened, right decisions and self-rated effort on the Paas scale at each step (verifier/src/simulate.ts).
+- **Over:** human data (timed sessions, a one-question effort rating on the PR page) and word counts with assumed reading speeds.
+- **Because:** there's no time to collect human data today, and agent runs give a measured comparison on every benchmark case, scored against known answers.
+- **Revisit if:** we get even a few real reviewers. Their numbers would check whether the agents' load tracks a person's.
+
 ## 2026-11-07: The engineer approves claims, not tests
 
 - **Chose:** the one human gate approves **claims**: plain-language behaviours that must be true. Tests, screenshots, evals and the rest are the checks under each claim, shown as evidence. Pitch is now "The engineer approves the claims, not the code." Harness docs, templates and the README updated to match. Agreed with DT.

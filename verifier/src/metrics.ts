@@ -30,6 +30,7 @@ export interface ScoreInput {
   usage?: Record<string, Usage[]>; // case id -> model calls
   diffLines?: Record<string, number>; // case id -> changed non-test Go lines
   liveRuns?: any[]; // server runs, for human wall time
+  sim?: Record<string, any>; // case id -> simulated engineer steps (benchmark `sim` step)
 }
 
 export type Decision = 'approve' | 'flag' | 'error' | 'missing';
@@ -126,7 +127,40 @@ export function score(i: ScoreInput) {
       } : {}),
     };
   }
-  return { assumptions: ASSUME, approaches: perApproach, cases: perCase, ...(i.liveRuns ? { live: liveTimes(i.liveRuns) } : {}) };
+  return { assumptions: ASSUME, approaches: perApproach, cases: perCase, ...(i.liveRuns ? { live: liveTimes(i.liveRuns) } : {}), ...(i.sim ? { simulated: scoreSim(i.cases, i.sim) } : {}) };
+}
+
+// Cognitive load at each human step, measured on agents standing in for the engineer (src/simulate.ts).
+// Two flows: today's (read the diff, decide) and ours (approve claims, then read the verdict and decide).
+// Load per step: tokens read, evidence opened, turns and self-rated effort (Paas 1-9).
+// Load per flow: the sum over its human steps, per case, compared only on cases that have both flows.
+export function scoreSim(cases: CaseInfo[], sim: Record<string, any>) {
+  const step = (rows: { c: CaseInfo; s: any }[], review: boolean) => {
+    const num = (k: string) => median(rows.map((r) => r.s[k]).filter((x): x is number => typeof x === 'number'));
+    const out: any = { cases: rows.length, readTokensMedian: num('readTokens'), effortMedian: num('effort'), openedMedian: num('opened'), turnsMedian: num('turns') };
+    if (review) {
+      const right = rows.filter((r) => (r.c.expected === 'bad') === (r.s.decision === 'block')).length;
+      out.correct = right; out.accuracy = round(rate(right, rows.length), 2);
+      out.defectsMerged = rows.filter((r) => r.c.expected === 'bad' && r.s.decision === 'merge').length;
+      out.goodChangesBlocked = rows.filter((r) => r.c.expected === 'good' && r.s.decision === 'block').length;
+    } else out.editedClaims = rows.filter((r) => r.s.decision === 'edit').length;
+    return out;
+  };
+  const rowsFor = (k: string) => cases.flatMap((c) => (sim[c.id]?.[k] ? [{ c, s: sim[c.id][k] }] : []));
+  const paired = cases.filter((c) => sim[c.id]?.reviewDiff && sim[c.id]?.planning && sim[c.id]?.reviewVerdict);
+  const total = (steps: any[], k: string) => steps.reduce((n, s) => n + (typeof s?.[k] === 'number' ? s[k] : 0), 0);
+  const today = paired.map((c) => sim[c.id].reviewDiff);
+  const ours = paired.map((c) => [sim[c.id].planning, sim[c.id].reviewVerdict]);
+  const flow = (per: any[][]) => ({ readTokensMedian: median(per.map((s) => total(s, 'readTokens'))), effortMedian: median(per.map((s) => total(s, 'effort'))) });
+  const t = flow(today.map((s) => [s])), o = flow(ours);
+  return {
+    steps: { planning: step(rowsFor('planning'), false), reviewDiff: step(rowsFor('reviewDiff'), true), reviewVerdict: step(rowsFor('reviewVerdict'), true) },
+    flows: {
+      pairedCases: paired.length, today: t, ours: o,
+      readingReduction: t.readTokensMedian && o.readTokensMedian ? round(t.readTokensMedian / o.readTokensMedian, 1) : null,
+      effortChange: t.effortMedian != null && o.effortMedian != null ? round(o.effortMedian - t.effortMedian, 1) : null,
+    },
+  };
 }
 
 export function toMarkdown(s: ReturnType<typeof score>) {
@@ -138,6 +172,17 @@ export function toMarkdown(s: ReturnType<typeof score>) {
   const st = (s.approaches as any).verifier?.stageSecondsMedian;
   if (st) out.push('', 'Verifier wall seconds by stage (median): ' + Object.entries(st).map(([k, v]) => `${k} ${v}`).join(', '));
   const live = (s as any).live;
+  const sim = (s as any).simulated;
+  if (sim) {
+    const r = (x: any) => x ?? 'n/a';
+    const { planning: p, reviewDiff: d, reviewVerdict: v } = sim.steps;
+    out.push('', 'Simulated engineer: cognitive load at each human step (medians)', '',
+      '| Step | Cases | Tokens read | Effort (1-9) | Evidence opened | Right decisions | Defects merged |', '|---|---|---|---|---|---|---|',
+      `| Today: review the diff | ${d.cases} | ${r(d.readTokensMedian)} | ${r(d.effortMedian)} | n/a | ${d.correct ?? 0}/${d.cases} | ${d.defectsMerged ?? 0} |`,
+      `| Ours: approve claims | ${p.cases} | ${r(p.readTokensMedian)} | ${r(p.effortMedian)} | n/a | n/a (${p.editedClaims ?? 0} edited) | n/a |`,
+      `| Ours: review the verdict | ${v.cases} | ${r(v.readTokensMedian)} | ${r(v.effortMedian)} | ${r(v.openedMedian)} | ${v.correct ?? 0}/${v.cases} | ${v.defectsMerged ?? 0} |`,
+      '', `Per change, on ${sim.flows.pairedCases} cases with both flows: today reads ${r(sim.flows.today.readTokensMedian)} tokens at effort ${r(sim.flows.today.effortMedian)}; ours reads ${r(sim.flows.ours.readTokensMedian)} tokens at total effort ${r(sim.flows.ours.effortMedian)} over two steps. Reading reduced ${r(sim.flows.readingReduction)}x.`);
+  }
   if (live?.runs) out.push('', `Live runs: ${live.runs}. Median time to approve claims: ${live.approveSecondsMedian ?? 'n/a'} s. Median wait for a verdict after approval: ${live.verdictWaitSecondsMedian ?? 'n/a'} s.`);
   return out.join('\n');
 }
@@ -169,7 +214,7 @@ if (import.meta.main) {
   }
   const runsDir = join(ROOT, '.work/runs');
   const liveRuns = existsSync(runsDir) ? readdirSync(runsDir).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(join(runsDir, f), 'utf8'))) : [];
-  const s = score({ cases, results, usage, diffLines, liveRuns });
+  const s = score({ cases, results, usage, diffLines, liveRuns, sim: read('sim') });
   writeFileSync(join(dir, 'metrics.json'), JSON.stringify(s, null, 1));
   console.log(toMarkdown(s));
   console.log(`\nFull output: ${join(dir, 'metrics.json')}`);

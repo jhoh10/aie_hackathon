@@ -1,4 +1,4 @@
-// node src/benchmark.ts <dev|holdout> <verifier|agent_tests|review|ci|all>
+// node src/benchmark.ts <dev|holdout> <verifier|agent_tests|review|ci|sim|all>
 // Runs the same cases through each approach and records raw results, including failures.
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -6,6 +6,7 @@ import { loadCases, REPO, type Case } from './cases.ts';
 import { verify, diffFor } from './pipeline.ts';
 import { modelFromEnv, Pending } from './model.ts';
 import * as P from './prompts.ts';
+import { simPlanning, simReviewDiff, simReviewVerdict } from './simulate.ts';
 import { ROOT, buildImage, ensureNetwork, runScenario, pool, sh } from './sandbox.ts';
 
 const [split, what = 'all'] = process.argv.slice(2);
@@ -50,6 +51,20 @@ async function runCi(c: Case) {
   return r;
 }
 
+// Simulated engineer at each human step (src/simulate.ts). Needs this split's verifier results.
+let verifierResults: Record<string, any> | undefined;
+async function runSim(c: Case) {
+  verifierResults ??= existsSync(join(OUT, 'verifier.json')) ? JSON.parse(readFileSync(join(OUT, 'verifier.json'), 'utf8')) : {};
+  const vr = verifierResults![c.id];
+  const diff = diffFor(REPO, c.base, c.head);
+  const reviewDiff = await simReviewDiff(c.id, c, diff, model);
+  if (!vr || vr.error) return { id: c.id, reviewDiff, note: 'no verifier result, so no planning or verdict review' };
+  const planning = await simPlanning(c.id, c.issue, vr.locked?.claims ?? [], model);
+  const reviewVerdict = await simReviewVerdict(c.id, c.issue, vr, model);
+  log(c.id, 'sim', `diff:${reviewDiff.decision} verdict:${reviewVerdict.decision}`);
+  return { id: c.id, planning, reviewDiff, reviewVerdict };
+}
+
 async function each<T>(name: string, n: number, fn: (c: Case) => Promise<T>) {
   const results: Record<string, T | { error: string }> = {};
   await pool(cases, n, async (c) => {
@@ -69,4 +84,5 @@ if (what === 'all' || what === 'ci') await each('ci', 2, runCi);
 if (what === 'all' || what === 'verifier') await each('verifier', 3, runVerifier);
 if (what === 'all' || what === 'agent_tests') await each('agent_tests', 3, runAgentTests);
 if (what === 'all' || what === 'review') await each('review', 4, runReview);
+if (what === 'all' || what === 'sim') await each('sim', 3, runSim);
 if (pending.length) log('WAITING ON MODEL ANSWERS:', pending.join(' '));

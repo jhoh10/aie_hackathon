@@ -28,7 +28,7 @@ Planned backwards from an **assumed 6:00 PM submission deadline**. Nobody has co
 - [ ] [DT] Core product: pick the stack and fill in "Running it" in the README
 - [ ] [SB] Find evals and datasets we can use
 - [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/)
-- [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script and wall time done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo
+- [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo
 - [ ] [MA] Research Lean for software verification. Decide by **2:30 PM** whether it goes in the demo or becomes a "what's next" slide.
 
 ## Next

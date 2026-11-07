@@ -57,3 +57,33 @@ Description: ${prBody}
 Diff:
 ${diff}
 Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.`;
+
+// Simulated engineer. Agents stand in for the two human steps so we can measure their load
+// without human data. Each prompt asks for a decision plus a self-rated mental effort on the
+// 9-point Paas scale. None of them sees the case's ground truth or defect note.
+const EFFORT = `"effort": 1-9, the mental effort this took you on the Paas scale (1 = very, very low, 9 = very, very high), "confidence": 0-1, "why": "one sentence"`;
+
+export const simPlan = (issue: string, claims: unknown) => `You are the engineer who asked for this change. An agent turned your request into claims: plain-language behaviours the change must make true. Before any code is written, check that the claims capture what you asked for. Approve them, or edit them if something is missing, wrong or untestable.
+${UNTRUSTED}
+<untrusted>${issue}</untrusted>
+Claims: ${JSON.stringify(claims)}
+Return JSON only: {"decision":"approve"|"edit","edits":[{"id":"c1","text":"..."}],${EFFORT}}.`;
+
+export const simReviewDiff = (issue: string, prTitle: string, prBody: string, diff: string) => `You are the engineer reviewing this pull request before merge. Nobody else checks it. Decide whether it is safe to merge.
+${UNTRUSTED}
+<untrusted>Issue: ${issue}
+Title: ${prTitle}
+Description: ${prBody}
+Diff:
+${diff}</untrusted>
+Return JSON only: {"decision":"merge"|"block",${EFFORT}}.`;
+
+export const simReviewVerdict = (issue: string, summary: unknown, opened: Record<string, unknown>, ids: string[], final: boolean) => `You are the engineer deciding whether to merge a pull request. You don't read the code. You approved claims before it was written, and an independent verifier tested them on the old and new versions. Its summary is below.
+${UNTRUSTED}
+<untrusted>Issue: ${issue}
+Verifier summary: ${JSON.stringify(summary)}
+${Object.keys(opened).length ? `Evidence you opened: ${JSON.stringify(opened)}` : ''}</untrusted>
+${final
+  ? 'You must decide now.'
+  : `If you need detail first, you can open the evidence for one claim or probe at a time: ${JSON.stringify(ids.filter((x) => !(x in opened)))}. Open only what you need.`}
+Return JSON only: ${final ? '' : '{"action":"open","id":"..."} or '}{"decision":"merge"|"block",${EFFORT}}.`;

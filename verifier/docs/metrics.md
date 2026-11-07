@@ -41,6 +41,18 @@ Runs that errored are counted separately and left out of the rates.
    - Every other approach: the person still has to read the diff, at 400 changed lines per hour. Diff size counts non-test Go lines and needs the PocketBase clone at `.work/repos/pocketbase`.
 
    The minute figures rest on these assumptions (`ASSUME` in `src/metrics.ts`). The raw counts behind them are in `metrics.json` too: number of claims and words approved, NEEDS_HUMAN verdicts, reasons to read and diff lines.
+
+   **Measured on a simulated engineer.** We have no time to collect human data, so agents do the human steps (`src/simulate.ts`, benchmark step `sim`). Each case runs two flows:
+   - *Today:* one step. The agent reads the issue and the diff, then decides to merge or block.
+   - *Ours:* two steps. The agent approves or edits the claims (planning), then reads the verifier's summary and decides. It can open the evidence for one claim or probe at a time, up to three, and is then made to decide.
+
+   For each step we record:
+   - **Tokens read:** what the agent saw by the time it decided, including any evidence it opened, estimated at 4 characters per token.
+   - **Effort:** its own rating of mental effort on the 9-point Paas scale, a standard single-question measure.
+   - **Evidence opened and turns taken.**
+   - **Right decisions:** whether merge or block matched the case's known answer, plus defects merged and good changes blocked.
+
+   Cognitive load per change is the sum over a flow's human steps, compared only on cases that have both flows. The headline numbers are how many times less the engineer reads, and the change in total effort. The simulated engineer never sees a case's known answer or defect note, and its tokens don't count towards any approach's token cost.
 6. **Wall time.** How long each approach takes by the clock, per case. The table shows the median; `metrics.json` also has the maximum and the time for every case.
    - Each approach: `wallMs`, saved by the benchmark with every result.
    - Verifier stages: `timings` in each verifier result, in ms: `claims`, `write_checks`, `build`, `run_checks`, `coverage`, `triage` and `total`. The run-checks stage runs every check twice on both versions, so it is usually the largest.
@@ -50,7 +62,7 @@ Runs that errored are counted separately and left out of the rates.
 ## Limits
 
 - The dev split has 8 cases, so one case moves a rate by 12 points or more. Report counts next to percentages.
-- Developer effort (metric 5) is modelled. Wall time from live runs (metric 6) is the measured version, but only for runs done on the PR page.
+- Developer effort (metric 5) is modelled or simulated, not measured on people. An agent's reading and self-rated effort stand in for a person's, so present them as a simulated engineer. Wall time from live runs (metric 6) is the only human measurement, and only for runs on the PR page.
 - Wall time is noisy on a laptop and venue Wi-Fi. Model stages take almost no time when answers come from the cache in `.work/gen`, and a Docker build is much slower the first time than once the image exists. Report the median, and say whether models and images were cached.
 - 400 lines per hour is a common figure for careful code review. Reading speed for claims is a guess. Both are easy to change.
 

@@ -86,3 +86,25 @@ test('median handles even and empty lists', () => {
   assert.equal(median([3, 1, 2, 10]), 2.5);
   assert.equal(median([]), null);
 });
+
+test('simulated engineer: load per human step and per flow, with right decisions from ground truth', () => {
+  const st = (decision: string, readTokens: number, effort: number, opened = 0) => ({ decision, readTokens, effort, opened, turns: opened + 1 });
+  const s = score({ cases, results: {}, sim: {
+    good1: { planning: st('approve', 300, 2), reviewDiff: st('block', 3000, 7), reviewVerdict: st('merge', 500, 2) },
+    bad1: { planning: st('edit', 400, 3), reviewDiff: st('merge', 5000, 8), reviewVerdict: st('block', 900, 3, 1) },
+    bad2: { reviewDiff: st('block', 4000, 6) },
+  } });
+  const sim: any = s.simulated;
+  assert.deepEqual(sim.steps.reviewDiff, { cases: 3, readTokensMedian: 4000, effortMedian: 7, openedMedian: 0, turnsMedian: 1, correct: 1, accuracy: 0.33, defectsMerged: 1, goodChangesBlocked: 1 });
+  assert.equal(sim.steps.reviewVerdict.correct, 2);
+  assert.equal(sim.steps.reviewVerdict.defectsMerged, 0);
+  assert.equal(sim.steps.planning.editedClaims, 1);
+  assert.equal(sim.flows.pairedCases, 2);
+  assert.deepEqual(sim.flows.today, { readTokensMedian: 4000, effortMedian: 7.5 });
+  assert.deepEqual(sim.flows.ours, { readTokensMedian: 1050, effortMedian: 5 });
+  assert.equal(sim.flows.readingReduction, 3.8);
+  assert.equal(sim.flows.effortChange, -2.5);
+  const md = toMarkdown(s);
+  assert.match(md, /\| Today: review the diff \| 3 \| 4000 \| 7 \| n\/a \| 1\/3 \| 1 \|/);
+  assert.match(md, /Reading reduced 3.8x/);
+});
