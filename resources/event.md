@@ -8,39 +8,64 @@
 ## Logistics
 
 - **When:** Saturday, Nov 7, 2026, 9:00 AM – 10:00 PM PST
-- **Where:** San Francisco, in person only
-- **Team size:** up to 4
+- **Where:** Shack15, 1 Ferry Building Suite 201, San Francisco (in person only). Sign in at the second-floor front desk with photo ID.
+- **Team size:** up to 4, solo allowed
 - **Entry:** application required, must be approved
+- **Wi-Fi:** on the details page (not copied here, this repo is public)
+- **Discord:** https://discord.com/invite/TAsaaxcXB (#announcements, #rules, #questions: ping @CV)
+- **Questions:** gina@cerebralvalley.ai or Discord
 
-## Theme
+## Schedule (Sat Nov 7, PT)
 
-Coding agents can write code. The challenge is agents that can understand, finish and judge real software on their own. The page calls out three directions:
+- 9:00 AM doors open, breakfast, team formation
+- 10:00 AM kick-off; 10:45 AM hacking starts
+- 1:00 PM lunch
+- **3:00 PM Meta $100 credit claims close**
+- **5:00 PM submissions due**
+- 5:00–6:45 PM first-round judging; 6:00 PM dinner
+- 7:00–8:00 PM final round (top six on stage)
+- 8:15 PM winners announced; 10:00 PM doors close
 
-1. **Self-improving systems:** agents that get measurably better with every run.
-2. **Reconstruction:** rebuilding software from imperfect evidence.
-3. **Verification:** checking what other agents ship before it merges.
+## Problem statements
+
+A project must build in at least one. **Ours is "Trust but Verify".**
+
+1. **The System That Gets Better:** an autonomous coding system that improves itself as it works. Each failure becomes a versioned change to its skills, tools, routing or context, adopted only if held-out evaluation confirms it.
+2. **Software Archaeology:** recover, rebuild, port or extend authorized software from incomplete evidence (binaries, traces, partial code, docs), separating what was observed from what was inferred.
+3. **Trust but Verify:** an independent verifier that evaluates AI-generated changes, catches defects, and blocks or rolls back anything below the required standard. The page asks how a verifier can write its own tests without sharing the implementer's blind spots, and stay independent, reproducible and hard to game.
+
+## Rules
+
+- Repositories must be public.
+- The demo may only show what the team built during the hackathon, and judges must be able to tell what that is. Otherwise: immediate disqualification.
+- No existing projects presented as new work.
+- Banned: anything violating legal, ethical or platform policies, or using code, data or assets you have no rights to. Listed anti-projects include basic RAG apps, Streamlit apps, image analyzers, and **any project where a dashboard is the main feature**.
+
+## Submission and judging
+
+Submit on the CV page with a one-minute demo video of what we built today. Repo public, demo link accessible, every member added. Criteria and rounds are in [docs/submission.md](../docs/submission.md).
 
 ## Prizes
 
-- $11,000 in total.
-- $5,000 of that is for the **best use of the Meta Model API** (see [sponsors.md](sponsors.md#meta-model-api)).
+"More prizes will be announced soon", per the page.
+
+| Track | Prize |
+| --- | --- |
+| Overall | 1st $3,000, 2nd $2,000, 3rd $1,000 (cash), each plus Gemini API credits, DeepMind swag and $500 MongoDB credits |
+| Best Use of Meta Model API | $5,000 cash |
+| Best Use of Subquadratic | 1st $5,000 + 5,000 API credits, 2nd $1,000 + 1,000 API credits |
+| Best Use of Fetch.ai | 1st $2,500, 2nd $2,500 (cash) |
+
+The Meta track has no criteria beyond its name. **Muse Code** (Meta's coding agent) appears only in Meta's resource links (Muse Code recipes in the cookbook, and a session called "Building with Muse Spark and Muse Code"), not in any prize rule.
 
 ## Sponsors
 
-Meta, Google DeepMind, MongoDB, Subquadratic, Fetch.ai. Docs for each are in [sponsors.md](sponsors.md).
+Meta, Google DeepMind, MongoDB, Subquadratic, Fetch.ai. Docs and credit offers for each are in [sponsors.md](sponsors.md).
 
 ## Judges and speakers (named so far)
 
 - Ivan Leo, Google DeepMind
 - Mike Beltzner, Meta
-
-## Still to fill in (from the details page)
-
-- [ ] Schedule (check-in, kickoff, submission deadline, demos)
-- [ ] Prize breakdown beyond the Meta prize
-- [ ] Judging criteria (also copy into docs/submission.md)
-- [ ] Submission requirements (video? repo? deployed link?)
-- [ ] Wi-Fi, Discord or Slack, venue address
 
 ## The summit itself
 

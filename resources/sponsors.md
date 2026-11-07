@@ -8,11 +8,11 @@ Check the event details page, Discord and the kickoff first: sponsors often hand
 
 | Provider | How to get access | Free credits | Notes |
 | --- | --- | --- | --- |
-| Meta Model API | Self-serve signup via the [product page](https://developer.meta.com/ai/products/meta-model-api/) | Reportedly $20 per new account | US developers only during preview. Each teammate can sign up. Ask Meta on site for hackathon credits. Set a spending cap before running evals. |
+| Meta Model API | Account at dev.meta.ai, **with billing set up** (credits don't bypass billing verification) | $100 per accepted participant via the claim form on the CV details page (needs your Team ID from the dev.meta.ai URL and your acceptance email). **Claims close 3:00 PM PT Nov 7.** | One grant per person. Credits are used before your card; set a spending notification on the Billing page. If they're late, ask at the Meta booth. |
 | Google Gemini | Google AI Studio, "Get API key" | Free tier with rate limits | Some new accounts may start on a prepaid plan. Ask DeepMind on site. |
-| Subquadratic (SubQ) | Waitlist form at [subq.ai](https://www.subq.ai/) | Unknown | Won't come through today. Ask their team on site. |
+| Subquadratic (SubQ) | console.subq.ai | 100M free tokens to SubQ Snap 1.1 for attendees | Long-context model built for agentic tasks. Has its own prize track (1st $5,000). |
 | Fetch.ai | Agentverse: sign in, generate key in profile. ASI:One: developer portal account | Unknown | Save the Agentverse key right away; it can't be shown again. |
-| MongoDB | Atlas free tier | Free tier is enough | Nothing to apply for. |
+| MongoDB | Atlas free tier | $100 credit code on the CV details page | Nothing to apply for. |
 
 ## Meta Model API
 
@@ -24,6 +24,7 @@ The $5,000 prize is for the best use of this one.
 - Serves the **Muse Spark** models (e.g. `muse-spark-1.1`, `muse-spark-1.2`). Multimodal input (text, image, video, audio, PDF), text output, about 1M token context, tool calling.
 - OpenAI-compatible: base URL `https://api.meta.ai/v1`, so the OpenAI SDK works by swapping the base URL and key. Keys come from the Meta developer site.
 - Public preview, US developers.
+- **Muse Code** is Meta's coding agent on these models. The CV page links "Muse code recipes" in the cookbook and an on-demand session, "Building with Muse Spark and Muse Code: from capabilities to production". No prize rule mentions it.
 - Using it through LiteLLM: https://docs.litellm.ai/docs/providers/meta
 
 ## Google DeepMind

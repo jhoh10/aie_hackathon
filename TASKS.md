@@ -31,7 +31,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 - [ ] [DT] Reviewer harness: scope it first in two sentences in docs/decisions.md. It has to say what it adds over what already serves the reviewer (claims review page `ui/plan-review.html`, the verifier's PASS / BLOCK / NEEDS_HUMAN, the PR status and page) so we don't build those twice. Likely shape: a reviewer gets a PR plus its claims and is walked through the verdict and the evidence, opening only what failed. Checkpoint at 3:30 PM.
 - [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue, blocks demo materials**; `h-bearer` already works by hand. In both SWE-bench runs both sides resolved the bug and the harness cost 1.5–3× more, so the demo needs a case where the default agent ships something wrong and we catch it (for example an `r-*` revert case).
-- [ ] Chase Meta on site for billing or hackathon credits (402 `billing_not_configured`, see Blocked). Without it the Meta prize story and the "real model" claim are weak.
+- [ ] **Everyone: claim the $100 Meta credits before 3:00 PM PT** (form on the CV details page; needs billing set up at dev.meta.ai and your Team ID, see resources/sponsors.md). Billing setup is likely also the fix for our 402 `billing_not_configured`. Without it the Meta prize story and the "real model" claim are weak.
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
 - [ ] [SB] Verifier: test the PR page and GitHub status end to end (not tried yet)
@@ -40,7 +40,6 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 ## Next
 
-- [ ] Copy the schedule and prize breakdown from the CV details page into resources/event.md. Leave out the venue Wi-Fi password, this repo is public.
 - [ ] Run the hand-off with the real model (needs Meta billing fixed: the key gets 402 `billing_not_configured`), so the h-bearer checks aren't hand-written
 - [ ] Run the hand-off on a bad case (an `r-*` revert) to show BLOCK end to end; needs a plan.md for that case
 - [ ] [DT] Get Meta Model API keys for everyone (the $5k prize track)
@@ -52,8 +51,8 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-developer-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
 - [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
-- [ ] Ask the SubQ team on site for API access (whole-codebase context for verifying a PR)
-- [ ] Check the CV details page for the rest of the $11k prize split; revisit the sponsor decision if Fetch.ai, MongoDB or DeepMind has a big track
+- [ ] Revisit SubQ: it has its own $5k track and gives 100M free tokens at console.subq.ai, so access isn't the blocker we assumed. Decide whether to add it as a whole-PR checker (docs/decisions.md)
+- [ ] Decide whether to run the developer harness in Muse Code (Meta's coding agent) for the Meta track; no prize rule requires it (resources/event.md)
 - [ ] Write the demo script (docs/submission.md)
 - [ ] Slides, plus a backup demo video
 - [ ] Fill in the README pitch, team and links, then submit the form (every member listed, repo accessible to judges)
@@ -76,6 +75,7 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 - [x] Pick the idea: idea 1, verification-first harness (2026-11-07)
 - [x] [SB] Verifier core pipeline written, not yet benchmarked (2026-11-07)
 - [x] [SB] Add deadline, judging criteria and disqualifiers to docs/submission.md (2026-11-07)
+- [x] [JH] Copy schedule, rules, problem statements and full prize list from the CV details page into resources/event.md (2026-11-07)
 - [x] [JH] Add resources folder with event and sponsor info (2026-11-07)
 - [x] [JH] Invite collaborators (2026-11-07)
 - [x] [JH] Create the repo (2026-11-07)
