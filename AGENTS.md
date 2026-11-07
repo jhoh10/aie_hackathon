@@ -32,4 +32,6 @@ use the editor.
 ## Project rules
 
 - `upstream/` is a read-only copy of the team repo (jhoh10/aie_hackathon); the app imports example plans from it with `?raw`, so refresh it from GitHub rather than editing it here.
-- Claims review data and the `.verify/plan.md` parser live in `src/lib/review/`; UI stays in `src/components/review/` so the parser can be tested without the page.
+- Fresh Claims Review uses typed source data and review/import logic in `src/data/`, with UI in `src/components/review/`; the legacy markdown parser stays in `src/lib/review/` so its existing consumers remain compatible.
+- Render plan explanations through a bold-only text renderer, never arbitrary HTML, because imported plans are untrusted.
+- Keep review state per plan in memory and guard browser preference storage; approval locks mutation controls to preserve verifier handoff integrity.

@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClaimsReview } from "@/components/review/ClaimsReview";
-import { SiteNav } from "@/components/SiteNav";
+import { ReviewWorkspace } from "@/components/review/ReviewWorkspace";
 
 export const Route = createFileRoute("/review")({
   head: () => ({
@@ -13,10 +12,5 @@ export const Route = createFileRoute("/review")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => (
-    <>
-      <SiteNav />
-      <ClaimsReview />
-    </>
-  ),
+  component: ReviewWorkspace,
 });

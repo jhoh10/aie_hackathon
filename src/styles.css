@@ -88,13 +88,13 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.97 0.008 85);
+  --background: oklch(0.978 0.003 85);
   --foreground: oklch(0.2 0.015 260);
-  --card: oklch(0.995 0.004 85);
+  --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.5 0.17 262);
+  --primary: oklch(0.39 0.08 162);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.94 0.01 85);
   --secondary-foreground: var(--foreground);
@@ -144,3 +144,66 @@
 @utility animate-rise { animation: rise 0.35s ease-out both; }
 @keyframes pop { 0% { transform: scale(0.6); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @utility animate-pop { animation: pop 0.25s ease-out; }
+
+.dark {
+  --background: oklch(0.17 0.008 160);
+  --foreground: oklch(0.93 0.004 160);
+  --card: oklch(0.205 0.009 160);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.72 0.105 162);
+  --primary-foreground: oklch(0.17 0.02 162);
+  --secondary: oklch(0.25 0.008 160);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.255 0.008 160);
+  --muted-foreground: oklch(0.7 0.009 160);
+  --accent: oklch(0.28 0.025 250);
+  --accent-foreground: oklch(0.8 0.065 250);
+  --border: oklch(0.32 0.007 160);
+  --input: var(--border);
+  --ring: var(--primary);
+  --ok: oklch(0.75 0.12 158);
+  --ok-soft: oklch(0.265 0.035 158);
+  --warn: oklch(0.8 0.1 80);
+  --warn-soft: oklch(0.29 0.025 80);
+  --lean: oklch(0.8 0.09 300);
+  --lean-soft: oklch(0.28 0.03 300);
+  --sec: oklch(0.78 0.12 35);
+  --sec-soft: oklch(0.28 0.04 35);
+  --destructive: oklch(0.75 0.16 30);
+  --ink: var(--foreground);
+  --ink-foreground: var(--background);
+}
+
+.review-workspace { letter-spacing: 0; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 36px; background: var(--primary); color: var(--primary-foreground); border-radius: 8px; }
+.status-badge { gap: 6px; padding: 6px 10px; font-size: 11px; font-weight: 500; }
+.strength-chip { font-size: 10px; line-height: 17px; padding: 1px 7px; border-radius: 5px; font-weight: 500; }
+.strength-proof { color: var(--lean); background: var(--lean-soft); border-color: color-mix(in oklch, var(--lean) 20%, transparent); }
+.strength-generated { color: var(--accent-foreground); background: var(--accent); border-color: color-mix(in oklch, var(--accent-foreground) 20%, transparent); }
+.strength-failpass { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in oklch, var(--ok) 20%, transparent); }
+.strength-example, .strength-static, .strength-observed { color: var(--muted-foreground); background: var(--muted); border-color: var(--border); }
+.reference-chip { white-space: normal; overflow-wrap: anywhere; font-size: 10px; line-height: 17px; padding: 1px 7px; border-radius: 5px; font-weight: 400; }
+.review-category { border-left: 3px solid var(--muted-foreground); }
+.category-intent { border-left-color: var(--ok); }
+.category-boundaries, .category-budgets { border-left-color: var(--warn); }
+.category-integration, .category-conformance, .category-model { border-left-color: var(--accent-foreground); }
+.category-formal { border-left-color: var(--lean); }
+.category-safety { border-left-color: var(--sec); }
+.claim-focused { box-shadow: inset 2px 0 var(--ring); }
+.review-collapse[data-state=open] { animation: review-open 180ms ease-out; }
+.review-collapse[data-state=closed] { animation: review-close 180ms ease-out; }
+.review-workspace [data-state=checked] svg { animation: pop 180ms ease-out; }
+.review-workspace strong { font-weight: 600; color: var(--foreground); }
+@keyframes review-open { from { height: 0; opacity: 0; } to { height: var(--radix-collapsible-content-height); opacity: 1; } }
+@keyframes review-close { from { height: var(--radix-collapsible-content-height); } to { height: 0; } }
+@media (max-width: 639px) {
+  .category-heading > button { flex-basis: 100%; }
+  .category-actions { padding-left: 28px; }
+  .review-workspace footer > div { gap: 8px; }
+  .review-workspace footer > div > div:first-child { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
