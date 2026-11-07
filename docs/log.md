@@ -4,6 +4,7 @@ Newest entries at the top. Keep each one short: what happened, who, and anything
 
 ## 2026-11-07
 
+- **Milestones moved an hour earlier** (JH, 1:40 PM). The deadline is 5:00 PM PT, not the 6:00 we assumed. Feature freeze is now 4:00 and submission 4:45. Stack, hello world and the demo scenario are overdue. Added a 2:00 PM milestone to start the benchmark, since its first run is the longest step left (Docker builds per case, never run end to end yet).
 - **Cognitive load measured on a simulated engineer** (JH). Agents do each human step: approve the claims, then decide merge or block from the verifier's summary, opening evidence only when needed. They also do today's step: decide from the diff. Benchmark step `sim`; `node src/metrics.ts` reports tokens read, effort (1-9), evidence opened and right decisions per step, plus how many times less the engineer reads. No human data, recorded in docs/decisions.md. Not run on real cases yet.
 - **Wall time added to the metrics** (JH). The benchmark saves how long each approach takes per case, the verifier saves time per stage (build, run checks and so on), and live PR-page runs give the real time to approve claims and to wait for a verdict. `node src/metrics.ts` shows medians. See verifier/docs/metrics.md, metric 6.
 - **"Claims" replaces "tests" as what the engineer approves** (JH, agreed with DT). The plan is now a list of claims, each with the checks that prove it; the claims are the same JSON the verifier takes. Updated the pitch, the harness README, conversation.md and the templates. See docs/decisions.md.

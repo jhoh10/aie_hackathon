@@ -4,16 +4,18 @@ One line per task. Put the owner's initials in brackets. Move lines between sect
 
 ## Milestones (Sat Nov 7, PST)
 
-Planned backwards from an **assumed 6:00 PM submission deadline**. Nobody has confirmed the real deadline yet. When someone does, move every time by the same amount. Tick each milestone as you hit it.
+Planned backwards from the **5:00 PM PT submission deadline** (from the CV page, see docs/submission.md). First-round judging is 5:00–6:45 PM, with a live demo of about 3 minutes plus Q&A. Shifted an hour earlier at 1:40 PM, when we learned the deadline was 5:00, not 6:00. Tick each milestone as you hit it.
 
-- [ ] **12:45 PM: idea locked, roles split.** Idea decided and recorded in docs/decisions.md, every person has an owner line below, real deadline confirmed.
-- [ ] **1:30 PM: stack and skeleton.** Stack picked, Meta Model API keys work for everyone, "Running it" in the README filled in.
-- [ ] **2:30 PM: hello world end to end.** One request goes input → agent → verification → output, deployed or runnable from a clean clone.
-- [ ] **4:00 PM: demo moment works.** The one thing judges should see runs reliably on the demo input, using the Meta API. If it isn't working by now, cut scope; don't move the freeze.
-- [ ] **5:00 PM: feature freeze.** Only bug fixes after this. Demo script written, slides started.
-- [ ] **5:30 PM: demo assets.** Backup demo video recorded, slides done, README has the pitch and team.
-- [ ] **5:45 PM: submitted.** Form in, every member listed, repo accessible to judges. 15 minutes of buffer.
-- [ ] **After submitting: rehearse.** Run the pitch twice before demos.
+- [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
+- [ ] **12:30 PM: stack and skeleton (overdue).** Meta Model API keys work for everyone, "Running it" in the README filled in.
+- [ ] **1:30 PM: hello world end to end (overdue).** One case goes claims → verifier → verdict from a clean clone. Demo scenario picked and named in the README's "Demo moment".
+- [ ] **2:00 PM: benchmark running.** `node src/benchmark.ts dev verifier` started on the real dev cases. The first run will need debugging, so allow 1–2 hours. Holdout is optional.
+- [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
+- [ ] **3:30 PM: numbers in.** The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier).
+- [ ] **4:00 PM: feature freeze.** Only bug fixes after this. Demo script written, slides started.
+- [ ] **4:30 PM: demo assets.** One-minute demo video recorded, slides done, README has the pitch, team and how to run it.
+- [ ] **4:45 PM: submitted.** Public repo, video, every member on the submission page. 15 minutes of buffer.
+- [ ] **4:45–5:00 PM: rehearse.** Run the 3-minute live demo twice.
 
 ## Who's on what
 
@@ -29,16 +31,15 @@ Planned backwards from an **assumed 6:00 PM submission deadline**. Nobody has co
 - [ ] [SB] Find evals and datasets we can use
 - [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/)
 - [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo
-- [ ] [MA] Research Lean for software verification. Decide by **2:30 PM** whether it goes in the demo or becomes a "what's next" slide.
+- [ ] [MA] Research Lean for software verification. Decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
 ## Next
 
-- [ ] **Urgent:** confirm the real submission deadline and demo time, then move the milestone times above to match (needs a Cerebral Valley login, about 10 min). docs/submission.md (SB, from the CV page) says **5:00 PM PT**, an hour earlier than the milestones assume.
 - [ ] Copy the schedule and prize breakdown from the CV details page into resources/event.md. Leave out the venue Wi-Fi password, this repo is public.
 - [ ] Tests-first conversation: output approved claims per verifier/docs/claims-contract.md, so the harness can hand off to the verifier
 - [ ] [DT] Get Meta Model API keys for everyone (the $5k prize track)
 - [ ] [DT] Get a hello-world version running end to end, using the Meta Model API
-- [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. Due by **1:30 PM**.
+- [ ] [DT, SB] Pick the demo scenario: the repo, the change and the tests the harness turns green live. **Overdue**; `h-bearer` already works by hand.
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (for example datasets and graders vs the numbers we show) so no one builds the same thing twice
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
 - [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
@@ -53,6 +54,7 @@ _Nothing yet. Say what it's waiting on._
 
 ## Done
 
+- [x] Confirm the real deadline: 5:00 PM PT, milestones shifted to match (2026-11-07)
 - [x] [JH] Write up how the harness display scales with task size (2026-11-07)
 - [x] Pick the idea: idea 1, verification-first harness (2026-11-07)
 - [x] [SB] Verifier core pipeline written, not yet benchmarked (2026-11-07)
