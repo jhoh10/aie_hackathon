@@ -9,7 +9,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
 - [ ] **12:30 PM: stack and skeleton (overdue, nearly done).** "Running it" in the README filled in and the verifier wired to Muse Spark. Left: Meta billing (key accepted, but chat calls return 402 `billing_not_configured`).
 - [ ] **1:30 PM: hello world end to end (done with hand-written checks).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-harness/evaluation/). Hand-off done: `src/handoff.ts` runs an approved plan through the verifier, PASS on `h-bearer` (verification-first-harness/README.md, "End to end"). Still missing: the real model instead of hand-written answers (blocked on Meta billing), and the demo scenario named in the README's "Demo moment".
-- [ ] **2:00 PM: benchmark running.** `node src/benchmark.ts dev verifier` started on the real dev cases. The first run will need debugging, so allow 1–2 hours. Holdout is optional.
+- [ ] **2:00 PM: benchmark running (started, handed to SB at 2:20).** A first dev run got partway on Jon's machine; see SB's Now line for what's left.
 - [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
 - [ ] **3:30 PM: numbers in.** The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier).
 - [ ] **4:00 PM: feature freeze.** Only bug fixes after this. Demo script written, slides started.
@@ -29,7 +29,7 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 - [ ] [DT] Make the harness runnable from the repo: commit how the SWE-bench side-by-side runs were done and fill in "Running it" in the README
 - [ ] [SB] Find evals and datasets we can use
-- [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/)
+- [ ] [SB] Verifier: run the benchmark on PocketBase cases, test the PR page and GitHub status (verifier/). **Handed over from a Claude run on Jon's machine that died at 2:15.** Done there: Go-version fix pushed (each commit builds with its own go.mod Go version; old commits broke on 1.27), CI on h-number and h-cascade pass, h-bearer CI fails, verifier on h-cascade gave NEEDS_HUMAN (16/20 reached). Review answers there were written by Claude knowing which cases were reverts, so don't count them. Not done: verifier on r-number, r-secret, h-bearer (the BLOCK-a-revert demo result), metrics. Suggest: `node src/benchmark.ts dev verifier` on those three first. Watch for the superuser-email normalize issue (see log).
 - [ ] [JH] Metrics (AIE-5): what we measure and show the judges. Definitions, script, wall time and simulated-engineer load done (verifier/docs/metrics.md, `node src/metrics.ts dev`). Next: run on real benchmark results and pick what goes in the demo
 - [ ] [MA] Research Lean for software verification. Decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
