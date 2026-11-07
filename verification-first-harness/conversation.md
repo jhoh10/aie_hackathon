@@ -2,6 +2,8 @@
 
 Every session goes through five phases in order. The agent may loop back (for example from D to C when the engineer edits the plan), but never skips forward. Code is only written in phase E.
 
+The engineer approves **one thing: the test and verification plan**. The code and the architecture are the agent's call; it doesn't ask for approval on them.
+
 Running example used below: **"Add a password-reset flow"** to an existing web app.
 
 ---
@@ -98,9 +100,7 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 
 ## Phase D: Confirm the testing approach with the engineer
 
-**Goal:** the engineer approves exactly what "done" means. This is **Gate 1**. Then the agent shows the architecture: **Gate 2**.
-
-### Gate 1: the test plan
+**Goal:** the engineer approves exactly what "done" means and how it will be verified. This is **the only gate** in the session.
 
 **The agent:**
 - Shows the table, the skipped list and the manual checks.
@@ -113,33 +113,17 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 - Edit rows ("add an iPhone screenshot", "drop the rate-limit test, the gateway does that").
 - Promote a skipped check back in.
 - Mark a row as "nice to have" (runs, but doesn't block done).
+- Add a check for anything they care about in *how* it's built, such as "no new dependencies", "p95 under 200 ms" or "uses the existing `mailer.ts`". This is the only way the engineer steers the design: as a verifiable check, not a design review.
 
-### Gate 2: the architecture
+**What the agent does not do here:** show or ask about the architecture. It doesn't need the engineer's sign-off on components, libraries or file layout.
 
-Once the plan is approved, the agent shows **how** it will build it, at the component level:
-- The components it will add or change (UI, API route, service, data model, external calls).
-- For each component, **which plan rows cover it**. Any component with no covering test is flagged.
-- New dependencies and migrations.
-
-```
-Reset page (UI)        ← rows 5, 6, 7, 8
-   │
-POST /api/reset        ← rows 3, 4, 9
-   │
-Token service          ← rows 1, 2
-   │
-Mailer (fake in tests) ← row 3
-```
-
-**Exit criteria:** the engineer approves the architecture. No code exists yet.
+**Exit criteria:** the engineer approves the test plan. No code exists yet.
 
 > **Agent:** Here's the plan: 10 automated checks and 1 manual one. Approve, or edit?
 >
 > **Engineer:** Add the visual check on an iPhone viewport too. Otherwise approve.
 >
-> **Agent:** Updated row 7 to desktop + iPhone 15. Saved to `.verify/plan.md`. Here's the architecture; every component is covered by at least one row. Approve?
->
-> **Engineer:** Approve.
+> **Agent:** Updated row 7 to desktop + iPhone 15. Saved to `.verify/plan.md` as approved. Starting the build.
 
 ---
 
@@ -148,22 +132,24 @@ Mailer (fake in tests) ← row 3
 **Goal:** the agent builds until every approved check passes, then proves it.
 
 **Order of work:**
-1. **Write the tests first**, from the approved plan, one test (or test group) per row. Run them and confirm they **fail** for the right reason (the feature doesn't exist yet). A test that passes before the feature exists is testing nothing.
-2. **Lock the approved tests.** The agent records a hash of each test file in `.verify/plan.md`. From here on it may not weaken an assertion, skip a test or delete a row without asking.
-3. **Implement** the feature.
-4. **Run the full suite**, including the existing regression tests.
-5. **Loop:** read failures, fix the *code*, re-run. Repeat until green.
-6. **Escalate instead of cheating.** If the agent believes a test itself is wrong, or a check can't be done, it stops and asks, showing the evidence. It never edits a locked test to make it pass.
-7. **Report.**
+1. **Choose the design.** The agent picks the code and architecture it thinks are best, following the codebase's existing patterns from phase B. No approval needed. It writes short **design notes** (components, the main choices and why, and which plan rows cover each component) that go into the verification report.
+2. **Check coverage of its own design.** If a component it plans to build isn't covered by any approved row, the agent adds a check for it, marked **agent-added**. The agent may add checks freely, but never remove or weaken an approved one.
+3. **Write the tests first**, from the approved plan, one test (or test group) per row. Run them and confirm they **fail** for the right reason (the feature doesn't exist yet). A test that passes before the feature exists is testing nothing.
+4. **Lock the approved tests.** The agent records a hash of each test file in `.verify/plan.md`. From here on it may not weaken an assertion, skip a test or delete a row without asking.
+5. **Implement** the feature.
+6. **Run the full suite**, including the existing regression tests.
+7. **Loop:** read failures, fix the *code*, re-run. Repeat until green. The agent may change its own design along the way if that's what it takes; it just updates the design notes.
+8. **Escalate instead of cheating.** If the agent believes a test itself is wrong, or a check can't be done, it stops and asks, showing the evidence. It never edits a locked test to make it pass.
+9. **Report.**
 
 **Guardrails during the loop:**
 - Max iterations (for example 10) before asking the engineer for help.
 - Flaky test detection: re-run a failing test 3 times; if results differ, report it as flaky instead of "fixing" it.
 - Visual tests: first run creates baselines; the engineer approves the baseline screenshots once.
 
-**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every row with pass/fail, how many attempts it took, links to screenshots and logs, the manual checks still pending, and the diff summary. This report goes in the PR description, so the **reviewer checks the plan and the evidence, not every line of code.**
+**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every row with pass/fail, how many attempts it took, links to screenshots and logs, any agent-added checks, the manual checks still pending, the design notes and the diff summary. The design notes are there to explain, not for approval. This report goes in the PR description, so the **reviewer checks the plan and the evidence, not every line of code.**
 
-> **Agent:** Done. 10/10 automated checks pass (row 6 failed twice: the token wasn't being cleared after use; fixed in `token.ts`). Visual baselines for desktop and iPhone are attached for your approval. One manual check is pending: email rendering in Outlook. Report saved to `.verify/report.md`.
+> **Agent:** Done. 10/10 approved checks pass, plus 1 I added for the token cleanup job (row 6 failed twice: the token wasn't being cleared after use; fixed in `token.ts`). Design: a stateless token service with hashed tokens in the `users` table; notes in the report. Visual baselines for desktop and iPhone are attached for your approval. One manual check is pending: email rendering in Outlook. Report saved to `.verify/report.md`.
 
 ---
 
@@ -173,6 +159,5 @@ Mailer (fake in tests) ← row 3
 | --- | --- | --- |
 | B | A | The code shows the task is bigger or different than described |
 | D | C | The engineer edits or adds checks |
-| D (Gate 2) | C | A component has no covering test, so a check is added |
 | E | D | A test turns out to be wrong or impossible; the engineer must re-approve the change |
 | E | A | Implementation reveals the requirement itself was unclear |
