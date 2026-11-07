@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: The harness runs lean by default
+
+- **Chose:** the lean prompt (verification-first-harness/harness-prompt.md). Phases A and B produce no messages, there are at most 8 claims, a fixed set of regression tests is checked once before and once after building, and the final message is at most 4 lines. It keeps the single approval of the claims and the team's plan format, so the verifier hand-off is unchanged.
+- **Over:** the full five-phase conversation, where every phase talks to the engineer and the full suite runs during the build loop.
+- **Because:** over 3 runs each on a SWE-bench task, cost fell from $0.88 to $0.42 and time from 2.5 to 1.3 minutes. The engineer read half as many words (542 to 280) and always gave exactly one reply. The old prompt cost more than the default agent ($0.74), and lean is cheaper.
+- **Revisit if:** lean plans start missing claims that the full conversation would have caught. Check this on tasks where the pass rate actually separates the two.
+
 ## 2026-11-07: The verifier reads the claims from the approved plan.md
 
 - **Chose:** a small converter (`verifier/src/handoff.ts`) that parses the Claims table of `.verify/plan.md`, refuses plans that aren't `Status: APPROVED`, and writes `.verify/claims.json` per the claims contract before running the verifier.

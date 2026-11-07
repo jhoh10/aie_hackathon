@@ -6,6 +6,22 @@ The engineer approves **one thing: the claims** (what must be true) and the chec
 
 Running example used below: **"Add a password-reset flow"** to an existing web app.
 
+## Lean by default
+
+The harness runs lean unless the engineer asks for more discussion. The prompt that does this is [harness-prompt.md](harness-prompt.md). Over three runs each on a SWE-bench task, lean cut cost from $0.88 to $0.42 and time from 2.5 to 1.3 minutes, and halved what the engineer reads (542 to 280 words). It kept the single approval of the plan.
+
+| Rule | Why |
+| --- | --- |
+| Phases A and B are silent: the agent restates the task and asks questions only inside the plan message, and only if the task is genuinely ambiguous | One message to read, one reply to give |
+| At most 8 claims; similar cases are grouped into one claim | The plan reads in under 30 seconds |
+| At least one `no_behavior_change` claim names concretely what must stay the same | Stops scope creep at approval; in our runs it kept the engineer from asking for changes that broke existing behaviour |
+| A fixed **regression scope** (the test folders for the touched modules, never the whole repo), run once before building as the baseline | Failures that were already there are known up front and never chased later |
+| Build loop runs only the new tests; the regression scope runs once at the end | Most of the cost is model steps, and each step re-reads the whole conversation |
+| The report states the baseline comparison as fact ("same 2 failures as baseline, none new") | No extra "please double-check" round |
+| Final message at most 4 lines and points to `.verify/report.md`; no narration between tool calls | The engineer reads the result, not the process |
+
+The phases below describe the full conversation. In lean mode the same steps happen, but A and B produce no messages of their own.
+
 ---
 
 ## Phase A: Discuss the idea
@@ -56,7 +72,9 @@ Running example used below: **"Add a password-reset flow"** to an existing web a
 - "Is there a test database, or do tests use mocks?"
 - "Anything you've been burned by here before?"
 
-**Exit criteria:** the agent has a short **codebase findings** note and the engineer has answered the testing questions.
+**Also, always:** pick the **regression scope** (the test folders that cover the modules it will touch, never the whole repo) and run it once now. That's the baseline; anything already failing there isn't the agent's to chase later.
+
+**Exit criteria:** the agent has a short **codebase findings** note and the engineer has answered the testing questions. In lean mode the findings aren't sent; any questions go into the plan message.
 
 > **Agent:** Findings: Next.js app, Postgres via Prisma. 40 Jest unit tests, none around auth. No e2e tests. CI runs `npm test` only. Email goes through a `mailer.ts` wrapper, which is easy to fake.
 >
@@ -72,7 +90,9 @@ Running example used below: **"Add a password-reset flow"** to an existing web a
 - Walks through the [testing catalog](testing-catalog.md) and considers **every category**, not just unit tests. For each one it decides: include, skip (with a one-line reason), or ask.
 - Writes each behaviour as one **claim**: an input and an output, specific enough that a test could disprove it, with no implementation detail.
 - Lists the **checks** under each claim: *type, what's tested, how it runs*. A claim can have several checks. No test code in this phase.
-- Covers the happy path, each edge case from phase A, and each "must not change" item (as `no_behavior_change` claims).
+- Covers the happy path, each edge case from phase A, and each "must not change" item (as `no_behavior_change` claims, named concretely).
+- Keeps it to **at most 8 claims** by grouping similar cases into one claim. A big task groups claims into areas instead ([display-scaling.md](display-scaling.md)).
+- Ends with one line each for the regression scope with its baseline, and the skipped checks.
 - Marks which checks are **new** and which **already exist** and must keep passing.
 - Estimates cost: how long the suite will take and any new dependencies.
 - Flags anything it **can't** verify automatically (for example "the email looks good in Outlook") so a human can check it by hand.
@@ -140,8 +160,8 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 3. **Write the tests first**, from the approved plan, one test (or test group) per check. Run them and confirm they **fail** for the right reason (the feature doesn't exist yet). A test that passes before the feature exists is testing nothing.
 4. **Lock the approved tests.** The agent records a hash of each test file in `.verify/plan.md`. From here on it may not weaken an assertion, skip a test or drop a claim without asking.
 5. **Implement** the feature.
-6. **Run the full suite**, including the existing regression tests.
-7. **Loop:** read failures, fix the *code*, re-run. Repeat until green. The agent may change its own design along the way if that's what it takes; it just updates the design notes.
+6. **Loop on the new tests:** read failures, fix the *code*, re-run only the new tests. Repeat until green.
+7. **Run the regression scope once** and compare it with the baseline from phase B. Only new failures are the agent's; it fixes those and reruns the scope. The agent may change its own design along the way if that's what it takes; it just updates the design notes.
 8. **Escalate instead of cheating.** If the agent believes a test itself is wrong, or a check can't be done, it stops and asks, showing the evidence. It never edits a locked test to make it pass.
 9. **Report.**
 
@@ -150,7 +170,7 @@ Skipped, with reasons: *load test (low traffic endpoint), mutation testing (time
 - Flaky test detection: re-run a failing test 3 times; if results differ, report it as flaky instead of "fixing" it.
 - Visual tests: first run creates baselines; the engineer approves the baseline screenshots once.
 
-**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every claim with pass/fail and the checks under it, how many attempts it took, links to screenshots and logs, any agent-added claims, the manual checks still pending, the design notes and the diff summary. The design notes are there to explain, not for approval. This report goes in the PR description, so the **reviewer checks the claims and the evidence, not every line of code.**
+**The verification report** (template in [test-plan-template.md](test-plan-template.md#4-verification-report)) lists every claim with pass/fail and the checks under it, how many attempts it took, links to screenshots and logs, any agent-added claims, the manual checks still pending, the design notes and the diff summary. The design notes are there to explain, not for approval. This report goes in the PR description, so the **reviewer checks the claims and the evidence, not every line of code.** It states the regression result against the baseline as fact. The agent's final message is at most 4 lines and points to the report instead of repeating it.
 
 > **Agent:** Done. 10/10 approved claims proven, plus 1 I added for the token cleanup job (c6 failed twice: the token wasn't being cleared after use; fixed in `token.ts`). Design: a stateless token service with hashed tokens in the `users` table; notes in the report. Visual baselines for desktop and iPhone are attached for your approval. One manual check is pending: email rendering in Outlook. Report saved to `.verify/report.md`.
 

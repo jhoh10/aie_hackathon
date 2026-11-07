@@ -15,6 +15,7 @@ A harness for coding agents (Claude Code or similar) that changes the order of w
 3. **The engineer owns the claims; the agent owns the code.** The engineer signs off once, on the plan: the claims and the checks that will prove them. The agent chooses the code and architecture it thinks are best, and iterates until the plan passes.
 4. **Every kind of evidence counts.** The checks under a claim are more than unit tests: e2e flows, screenshots, accessibility, performance budgets, security checks, LLM evals. See [testing-catalog.md](testing-catalog.md).
 5. **Proof, not claims.** The agent finishes with a report of what ran and what passed, not "I implemented X".
+6. **Lean by default.** One message to read and one approval to give. At most 8 claims, a fixed set of regression tests checked once before and once after, and a 4-line final message. Verification shouldn't double the cost of a change. See [harness-prompt.md](harness-prompt.md).
 
 ## How a session runs
 
@@ -45,7 +46,9 @@ Five phases, with one human gate: the plan (claims, plus the checks that prove t
 
 | File | What's in it |
 | --- | --- |
-| [conversation.md](conversation.md) | The five phases in detail: goals, agent behaviour, questions, exit criteria, example dialogue |
+| [harness-prompt.md](harness-prompt.md) | **The prompt to use**: the lean system prompt that makes a coding agent follow the harness |
+| [conversation.md](conversation.md) | The five phases in detail, and the lean rules that are the default |
+| [evaluation/](evaluation/) | Side-by-side runs of the default agent vs the harness on SWE-bench tasks |
 | [testing-catalog.md](testing-catalog.md) | Every kind of check the agent can propose, what each proves and when to suggest it |
 | [test-plan-template.md](test-plan-template.md) | The artifacts: task brief, plan (claims and checks), design notes, verification report |
 | [display-scaling.md](display-scaling.md) | How the plan and report show a one-line bug fix and a whole feature on the same screen |

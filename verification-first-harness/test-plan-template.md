@@ -67,6 +67,11 @@ Status: DRAFT | APPROVED by <name> on <date>
 | --- | --- |
 | Load test | Low-traffic endpoint |
 
+## Regression scope
+
+- Scope: <the test folders for the touched modules, never the whole repo>
+- Baseline before any change: <N passed, M failed (names)>
+
 ## Cost
 
 - Suite runtime: about <N> minutes
