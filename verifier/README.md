@@ -2,7 +2,7 @@
 
 An independent check for AI-written PRs. It takes approved claims about behaviour, writes black-box tests without seeing the code, runs them on the old and new versions in a sandbox, and returns PASS, BLOCK or NEEDS_HUMAN with evidence.
 
-**Status:** core pipeline written. One real PocketBase bug reproduced end to end by hand. No benchmark results yet, and the PR page and GitHub status path are untested.
+**Status:** benchmarked on 20 PocketBase PRs: it stopped 10 of 12 bad PRs that CI let through, and let 1 of 8 honest fixes straight through (see [results/summary.md](results/summary.md)). The PR page and GitHub status path are not yet tested end to end.
 
 ## How it decides
 
