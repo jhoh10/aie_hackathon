@@ -1,17 +1,18 @@
-<section id="attention" data-transition="fade" style="background:#F4F3EE;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
-<h2 style="font-size:72px;font-weight:600;line-height:1.1">What a person reads per PR</h2>
+<section id="attention" data-transition="fade" style="background:#F4F3EE;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:72px;font-weight:600;line-height:1.1">Less to approve, not yet less to review</h2>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
-<div style="background:#FBE3D3;border-radius:24px;padding:56px;display:flex;flex-direction:column;gap:24px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A3A12;letter-spacing:2px;text-transform:uppercase">Reviewing the diff</p>
-<p style="font-size:200px;font-weight:600;line-height:1;color:#16202B">62</p>
-<p style="font-size:36px;line-height:1.35;color:#3D2A1E">changed lines of Go, typical PR in our set, with no guarantee the reader catches the bug</p>
+<div style="background:#DCE7FB;border-radius:24px;padding:48px;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#1D4FA8;letter-spacing:2px;text-transform:uppercase">Approval step</p>
+<p style="font-size:120px;font-weight:600;line-height:1;color:#16202B">3.3 claims</p>
+<p style="font-size:32px;line-height:1.4;color:#1E2B45">read on average to approve a change, against a median of 62 changed lines in the diff</p>
 </div>
-<div style="background:#DCE7FB;border-radius:24px;padding:56px;display:flex;flex-direction:column;gap:24px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#1D4FA8;letter-spacing:2px;text-transform:uppercase">Approving the claims</p>
-<p style="font-size:200px;font-weight:600;line-height:1;color:#16202B">3.3</p>
-<p style="font-size:36px;line-height:1.35;color:#1E2B45">plain-language claims on average, each one proven or flagged by running it, not by reading</p>
+<div style="background:#FBE3D3;border-radius:24px;padding:48px;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8A3A12;letter-spacing:2px;text-transform:uppercase">Whole flow, simulated engineer</p>
+<p style="font-size:120px;font-weight:600;line-height:1;color:#16202B">5 of 12</p>
+<p style="font-size:32px;line-height:1.4;color:#3D2A1E">right decisions from the verifier’s summary, against 12 of 12 from the diff, after reading about 3× more</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5563">Source: our 20 PocketBase benchmark PRs. Lines are the median added or removed per PR, tests included. Claims were written from each PR’s issue.</p>
-<aside>This is the cognitive load argument. Today the human reads a median of 62 changed lines per PR in our set, and the AI reviewer reads the same diff. With our approach the human reads three or four sentences before any code exists.</aside>
+<p style="font-size:32px;line-height:1.4;color:#4A5563;width:1600px">Why: the evidence summary outweighed these small diffs, and checks that passed on both versions looked reassuring. Next: shorter summaries, and never presenting an unproven claim as good news.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5563">Source: our 20 PocketBase PRs; simulated engineer on the 12 held-out cases. Claude agents stood in for engineers; tokens are estimates.</p>
+<aside>We measured this honestly, and it cut against us. Approving claims is much lighter than reading a diff. But when an agent stood in for the engineer for the whole flow, deciding from our verifier's summary was less accurate and more reading than reviewing these small diffs. That tells us what to fix next: a tighter summary, and unproven claims shown as gaps, not passes.</aside>
 </section>
