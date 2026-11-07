@@ -26,7 +26,7 @@ export function lockReview(plan: Plan, state: ReviewState): ReviewState {
   return { ...state, locked: true };
 }
 
-const text = z.string().trim().min(1, 'Must not be empty');
+const text = z.string().refine(value => value.trim().length > 0, 'Must not be empty');
 const evidenceSchema = z.object({ type: text, s: z.enum(['proof', 'generated', 'failpass', 'example', 'static', 'observed']), what: text.optional(), code: text.optional() }).strict().refine(e => Boolean(e.what || e.code), 'Evidence needs what or code');
 const claimSchema = z.object({ id: text, kind: z.enum(['behavior_change', 'no_behavior_change']), text, refs: z.array(text).optional(), sec: z.boolean().optional(), amended: z.boolean().optional(), evidence: z.array(evidenceSchema).min(1) }).strict();
 const planSchema = z.object({
