@@ -20,11 +20,11 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 - **Because:** on pylint-8898 a run passed all 11 approved checks but also changed `( )` comma handling, which no check covered. That is what failed the real hidden test. The packet marked it **No test**, in about 30 seconds for about $0.20.
 - **Revisit if:** packets miss real problems that a raw-diff review would catch, or reviewers still open the diff for most items.
 
-## 2026-11-07: Demo in Claude Code; Meta shows up as the independent verifier
+## 2026-11-07: Demo in Claude Code; the verifier stays model-agnostic
 
-- **Chose:** keep building and demoing the developer harness in Claude Code. Meta's models do the verifying: the verifier's claims, claim-test, probe and triage roles call Muse Spark through the Meta Model API.
-- **Over:** moving the harness and demo to Muse Code, Meta's coding agent.
-- **Because:** the prize is "Best Use of Meta Model API", which is about the API in the product. No prize rule mentions Muse Code (resources/event.md). Switching agents three hours before the deadline risks the demo. A Claude-built change checked by a Meta-model verifier is also our answer to the Trust but Verify question of how a verifier avoids the implementer's blind spots: a different lab writes the tests.
+- **Chose:** keep building and demoing the developer harness in Claude Code. The verifier stays model-agnostic (any OpenAI-compatible model, set by env vars). For the demo it runs on Muse Spark through the Meta Model API.
+- **Over:** moving the harness and demo to Muse Code, Meta's coding agent, or pitching the verifier as Meta-only.
+- **Because:** the prize is "Best Use of Meta Model API", which is about the API in the product, and no prize rule mentions Muse Code (resources/event.md). Switching agents three hours before the deadline risks the demo. Tying the product to one model would be done for the prize, not for users. The real design point is that the verifier should run on a different model from the implementer, so the two don't share blind spots, and Muse Spark is the one we use today.
 - **Revisit if:** Meta's judges say on site that using Muse Code counts toward the prize.
 
 ## 2026-11-07: The harness runs lean by default
