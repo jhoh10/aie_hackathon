@@ -186,7 +186,11 @@ def render(p, files, diff_name):
         return c.startswith(("no test", "none"))
     n_unc = sum(1 for r in frows if untested(r))
 
-    chips = (f'<div class="chip"><div class="cv">{esc(m_claims.group(1)) if m_claims else "–"}</div><div class="cl">claims proven</div></div>'
+    no_claims = stats.startswith("No approved claims")
+    claims_chip = (f'<div class="chip"><div class="cv">None</div><div class="cl">approved claims</div></div>' if no_claims else
+                   f'<div class="chip"><div class="cv">{esc(m_claims.group(1)) if m_claims else "–"}</div><div class="cl">claims proven</div></div>')
+    m_tests = m_tests or re.search(r"Tests:?\s*([^·]+)", stats)
+    chips = (claims_chip +
              f'<div class="chip"><div class="cv">{esc(m_tests.group(1).strip()) if m_tests else "–"}</div><div class="cl">tests</div></div>'
              f'<div class="chip {"alert" if n_unc else "good"}"><div class="cv">{n_unc}</div><div class="cl">untested behaviour{"s" if n_unc != 1 else ""}</div></div>')
 
@@ -237,12 +241,13 @@ def render(p, files, diff_name):
                     if n_arch else "")
     toc_extra = ((f'<a href="#tests">Tests <span class="n">{n_tests}</span></a>' if n_tests else "")
                  + (f'<a href="#arch">Architecture <span class="n">{n_arch}</span></a>' if n_arch else ""))
+    diffnote_text = (f"Click any file reference to see those lines of <code>{esc(diff_name)}</code>." if files and n_arch else "")
     return fill(
         PAGE, title=esc(p["title"]), summary=inline(p["summary"]), chips=chips,
-        source=esc(src.group(1)) if src else "", func=func, tests_section=tests_section, arch_section=arch_section, toc_extra=toc_extra, test_notes=test_notes,
+        source_line=(("No approved plan: every behaviour is judged by its tests alone. " if no_claims else (f"Claims source: {esc(src.group(1))}. " if src else "")) + diffnote_text), func=func, tests_section=tests_section, arch_section=arch_section, toc_extra=toc_extra, test_notes=test_notes,
         arch=arch, arch_notes=arch_notes, footer=inline(p["footer"]), n_func=n_func, n_unc=n_unc,
         n_tests=len(p["sections"].get("tests", [])), n_arch=len(p["sections"].get("arch", [])),
-        diffnote=(f"Click any file reference to see those lines of <code>{esc(diff_name)}</code>." if files and n_arch else ""),
+        diffnote_unused=(f"Click any file reference to see those lines of <code>{esc(diff_name)}</code>." if files and n_arch else ""),
         data=data, css=CSS, js=JS)
 
 
@@ -323,7 +328,7 @@ pre.out{white-space:pre-wrap;font:12px/1.45 ui-monospace,Menlo,monospace;backgro
 JS = r"""
 const DATA = JSON.parse(document.getElementById('data').textContent);
 const state = {decision: null, comments: []};
-const KEY = 'review:' + DATA.title;
+const KEY = 'review:' + location.pathname + ':' + DATA.title;
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) Object.assign(state, s); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
 const list = document.getElementById('clist'), copyBtn = document.getElementById('copy'), out = document.getElementById('out');
@@ -376,7 +381,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=
   <h1>{title}</h1>
   <p class="sum">{summary}</p>
   <div class="chips">{chips}</div>
-  <div class="src">Claims source: {source}. {diffnote}</div>
+  <div class="src">{source_line}</div>
 </header>
 <main>
   <section id="func"><div class="sh"><h2>What the PR does</h2><span class="muted">{n_func} behaviour changes · <b style="color:var(--warn)">{n_unc} with no test</b></span></div><ul class="flist">{func}</ul></section>

@@ -22,7 +22,7 @@ The other half of the [developer harness](../verification-first-developer-harnes
 | Verifier verdict, PASS / BLOCK / NEEDS_HUMAN ([verifier/](../verifier/)) | Is each approved claim proven? | Is there behaviour that **no claim covers**? Changed or weakened existing tests? Architecture drift? |
 | Developer harness report (`.verify/report.md`) | The author's own account of what passed | An independent summary built from the diff, cross-checked against that report |
 
-Example: in one of our pylint evaluation runs, all 11 approved checks passed and the author's report said so. But the code also stopped splitting regexes on commas inside `( )`, and no check covered that. It is exactly what failed the project's real hidden test. A verifier that proves only the approved claims won't flag it. The review packet marked it **No test**, generated in under a minute for about $0.20. See [examples/pylint-8898/](examples/pylint-8898/).
+Example: in one of our pylint evaluation runs, all 11 approved checks passed and the author's report said so. But the code also stopped splitting regexes on commas inside `( )`, and no check covered that. It is exactly what failed the project's real hidden test. A verifier that proves only the approved claims won't flag it. The review packet marked it **No test**, generated in under a minute for about $0.20. See [examples/pylint-8898/](examples/pylint-8898/), and [examples/](examples/README.md) for three more.
 
 ## How a review runs
 
@@ -61,7 +61,7 @@ A header and up to three short sections, everything numbered so the reviewer can
 | [review-flow.md](review-flow.md) | The six steps, the self-checks that keep the packet honest, and how critique flows back |
 | [review-packet-template.md](review-packet-template.md) | The packet format the prompt fills in |
 | [ui/render.py](ui/render.py) | Turns a packet (and the PR diff) into the page the reviewer uses: untested behaviour highlighted, architecture file references open their diff lines, comments on items, Approve / Request changes, export as `review.md` |
-| [examples/pylint-8898/](examples/pylint-8898/) | A real packet generated from one of our SWE-bench runs, and its rendered page `review.html` |
+| [examples/](examples/README.md) | Four real PRs with their packets and rendered pages: harness-built, default-agent and upstream changes |
 
 ## Running it
 

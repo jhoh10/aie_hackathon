@@ -96,7 +96,7 @@ pre.out{white-space:pre-wrap;font:12px/1.45 ui-monospace,Menlo,monospace;backgro
 <script>
 const DATA = JSON.parse(document.getElementById('data').textContent);
 const state = {decision: null, comments: []};
-const KEY = 'review:' + DATA.title;
+const KEY = 'review:' + location.pathname + ':' + DATA.title;
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) Object.assign(state, s); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
 const list = document.getElementById('clist'), copyBtn = document.getElementById('copy'), out = document.getElementById('out');
