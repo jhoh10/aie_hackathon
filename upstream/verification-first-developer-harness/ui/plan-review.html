@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claims Review</title>
+<style>
+:root{--bg:#f6f4ee;--panel:#fffefb;--ink:#1a1d24;--soft:#5a6170;--line:#e2ded4;--accent:#2a5fd0;--accentbg:#eaf0fc;
+--ok:#1f7a52;--okbg:#e3f3ea;--warn:#8a5a00;--warnbg:#fbf1da;--lean:#6b3fa0;--leanbg:#f1eafa;--sec:#a1361b;--secbg:#fbebe5;
+--code:#f1efe8;--on:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14181f;--panel:#1c212b;--ink:#e9e6df;--soft:#aab2c0;
+--line:#2c3444;--accent:#7aa2ff;--accentbg:#1f2738;--ok:#7fd1a8;--okbg:#1d3328;--warn:#e3b85a;--warnbg:#2e2614;
+--lean:#c4a3f0;--leanbg:#2a2238;--sec:#ff9c80;--secbg:#3a221c;--code:#232937;--on:#14181f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:940px;margin:0 auto;padding:24px 16px 120px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font:13px ui-monospace,Menlo,monospace}
+pre{background:var(--code);border-radius:8px;padding:10px;overflow:auto;font:12.5px/1.5 ui-monospace,Menlo,monospace;margin:6px 0 0;white-space:pre}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font:inherit;font-size:14px;font-weight:600;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--soft);cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.eyebrow{font:12px ui-monospace,Menlo,monospace;color:var(--soft)}
+h1{font-size:22px;line-height:1.3;margin:4px 0 6px}
+h2.sec{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--soft);margin:22px 0 8px}
+.sub{color:var(--soft);margin:0}
+header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.status{font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px;background:var(--warnbg);color:var(--warn);white-space:nowrap}
+.status.done{background:var(--okbg);color:var(--ok)}
+.why{background:var(--accentbg);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.why b{color:var(--accent)}
+.progress{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.ptop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;margin-bottom:8px}
+.bar{height:8px;background:var(--code);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .25s}
+.policy{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--soft);margin-top:10px;cursor:pointer}
+.policy input{width:16px;height:16px;accent-color:var(--ok)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12.5px;color:var(--soft);margin:10px 0 0}
+.cat{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;border-left:4px solid var(--line)}
+.cat.routine{border-style:dashed;border-left-style:solid}
+.cat.k-formal{border-left-color:var(--lean)}.cat.k-safety{border-left-color:var(--sec)}.cat.k-conformance{border-left-color:var(--accent)}
+.cat.k-intent{border-left-color:var(--ok)}.cat.k-preserved{border-left-color:var(--soft)}
+.chead{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.toggle{flex:1;display:flex;align-items:flex-start;gap:8px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0;min-width:0}
+.chev{flex:none;width:18px;font-size:14px;line-height:22px;text-align:center;transition:transform .15s;color:var(--soft)}
+[aria-expanded=true]>.chev{transform:rotate(90deg)}
+.cname{font-weight:650}
+.cnote{display:block;color:var(--soft);font-size:13px}
+.count{font:13px ui-monospace,Menlo,monospace;color:var(--soft);white-space:nowrap}
+.count.all{color:var(--ok);font-weight:700}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:6px 12px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.toggle:focus-visible,.check:focus-visible,.tab:focus-visible,.evtoggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rows{border-top:1px solid var(--line)}
+.rows[hidden],.ev[hidden]{display:none}
+.claim{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.claim:last-child{border-bottom:0}
+.claim.ok{background:color-mix(in srgb,var(--okbg) 55%,transparent)}
+.check{width:28px;height:28px;border-radius:7px;border:2px solid var(--soft);background:var(--panel);cursor:pointer;display:grid;place-items:center;color:var(--on);font-size:16px;font-weight:800;padding:0;margin-top:1px}
+.check[aria-checked=true]{background:var(--ok);border-color:var(--ok)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--soft);margin-bottom:3px}
+.tag{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--code);color:var(--soft);white-space:nowrap}
+.tag.amend{background:var(--warnbg);color:var(--warn)}
+.tag.ref{background:var(--accentbg);color:var(--accent)}
+.tag.secref{background:var(--secbg);color:var(--sec)}
+.s-proof{background:var(--leanbg);color:var(--lean)}
+.s-generated{background:var(--okbg);color:var(--ok)}
+.s-failpass{background:var(--accentbg);color:var(--accent)}
+.s-example,.s-static{background:var(--code);color:var(--soft)}
+.s-observed{background:var(--warnbg);color:var(--warn)}
+.ctext{margin:0;font-weight:500}
+.evtoggle{margin-top:6px;background:none;border:0;padding:0;font:inherit;font-size:13px;color:var(--accent);cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+.ev{margin:8px 0 0;padding:0 0 0 12px;list-style:none;border-left:2px solid var(--line)}
+.ev li{margin:0 0 10px;font-size:13.5px}
+.ev .ehead{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+.ev .etype{font-weight:650}
+.skipped{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px}
+.skipped table{width:100%;border-collapse:collapse;font-size:14px}
+.skipped td{padding:8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.skipped tr:last-child td{border-bottom:0}
+.skipped td:first-child{font-weight:600;width:34%;padding-right:12px}
+.skipped td:last-child{color:var(--soft)}
+.footer{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:12px 16px}
+.finner{max-width:940px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.fmsg{font-size:14px;color:var(--soft)}
+.fbtns{display:flex;gap:8px}
+.locked{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:16px}
+.locked h2{font-size:15px;margin:0 0 6px}
+.locked pre{max-height:320px}
+@media (max-width:560px){.chead{flex-wrap:wrap}.skipped td:first-child{width:45%}}
+</style>
+</head>
+<body>
+<main>
+  <nav class="tabs" role="tablist" aria-label="Use case" id="tabs"></nav>
+  <header>
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="title"></h1>
+      <p class="sub" id="scale"></p>
+    </div>
+    <span class="status" id="status" role="status"></span>
+  </header>
+  <div class="why" id="why"></div>
+
+  <section class="progress" aria-label="Approval progress">
+    <div class="ptop"><span id="ptext"></span><span id="pcat"></span></div>
+    <div class="bar"><i id="pbar"></i></div>
+    <label class="policy" id="policyRow"><input type="checkbox" id="policy"> Auto-approve routine regression claims on future PRs in this repo</label>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <div id="cats"></div>
+  <h2 class="sec">Considered and skipped</h2>
+  <div class="skipped" id="skipped"></div>
+  <div id="lockedOut"></div>
+</main>
+
+<div class="footer">
+  <div class="finner">
+    <span class="fmsg" id="fmsg"></span>
+    <div class="fbtns">
+      <button class="btn" id="reset">Reset</button>
+      <button class="btn primary" id="approvePlan" disabled>Approve claims</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// The engineer approves CLAIMS (plain-language behaviours). Tests, proofs and scans are the evidence under each claim.
+//
+// CATEGORIES: one fixed set, each defined by the kind of guarantee it gives. A use-case profile picks which apply,
+// says why the others were skipped, and can mark a category "routine" (collapsed, bulk-approvable, auto-approvable).
+// EVIDENCE STRENGTH: how much a check proves, strongest first. Shown on every check so a reviewer can tell a
+// proof from a screenshot at a glance.
+//
+// Approved claims export as verifier/docs/claims-contract.md JSON (group = category name).
+// The bug-fix plan is the real one from evaluation/example_side_by_side_eval.html; the others are illustrative.
+
+const CATEGORY = {
+  intent:      {name:'Intent',                     note:'The change does what was asked'},
+  boundaries:  {name:'Edge cases and failure modes', note:'Unusual inputs, limits, errors and misuse'},
+  integration: {name:'Integration and contracts',  note:'Fits the components and APIs around it'},
+  conformance: {name:'Architecture conformance',   note:'Follows the repo\'s design rules'},
+  safety:      {name:'Safety and compliance',      note:'Security, privacy and the standards that apply'},
+  budgets:     {name:'Quality budgets',            note:'Performance, accessibility and cost limits'},
+  formal:      {name:'Formal guarantees',          note:'Proved for every input in Lean 4, checked by its kernel'},
+  model:       {name:'Code matches the model',     note:'The shipped code agrees with what was proved'},
+  preserved:   {name:'Preserved behaviour',        note:'What already worked keeps working'}
+};
+
+const STRENGTH = {
+  proof:     {label:'Proof',              tip:'Holds for all inputs'},
+  generated: {label:'Generated inputs',   tip:'Property-based, fuzz or differential runs over many inputs'},
+  failpass:  {label:'Fails before, passes after', tip:'Shown to detect the bug on the old code'},
+  example:   {label:'Example test',       tip:'Specific inputs and outputs'},
+  static:    {label:'Static check',       tip:'Types, lint, dependency or import rules'},
+  observed:  {label:'Observed',           tip:'Screenshot, log scan or manual check'}
+};
+
+const PLANS = {
+  bugfix: {
+    label:'Bug fix',
+    eyebrow:'sympy/sympy · issue #24661 · .verify/plan.md',
+    title:'parse_expr(evaluate=False) for relationals',
+    why:'<b>Bug fix:</b> the key claim must <b>fail on the old code and pass on the fix</b>. The rest covers nearby inputs the fix could get wrong, and keeps everything else unchanged.',
+    categories:[
+      {cat:'intent', open:true, claims:[
+        {id:'c1', kind:'behavior_change', text:"parse_expr('1 < 2', evaluate=False) returns the unevaluated Lt(1, 2), not True.",
+         evidence:[{type:'Unit', s:'failpass', what:'Fails on the old commit (returns True); passes on the fix'}]},
+        {id:'c2', kind:'behavior_change', text:'>, <=, >=, == and != with evaluate=False return unevaluated Gt, Le, Ge, Eq and Ne.',
+         evidence:[{type:'Unit (parametrized)', s:'example', what:'One case per operator against Gt/Le/Ge/Eq/Ne'}]}
+      ]},
+      {cat:'boundaries', open:true, claims:[
+        {id:'c3', kind:'behavior_change', text:'Symbolic comparisons such as x + 1 > y stay unevaluated, operands included.',
+         evidence:[{type:'Unit', s:'example', what:'x < y and x + 1 > y give unevaluated relationals with unevaluated operands'}]},
+        {id:'c4', kind:'behavior_change', amended:true, text:'A chained comparison 1 < 2 < 3 returns an unevaluated And of pairwise comparisons, not True.',
+         evidence:[{type:'Unit', s:'example', what:'1 < 2 < 3 → And(Lt(1,2), Lt(2,3), evaluate=False)'}]}
+      ]},
+      {cat:'integration', open:true, claims:[
+        {id:'c5', kind:'behavior_change', text:'(1 < 2) & (3 > 2) with evaluate=False returns an unevaluated And of relationals.',
+         evidence:[{type:'Integration', s:'example', what:'Full parse_expr pipeline: relational and boolean transforms together'}]}
+      ]},
+      {cat:'preserved', open:false, routine:true, claims:[
+        {id:'c6', kind:'no_behavior_change', text:"Without evaluate=False, parse_expr('1 < 2') is still True and x < y is unchanged.",
+         evidence:[{type:'Unit', s:'example', what:"Default parse_expr results unchanged"}]},
+        {id:'c7', kind:'no_behavior_change', text:'Every existing parser test still passes.',
+         evidence:[{type:'Existing suite', s:'example', what:'sympy/parsing/tests: 46 passed, 9 skipped'}]}
+      ]}
+    ],
+    skipped:[
+      ['Architecture conformance', 'One method added to an existing class; no new modules or dependencies.'],
+      ['Safety and compliance', 'Parses math expressions; no auth, personal data or new external input.'],
+      ['Quality budgets', 'Adds one AST visitor; no hot path or large data involved.'],
+      ['Formal guarantees', 'Small operator set is fully covered by example tests; a proof would add little.']
+    ]
+  },
+
+  feature: {
+    label:'New feature',
+    eyebrow:'pocketbase/pocketbase · example feature · .verify/plan.md',
+    title:'Password reset by email link',
+    why:'<b>New feature:</b> beyond what users can do, claims show the change follows the <b>architecture guide</b> and the <b>security rules for auth code</b>. Each of those claims names the rule it satisfies.',
+    categories:[
+      {cat:'intent', open:true, claims:[
+        {id:'f1', kind:'behavior_change', text:'A user with an account can request a reset email and set a new password from its link.',
+         evidence:[{type:'E2E', s:'example', what:'Request → captured email → open link → set password → log in with the new one'}]}
+      ]},
+      {cat:'boundaries', open:true, claims:[
+        {id:'f2', kind:'behavior_change', text:'A reset link works only once.',
+         evidence:[{type:'Integration', s:'example', what:'Second use of the same token returns 400'}]},
+        {id:'f3', kind:'behavior_change', text:'A reset link older than 30 minutes is rejected.',
+         evidence:[{type:'Integration', s:'example', what:'Clock advanced 31 minutes → 400, password unchanged'}]},
+        {id:'f4', kind:'behavior_change', text:'Malformed or tampered tokens are rejected without a server error.',
+         evidence:[{type:'Fuzz', s:'generated', what:'10,000 random and mutated tokens → always 400, never 500'}]}
+      ]},
+      {cat:'integration', open:true, claims:[
+        {id:'f5', kind:'behavior_change', refs:['Arch: API conventions'], text:'The new endpoints follow the existing route naming and error format.',
+         evidence:[{type:'Contract', s:'example', what:'Responses validated against the existing API error schema'}]}
+      ]},
+      {cat:'conformance', open:true, claims:[
+        {id:'a1', kind:'behavior_change', refs:['Arch: reuse mailer'], text:'Emails go through the existing mailer; no new dependencies are added.',
+         evidence:[{type:'Dependency rule', s:'static', what:'go.mod unchanged; new code imports the mailer package only'}]},
+        {id:'a2', kind:'behavior_change', refs:['Arch: migrations'], text:'The schema change can be rolled back.',
+         evidence:[{type:'Migration', s:'example', what:'Up, down, up on a copy of the test database'}]}
+      ]},
+      {cat:'safety', open:true, claims:[
+        {id:'s1', kind:'behavior_change', sec:true, refs:['OWASP ASVS V2.5'], text:'Known and unknown emails get the same response, so accounts cannot be discovered.',
+         evidence:[{type:'Security', s:'example', what:'Status, body and timing bucket compared for both cases'}]},
+        {id:'s2', kind:'behavior_change', sec:true, refs:['Security rule: tokens at rest'], text:'Reset tokens are stored only as a hash.',
+         evidence:[{type:'Integration', s:'example', what:'Database holds a hash, never the raw token'}]},
+        {id:'s3', kind:'behavior_change', sec:true, refs:['Security rule: rate limits'], text:'At most 5 reset requests per email per hour.',
+         evidence:[{type:'Integration', s:'example', what:'6th request within an hour returns 429'}]},
+        {id:'s4', kind:'behavior_change', sec:true, refs:['Security rule: secrets in logs'], text:'Reset tokens never appear in logs.',
+         evidence:[{type:'Log scan', s:'observed', what:'Full E2E run; logs searched for every issued token'}]},
+        {id:'s5', kind:'behavior_change', sec:true, refs:['OWASP ASVS V2.5'], text:'Existing sessions are signed out after a password reset.',
+         evidence:[{type:'Integration', s:'example', what:'Old session token returns 401 after reset'}]}
+      ]},
+      {cat:'budgets', open:true, claims:[
+        {id:'b1', kind:'behavior_change', text:'The reset page is usable on desktop and mobile, with no serious accessibility issues.',
+         evidence:[{type:'Screenshot', s:'observed', what:'desktop.png and iphone.png attached to the report'},
+                   {type:'Accessibility', s:'static', what:'axe: no serious or critical violations'}]}
+      ]},
+      {cat:'preserved', open:false, routine:true, claims:[
+        {id:'r1', kind:'no_behavior_change', text:'Login, sign-up and OAuth flows work as before.',
+         evidence:[{type:'Existing suite', s:'example', what:'apis/record_auth_*_test.go'}]},
+        {id:'r2', kind:'no_behavior_change', text:'Existing API responses keep the same shape.',
+         evidence:[{type:'Contract', s:'example', what:'Recorded responses for existing endpoints unchanged'}]}
+      ]}
+    ],
+    skipped:[
+      ['Formal guarantees', 'No small pure core where a proof pays off; token logic is covered by fuzzing.'],
+      ['Code matches the model', 'No formal model, so nothing to match.']
+    ]
+  },
+
+  refactor: {
+    label:'Refactor',
+    eyebrow:'pocketbase/pocketbase · example refactor · .verify/plan.md',
+    title:'Move record validation into its own package',
+    why:'<b>Refactor:</b> nothing new should happen, so <b>preserved behaviour is the main claim</b>. It stays open and is never auto-approved. Conformance claims say what the new structure must look like.',
+    categories:[
+      {cat:'preserved', open:true, routine:false, claims:[
+        {id:'p1', kind:'no_behavior_change', text:'Every API response is identical before and after, for recorded real traffic.',
+         evidence:[{type:'Differential replay', s:'generated', what:'5,000 recorded requests replayed on old and new builds; responses byte-identical'}]},
+        {id:'p2', kind:'no_behavior_change', text:'Validation error messages and codes are unchanged.',
+         evidence:[{type:'Snapshot', s:'example', what:'Error snapshots for every validator compared with the old build'}]},
+        {id:'p3', kind:'no_behavior_change', text:'Every existing test passes without being edited.',
+         evidence:[{type:'Existing suite', s:'example', what:'go test ./... ; no test files in the diff'}]}
+      ]},
+      {cat:'conformance', open:true, claims:[
+        {id:'a1', kind:'no_behavior_change', refs:['Arch: layering'], text:'The new validation package does not import the API or database layers.',
+         evidence:[{type:'Import rule', s:'static', what:'go list deps check fails on any import of apis/ or daos/'}]},
+        {id:'a2', kind:'no_behavior_change', refs:['Arch: layering'], text:'There are no import cycles.',
+         evidence:[{type:'Build', s:'static', what:'go vet ./... and build succeed'}]}
+      ]},
+      {cat:'budgets', open:true, claims:[
+        {id:'b1', kind:'no_behavior_change', text:'Validation is no more than 5% slower.',
+         evidence:[{type:'Benchmark', s:'example', what:'BenchmarkValidateRecord, old vs new, 10 runs each'}]}
+      ]}
+    ],
+    skipped:[
+      ['Intent', 'No new behaviour is intended.'],
+      ['Edge cases and failure modes', 'Covered by the differential replay: any changed edge case changes a response.'],
+      ['Safety and compliance', 'No change to auth, data handling or external input.'],
+      ['Formal guarantees', 'Behaviour-preserving move; differential replay is the stronger, cheaper evidence.']
+    ]
+  },
+
+  formal: {
+    label:'Critical logic (Lean)',
+    eyebrow:'pocketbase/pocketbase · example critical logic · .verify/plan.md',
+    title:'Pagination for record lists',
+    why:'<b>Critical logic:</b> for a small pure function where a missed case is costly, the key claims are <b>proved in Lean 4 for every input</b>, not sampled. A second group ties the shipped Go code to the proven model.',
+    categories:[
+      {cat:'formal', open:true, claims:[
+        {id:'p1', kind:'behavior_change', text:'Every record appears on exactly one page.',
+         evidence:[{type:'Lean theorem', s:'proof', code:"theorem mem_exactly_one_page (perPage total i : Nat)\n    (hp : 0 < perPage) (hi : i < total) :\n    ∃! page, (bounds perPage page total).1 ≤ i ∧\n             i < (bounds perPage page total).2"},
+                   {type:'Proof check', s:'static', what:'lake build passes; #print axioms shows no sorryAx'}]},
+        {id:'p2', kind:'behavior_change', text:'No page holds more than perPage records.',
+         evidence:[{type:'Lean theorem', s:'proof', code:"theorem page_size_le (perPage page total : Nat) :\n    (bounds perPage page total).2 - (bounds perPage page total).1 ≤ perPage"}]},
+        {id:'p3', kind:'behavior_change', text:'The page count is zero only when there are no records.',
+         evidence:[{type:'Lean theorem', s:'proof', code:"theorem totalPages_eq_zero_iff (perPage total : Nat) (hp : 0 < perPage) :\n    totalPages perPage total = 0 ↔ total = 0"}]}
+      ]},
+      {cat:'model', open:true, claims:[
+        {id:'m1', kind:'behavior_change', text:'The Go pagination returns the same page bounds as the Lean model.',
+         evidence:[{type:'Differential', s:'generated', what:'100,000 generated (perPage, page, total) inputs; Go vs. compiled Lean model'}]}
+      ]},
+      {cat:'boundaries', open:true, claims:[
+        {id:'m2', kind:'behavior_change', text:'A page past the end returns an empty list, not an error; perPage = 0 is rejected with 400.',
+         evidence:[{type:'Unit', s:'example', what:'page = totalPages + 1 → 200 with items: []; perPage = 0 → 400'}]}
+      ]},
+      {cat:'preserved', open:false, routine:true, claims:[
+        {id:'r1', kind:'no_behavior_change', text:'Existing list API tests pass.',
+         evidence:[{type:'Existing suite', s:'example', what:'apis/record_crud_list_test.go'}]},
+        {id:'r2', kind:'no_behavior_change', text:'List responses keep the same shape.',
+         evidence:[{type:'Contract', s:'example', what:'page, perPage, totalItems, totalPages, items'}]}
+      ]}
+    ],
+    skipped:[
+      ['Intent', 'Covered by the formal guarantees, which state the intended behaviour exactly.'],
+      ['Safety and compliance', 'Reads already-authorised records; access rules unchanged.'],
+      ['Quality budgets', 'Constant-time arithmetic.']
+    ]
+  }
+};
+
+const POLICY_KEY = 'vf-auto-approve-regression';
+const store = {
+  get(){ try { return localStorage.getItem(POLICY_KEY) === '1'; } catch(e){ return false; } },
+  set(v){ try { localStorage.setItem(POLICY_KEY, v ? '1' : '0'); } catch(e){} }
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const groupKey = g => `${g.cat}`;
+const claimsOf = p => p.categories.flatMap(g => g.claims.map(k => ({...k, g})));
+const chip = s => `<span class="tag s-${s}" title="${esc(STRENGTH[s].tip)}">${STRENGTH[s].label}</span>`;
+const order = Object.keys(STRENGTH);
+const strongest = k => k.evidence.map(e => e.s).sort((a, b) => order.indexOf(a) - order.indexOf(b))[0];
+
+const state = {plan:'bugfix', policy:store.get(), per:{}};
+function fresh(planId){
+  const s = {approved:new Set(), open:{}, ev:new Set(), locked:false};
+  PLANS[planId].categories.forEach(g => { s.open[g.cat] = g.open; if (g.routine && state.policy) g.claims.forEach(k => s.approved.add(k.id)); });
+  return s;
+}
+const cur = () => state.per[state.plan] || (state.per[state.plan] = fresh(state.plan));
+
+function render(){
+  const p = PLANS[state.plan], s = cur(), all = claimsOf(p);
+  $('tabs').innerHTML = Object.entries(PLANS).map(([id, pl]) =>
+    `<button class="tab" role="tab" aria-selected="${id === state.plan}" data-plan="${id}">${pl.label}</button>`).join('');
+  $('eyebrow').textContent = p.eyebrow;
+  $('title').textContent = p.title;
+  const nEv = all.reduce((n, k) => n + k.evidence.length, 0);
+  $('scale').textContent = `${p.label} · ${all.length} claims in ${p.categories.length} categories · ${nEv} checks`;
+  $('why').innerHTML = p.why;
+  $('legend').innerHTML = 'Evidence strength, strongest first: ' + order.map(chip).join('');
+
+  $('cats').innerHTML = p.categories.map(g => {
+    const def = CATEGORY[g.cat], ok = g.claims.filter(k => s.approved.has(k.id)).length, done = ok === g.claims.length, open = s.open[g.cat];
+    const note = g.routine ? `${def.note} · routine, collapsed by default` : def.note;
+    return `<section class="cat k-${g.cat} ${g.routine ? 'routine' : ''}">
+      <div class="chead">
+        <button class="toggle" aria-expanded="${open}" aria-controls="rows-${g.cat}" data-toggle="${g.cat}">
+          <span class="chev" aria-hidden="true">▶</span>
+          <span><span class="cname">${esc(def.name)}</span><span class="cnote">${esc(note)}</span></span>
+        </button>
+        <span class="count ${done ? 'all' : ''}">${ok}/${g.claims.length} claims</span>
+        <button class="btn" data-all="${g.cat}" ${s.locked ? 'disabled' : ''}>${done ? 'Clear all' : 'Approve all'}</button>
+      </div>
+      <div class="rows" id="rows-${g.cat}" ${open ? '' : 'hidden'}>
+        ${g.claims.map(k => {
+          const on = s.approved.has(k.id), evOpen = s.ev.has(k.id);
+          const refs = (k.refs || []).map(r => `<span class="tag ${k.sec ? 'secref' : 'ref'}">${esc(r)}</span>`).join('');
+          return `<div class="claim ${on ? 'ok' : ''}">
+            <button class="check" role="checkbox" aria-checked="${on}" aria-label="Approve claim ${k.id}" data-check="${k.id}" ${s.locked ? 'disabled' : ''}>${on ? '✓' : ''}</button>
+            <div>
+              <div class="meta"><span>${k.id}</span>${chip(strongest(k))}${refs}${k.kind === 'no_behavior_change' ? '<span class="tag">must not change</span>' : ''}${k.amended ? '<span class="tag amend">amended by engineer</span>' : ''}</div>
+              <p class="ctext">${esc(k.text)}</p>
+              <button class="evtoggle" aria-expanded="${evOpen}" aria-controls="ev-${k.id}" data-ev="${k.id}"><span class="chev" aria-hidden="true">▶</span>Evidence · ${k.evidence.length} ${k.evidence.length === 1 ? 'check' : 'checks'}</button>
+              <ul class="ev" id="ev-${k.id}" ${evOpen ? '' : 'hidden'}>
+                ${k.evidence.map(e => `<li><div class="ehead"><span class="etype">${esc(e.type)}</span>${chip(e.s)}</div>${e.code ? `<pre>${esc(e.code)}</pre>` : esc(e.what)}</li>`).join('')}
+              </ul>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>`;
+  }).join('');
+
+  $('skipped').innerHTML = `<table><tbody>${p.skipped.map(([c, r]) => `<tr><td>${esc(c)}</td><td>${esc(r)}</td></tr>`).join('')}</tbody></table>`;
+
+  const done = all.filter(k => s.approved.has(k.id)).length, total = all.length;
+  $('ptext').textContent = `${done} of ${total} claims approved`;
+  const routine = all.filter(k => k.g.routine), rOk = routine.filter(k => s.approved.has(k.id)).length;
+  $('pcat').textContent = !routine.length ? 'No routine claims: review every one'
+    : state.policy ? 'Routine regression: auto-approved by repo policy' : `Routine regression: ${rOk}/${routine.length}`;
+  $('pbar').style.width = `${(done / total) * 100}%`;
+  const ready = done === total;
+  $('approvePlan').disabled = !ready || s.locked;
+  $('fmsg').textContent = s.locked ? 'Claims approved and locked. The agent can start building.'
+    : ready ? 'Every claim approved. Approve to lock them for this PR.'
+    : `${total - done} claim${total - done === 1 ? '' : 's'} left to approve`;
+  $('status').textContent = s.locked ? 'Approved' : 'Awaiting review';
+  $('status').classList.toggle('done', s.locked);
+  $('policy').checked = state.policy;
+  $('policy').disabled = s.locked;
+  $('lockedOut').innerHTML = s.locked ? lockedHtml(p) : '';
+  if (s.locked) $('copy').addEventListener('click', () => navigator.clipboard?.writeText(claimsJson(p)).then(() => $('copy').textContent = 'Copied'));
+}
+
+const claimsJson = p => JSON.stringify({claims: claimsOf(p).map(k => ({id:k.id, text:k.text, kind:k.kind, group:CATEGORY[k.g.cat].name}))}, null, 2);
+const lockedHtml = p => `<section class="locked">
+  <h2>Approved claims, handed to the verifier</h2>
+  <p class="sub">Locked for this PR (verifier/docs/claims-contract.md). Editing a claim now needs a new approval.</p>
+  <pre id="json">${esc(claimsJson(p))}</pre>
+  <p><button class="btn" id="copy">Copy JSON</button></p>
+</section>`;
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-plan],[data-toggle],[data-check],[data-all],[data-ev]');
+  if (!t) return;
+  const s = cur(), p = PLANS[state.plan];
+  let key;
+  if (t.dataset.plan){ state.plan = t.dataset.plan; key = `[data-plan="${t.dataset.plan}"]`; }
+  else if (t.dataset.toggle){ s.open[t.dataset.toggle] = !s.open[t.dataset.toggle]; key = `[data-toggle="${t.dataset.toggle}"]`; }
+  else if (t.dataset.ev){ const id = t.dataset.ev; s.ev.has(id) ? s.ev.delete(id) : s.ev.add(id); key = `[data-ev="${id}"]`; }
+  else if (t.dataset.check){ const id = t.dataset.check; s.approved.has(id) ? s.approved.delete(id) : s.approved.add(id); key = `[data-check="${id}"]`; }
+  else if (t.dataset.all){
+    const g = p.categories.find(c => c.cat === t.dataset.all), all = g.claims.every(k => s.approved.has(k.id));
+    g.claims.forEach(k => all ? s.approved.delete(k.id) : s.approved.add(k.id)); key = `[data-all="${g.cat}"]`;
+  }
+  render();
+  document.querySelector(key)?.focus();
+});
+
+$('policy').addEventListener('change', e => {
+  state.policy = e.target.checked; store.set(state.policy);
+  Object.keys(PLANS).forEach(id => {
+    const s = state.per[id]; if (!s || s.locked) return;
+    PLANS[id].categories.filter(g => g.routine).forEach(g => g.claims.forEach(k => state.policy ? s.approved.add(k.id) : s.approved.delete(k.id)));
+  });
+  render();
+});
+$('reset').addEventListener('click', () => { state.per[state.plan] = fresh(state.plan); render(); });
+$('approvePlan').addEventListener('click', () => { cur().locked = true; render(); $('lockedOut').scrollIntoView({behavior:'smooth'}); });
+
+render();
+</script>
+</body>
+</html>

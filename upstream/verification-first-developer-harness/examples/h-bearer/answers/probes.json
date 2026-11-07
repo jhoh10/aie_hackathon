@@ -1,0 +1,16 @@
+{
+  "scenarios": [
+    { "id": "p-lower", "claim": null, "kind": "probe", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh?fields=record.collectionName", "headers": { "Authorization": "bearer {{superuser_token}}" } } ] },
+    { "id": "p-upper-list", "claim": null, "kind": "probe", "steps": [
+      { "id": "list", "method": "GET", "path": "/api/collections/_superusers/records?fields=collectionName", "headers": { "Authorization": "BEARER {{superuser_token}}" } } ] },
+    { "id": "p-exact", "claim": null, "kind": "probe", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh?fields=record.collectionName", "headers": { "Authorization": "Bearer {{superuser_token}}" } } ] },
+    { "id": "p-prefix-only", "claim": null, "kind": "probe", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh", "headers": { "Authorization": "Bearer" } } ] },
+    { "id": "p-double-space", "claim": null, "kind": "probe", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh", "headers": { "Authorization": "Bearer  {{superuser_token}}" } } ] },
+    { "id": "p-other-scheme", "claim": null, "kind": "probe", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh", "headers": { "Authorization": "Token {{superuser_token}}" } } ] }
+  ]
+}

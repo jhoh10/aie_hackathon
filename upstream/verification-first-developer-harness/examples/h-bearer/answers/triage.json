@@ -1,0 +1,6 @@
+{
+  "findings": [
+    { "id": "p-lower", "triage": "explained", "severity": "minor", "why": "A lowercase bearer prefix now authenticates, which is what claim c1 says." },
+    { "id": "p-upper-list", "triage": "explained", "severity": "minor", "why": "An uppercase BEARER prefix now authenticates the superuser list, which is what claim c1 says." }
+  ]
+}
