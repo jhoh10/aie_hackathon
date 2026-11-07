@@ -60,8 +60,11 @@ export function openaiModel(baseUrl: string, apiKey: string, model: string): Mod
   } };
 }
 
-export function modelFromEnv(): Model {
-  // Defaults to Meta's OpenAI-compatible Model API. Standard (non-contributor) models only, so code isn't used for training.
-  const { MODEL_BASE_URL: u = 'https://api.meta.ai/v1', MODEL_API_KEY: k, MODEL_NAME: n = 'muse-spark-1.3' } = process.env;
-  return k ? openaiModel(u, k, n) : fileModel();
+export function modelFromEnv(env: Record<string, string | undefined> = process.env): Model {
+  // Defaults to Meta's OpenAI-compatible Model API (Muse Spark). Standard (non-contributor) models only, so code isn't
+  // used for training. The key is MODEL_API_KEY, or META_API_KEY as in the team .env. MODEL=files forces saved answers.
+  // `||` rather than defaults, so empty lines copied from .env.example don't blank them out.
+  const u = env.MODEL_BASE_URL || 'https://api.meta.ai/v1', n = env.MODEL_NAME || 'muse-spark-1.3';
+  const k = env.MODEL_API_KEY || env.META_API_KEY;
+  return k && env.MODEL !== 'files' ? openaiModel(u, k, n) : fileModel();
 }

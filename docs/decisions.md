@@ -20,6 +20,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 - **Because:** the plan's Claims table already has the contract's columns (#, Claim, Kind, Group). One source means the claims the engineer approved are exactly the ones the verifier checks, with no second copy to drift, and the harness conversation doesn't change.
 - **Revisit if:** claims need fields a markdown table can't hold well, or the plan view (display-scaling.md) starts writing JSON itself.
 
+## 2026-11-07: Muse Spark 1.3, standard model, via the existing OpenAI-compatible client
+
+- **Chose:** `muse-spark-1.3` (newest listed by `GET /v1/models`) through the verifier's existing `openaiModel`, configured by env vars (`META_API_KEY`, `MODEL_BASE_URL`, `MODEL_NAME`).
+- **Over:** the `-contributor` variants (they allow Meta to train on inputs, and we send code), LiteLLM or the OpenAI SDK (a new dependency for what is one fetch call).
+- **Because:** no new dependency, and switching models or endpoints (Gemini, Claude via a compatible proxy) stays an env change.
+- **Revisit if:** 1.3 is slow or gives bad JSON once billing works; try `MODEL_NAME=muse-spark-1.2`.
+
 ## 2026-11-07: Chase the Meta prize; skip Fetch.ai and MongoDB for now
 
 - **Chose:** go all in on the Meta Model API ($5k, the only confirmed prize). The verifier's model step is already OpenAI-compatible (verifier/src/model.ts), so Muse Spark is mostly a base URL, key and model name change. If it's cheap once Meta works, add Gemini as a second, independent checker ("two labs agree the claim is proven"). Ask SubQ on site for a key, since whole-codebase context suits verifying a PR.
