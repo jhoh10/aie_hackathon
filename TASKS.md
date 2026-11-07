@@ -7,7 +7,7 @@ One line per task. Put the owner's initials in brackets. Move lines between sect
 Planned backwards from the **5:00 PM PT submission deadline** (from the CV page, see docs/submission.md). First-round judging is 5:00–6:45 PM, with a live demo of about 3 minutes plus Q&A. Shifted an hour earlier at 1:40 PM, when we learned the deadline was 5:00, not 6:00. Tick each milestone as you hit it.
 
 - [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
-- [ ] **12:30 PM: stack and skeleton (overdue).** Meta Model API keys work for everyone, "Running it" in the README filled in.
+- [ ] **12:30 PM: stack and skeleton (overdue, nearly done).** "Running it" in the README filled in and the verifier wired to Muse Spark. Left: Meta billing (key accepted, but chat calls return 402 `billing_not_configured`).
 - [ ] **1:30 PM: hello world end to end (half done, overdue).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-harness/evaluation/). Still missing: runnable from the repo ("Running it" in the README), the approved claims handed to the verifier, and the demo scenario named in the README's "Demo moment".
 - [ ] **2:00 PM: benchmark running.** `node src/benchmark.ts dev verifier` started on the real dev cases. The first run will need debugging, so allow 1–2 hours. Holdout is optional.
 - [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
@@ -44,7 +44,6 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
 - [ ] Plan and report view: one tree that scales from bug fix to feature (verification-first-harness/display-scaling.md). Needs the `group` field from the claims contract
 - [ ] Make the Meta Model API use visible in the demo and the pitch
-- [ ] Point the verifier's model step (verifier/src/model.ts) at Muse Spark via `https://api.meta.ai/v1`
 - [ ] Optional, after Meta works: Gemini as a second, independent checker on verdicts
 - [ ] Ask the SubQ team on site for API access (whole-codebase context for verifying a PR)
 - [ ] Check the CV details page for the rest of the $11k prize split; revisit the sponsor decision if Fetch.ai, MongoDB or DeepMind has a big track
@@ -54,10 +53,11 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 
 ## Blocked
 
-_Nothing yet. Say what it's waiting on._
+- [ ] [DT] Meta Model API chat calls: waiting on billing for the Meta team (dev.meta.ai/billing). The key lists models fine; `POST /v1/chat/completions` returns 402 `billing_not_configured`. Ask Meta on site for hackathon credits. Until then the verifier uses saved answers (`MODEL=files` or no key).
 
 ## Done
 
+- [x] Verifier model step points at Muse Spark (`muse-spark-1.3`, `https://api.meta.ai/v1`), reads `META_API_KEY`; "Running it" in the README filled in (2026-11-07)
 - [x] [DT] Harness run end to end on two SWE-bench Verified tasks (sympy-24661, pylint-8898), side by side with default Claude Code; both sides resolved both (2026-11-07)
 - [x] Confirm the real deadline: 5:00 PM PT, milestones shifted to match (2026-11-07)
 - [x] [JH] Write up how the harness display scales with task size (2026-11-07)
