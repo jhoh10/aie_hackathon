@@ -1,12 +1,19 @@
 # Submission
 
-**Deadline:** _TBD (write the exact time and timezone here)_
+**Deadline:** Saturday 2026-11-07, 5:00 PM PT. First-round judging runs 5:00–6:45 PM. Finals are 7:00–8:00 PM, winners at 8:15 PM.
+
+**Submit:** public repo, a one-minute demo video, and all team members on the submission page.
 
 ## Judging criteria
 
-_Copy them from the hackathon page so we can check the demo against them._
+Live demo of about 3 minutes, then 1-2 minutes of Q&A. The top six teams demo on stage, where all four criteria count equally.
 
--
+- Technical demo: 35%. Does it work and impress?
+- Implementation difficulty: 30%. Is it more than a few AI prompts away?
+- Impact potential: 20%. Is it a significant real-world pain?
+- Creativity: 15%. Is it something new?
+
+Disqualifiers: the demo must clearly show what was built today, and no existing projects. Any project where a dashboard is the main feature is on the banned list.
 
 ## Checklist
 
