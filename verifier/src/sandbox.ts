@@ -22,13 +22,21 @@ export async function ensureNetwork() {
   await docker('network', 'inspect', NET).catch(() => docker('network', 'create', '--internal', NET));
 }
 
+// Go version from the commit's go.mod, as major.minor. Old PocketBase commits break under newer Go
+// (e.g. infinite recursion in Collection.UnmarshalJSON on Go 1.27), so build each with its own toolchain.
+export async function goVersion(repo: string, sha: string): Promise<string> {
+  const mod = await sh('git', ['-C', repo, 'show', `${sha}:go.mod`]).catch(() => '');
+  return mod.match(/^go (\d+\.\d+)/m)?.[1] ?? '1.27';
+}
+
 export async function buildImage(repo: string, sha: string): Promise<string> {
-  const tag = `vouch-app:${sha.slice(0, 12)}`;
+  const go = await goVersion(repo, sha);
+  const tag = `vouch-app:${sha.slice(0, 12)}-go${go}`;
   if (await docker('image', 'inspect', tag).then(() => true, () => false)) return tag;
   const dir = await mkdtemp(join(tmpdir(), 'vouch-build-'));
   try {
     await sh('sh', ['-c', `git -C "$0" archive "$1" | tar -x -C "$2"`, repo, sha, dir]);
-    await docker('build', '-q', '-t', tag, '-f', join(ROOT, 'docker/app.Dockerfile'), dir);
+    await docker('build', '-q', '-t', tag, '--build-arg', `GO_VERSION=${go}`, '-f', join(ROOT, 'docker/app.Dockerfile'), dir);
     return tag;
   } finally { await rm(dir, { recursive: true, force: true }); }
 }

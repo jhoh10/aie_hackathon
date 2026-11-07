@@ -1,6 +1,8 @@
 # Builds one commit into a coverage-instrumented binary. The build context is a
 # `git archive` of the commit under test, so the verifier is invisible to it.
-FROM golang:1.27-alpine AS build
+# Go toolchain matches the commit's go.mod (old commits misbehave on newer Go).
+ARG GO_VERSION=1.27
+FROM golang:${GO_VERSION}-alpine AS build
 ENV CGO_ENABLED=0
 WORKDIR /src
 COPY go.mod go.sum ./

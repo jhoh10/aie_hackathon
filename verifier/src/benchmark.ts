@@ -7,7 +7,7 @@ import { verify, diffFor } from './pipeline.ts';
 import { modelFromEnv, Pending } from './model.ts';
 import * as P from './prompts.ts';
 import { simPlanning, simReviewDiff, simReviewVerdict } from './simulate.ts';
-import { ROOT, buildImage, ensureNetwork, runScenario, pool, sh } from './sandbox.ts';
+import { ROOT, buildImage, ensureNetwork, runScenario, pool, sh, goVersion } from './sandbox.ts';
 
 const [split, what = 'all'] = process.argv.slice(2);
 const OUT = join(ROOT, '.work/results', split); mkdirSync(OUT, { recursive: true });
@@ -44,7 +44,7 @@ async function runCi(c: Case) {
   if (!pkgs.length) return { id: c.id, pass: true, pkgs, note: 'no tested packages touched' };
   const started = Date.now();
   const script = `mkdir -p /s && git -C /repo archive ${c.head} | tar -x -C /s && cd /s && CGO_ENABLED=0 go test ${pkgs.join(' ')} 2>&1 | tail -15`;
-  const out = await sh('docker', ['run', '--rm', '-v', `${REPO}:/repo:ro`, '-v', 'vouch-gomod:/go/pkg/mod', '-v', 'vouch-gocache:/root/.cache/go-build', '-e', 'GOFLAGS=-buildvcs=false', 'golang:1.27-alpine', 'sh', '-c', `apk add -q git >/dev/null; git config --global --add safe.directory '*'; ${script}`]);
+  const out = await sh('docker', ['run', '--rm', '-v', `${REPO}:/repo:ro`, '-v', 'vouch-gomod:/go/pkg/mod', '-v', 'vouch-gocache:/root/.cache/go-build', '-e', 'GOFLAGS=-buildvcs=false', `golang:${await goVersion(REPO, c.head)}-alpine`, 'sh', '-c', `apk add -q git >/dev/null; git config --global --add safe.directory '*'; ${script}`]);
   const r = { id: c.id, pkgs, pass: !/^(FAIL|--- FAIL|panic:)/m.test(out) && /^ok/m.test(out), tail: out.slice(-1200), wallMs: Date.now() - started };
   writeFileSync(cacheFile, JSON.stringify(r));
   log(c.id, 'ci', r.pass ? 'pass' : 'FAIL');
