@@ -385,9 +385,6 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=
   <p class="foot">{footer}</p>
 </main>
 <aside class="side">
-  <div class="panel"><h3>On this page</h3><nav class="toc">
-    <a href="#func">What the PR does <span class="n">{n_func}</span></a>
-    {toc_extra}</nav></div>
   <div class="panel"><h3>Your decision</h3>
     <div class="dec" role="group" aria-label="Decision">
       <button class="approve" data-d="APPROVE">✓ Approve</button>
