@@ -4,14 +4,14 @@ The other half of the [developer harness](../verification-first-developer-harnes
 
 ## The one-line pitch
 
-> Review the change, not the code. The reviewer reads one page: what the PR now does, what its tests feed in and expect out, and what changed in the architecture. Then they approve or critique that page.
+> Review the change, not the code. The reviewer reads one short page: what the PR now does, what its tests feed in and expect out, and, only when it changed, the architecture. Then they approve or critique that page.
 
 ## Core beliefs
 
 1. **Code is a black box for the reviewer too.** Reading every line doesn't scale to agent-written code. A reviewer's attention goes on behaviour, evidence and structure.
 2. **The summary is generated from the diff, not from the author's description.** The PR description and the claims say what was *meant*. The packet says what the code *does*. Any gap between the two is the most important thing on the page.
 3. **Short beats complete.** The whole packet is about 200 words: at most 3 lines on what the PR does, plus one line for every behaviour no test covers. Those lines are the point of the packet.
-4. **Nothing in the diff goes unexplained.** Every changed hunk shows up in what the PR does, its tests or its architecture. A behaviour change with no test always gets its own line, marked **No test**.
+4. **Nothing in the diff goes unexplained.** Every behaviour change shows up in what the PR does. A behaviour change with no test always gets its own line, marked **No test**.
 5. **Critique is about behaviour.** The reviewer comments on packet items ("F2 is not wanted", "T4 needs an empty-input case"). Those comments go back to the developer agent as edits to the claims, not as line comments.
 
 ## What it adds over what we already have
@@ -44,14 +44,14 @@ The steps are described in [review-flow.md](review-flow.md).
 
 ## The review packet
 
-A header and three short sections, everything numbered so the reviewer can point at it. The full template is in [review-packet-template.md](review-packet-template.md).
+A header and up to three short sections, everything numbered so the reviewer can point at it. Only "What the PR does" is always there; the other sections appear only when they have something to say. The full template is in [review-packet-template.md](review-packet-template.md).
 
 | Section | What the reviewer sees |
 | --- | --- |
 | **Header** | One sentence (at most 15 words); claims proven, tests new / changed, untested behaviours |
 | **What the PR does** (F1, F2, …) | At most 3 one-line behaviour changes (before → after, at most 10 words) with the tests that cover them, plus one line per behaviour with **No test** |
-| **Tests** (T1, T2, …) | At most 6 rows of input → expected output, similar cases grouped; changed existing tests say what they used to expect |
-| **Architecture** (A1, A2, …) | At most 3 one-line structural changes with the file |
+| **Tests** (T1, T2, …), if the PR touches tests | At most 6 rows of input → expected output, similar cases grouped; changed existing tests say what they used to expect |
+| **Architecture** (A1, A2, …), only for high-level changes | At most 3 lines: components added or removed, public API, CLI, config, dependency, schema or data format changes, new connections between components. Private helpers and internal refactors never count, so a bug fix usually has no architecture section |
 
 ## Files in this folder
 
