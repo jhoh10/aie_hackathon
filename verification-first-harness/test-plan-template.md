@@ -32,7 +32,7 @@ Produced in phase A. Saved to `.verify/brief.md`.
 
 ## 2. Test plan
 
-Produced in phase C, approved in phase D (Gate 1). Saved to `.verify/plan.md`.
+Produced in phase C, approved by the engineer in phase D (the only approval in a session). Saved to `.verify/plan.md`.
 
 ```markdown
 # Test plan: <task>
@@ -72,12 +72,14 @@ Status: DRAFT | APPROVED by <name> on <date>
 
 ---
 
-## 3. Architecture map
+## 3. Design notes
 
-Produced and approved in phase D (Gate 2). Appended to `.verify/plan.md`.
+Written by the agent at the start of phase E and kept up to date while it builds. **Not approved by the engineer**: the code and architecture are the agent's call. They explain the design and show that every component is covered by a check. Included in the verification report.
 
 ```markdown
-## Architecture
+## Design notes
+
+**Approach:** <two or three sentences: what the agent built and why it chose this over the obvious alternatives>
 
 | Component | Change | Covered by rows |
 | --- | --- | --- |
@@ -109,6 +111,14 @@ Result: ✅ 10/10 automated checks passed · ⏳ 1 manual check pending
 | 1 | Token expires after 30 min | Pass | 1 | log |
 | 6 | Reused link shows an error | Pass | 3 | log, screenshot |
 | 7 | Reset page matches baseline | Pass | 1 | desktop.png, iphone.png |
+
+## Agent-added checks
+| # | Check | Why it was added | Result |
+| --- | --- | --- | --- |
+| A1 | Expired tokens are purged nightly | Cleanup job had no covering row | Pass |
+
+## Design notes
+<the design notes from section 3>
 
 ## What went wrong on the way
 - Row 6 failed twice: token wasn't cleared after use. Fixed in `token.ts`.
