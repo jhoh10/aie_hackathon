@@ -2,9 +2,9 @@
 
 **Direction:** trust but verify. This fits the hackathon's "verify what other agents ship before it merges" theme (see resources/event.md).
 
-**Leaning towards:** Idea 1.
+**Picked:** Idea 1 (2026-11-07, see docs/decisions.md).
 
-## Idea 1: Talk through the tests before writing the code (leading)
+## Idea 1: Talk through the tests before writing the code (picked)
 
 Expanded in [verification-first-harness/](../verification-first-harness/README.md): the five-phase conversation, a catalog of every kind of test, and templates.
 
@@ -19,7 +19,7 @@ Get engineers into a conversation about testing *before* they start coding. Work
   - How does a reviewer use it at review time?
   - What's the demo moment?
 
-## Idea 2: The LLM picks the lines worth reviewing
+## Idea 2: The LLM picks the lines worth reviewing (not picked)
 
 The LLM points reviewers at the significant lines of a change, so they review those instead of the whole diff.
 
