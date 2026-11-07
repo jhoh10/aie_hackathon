@@ -1,0 +1,1 @@
+{"decision": "merge", "effort": 6, "confidence": 0.6, "why": "Normalizes index table names on save and adds a migration to reconcile sqlite_master; the logic is plausible, though failing on a missing index name is stricter than before."}

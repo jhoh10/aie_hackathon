@@ -187,18 +187,19 @@ export function toMarkdown(s: ReturnType<typeof score>) {
   return out.join('\n');
 }
 
-if (import.meta.main) {
+if (import.meta.main ?? process.argv[1]?.endsWith("metrics.ts")) { // import.meta.main needs Node 24.2+
   const { readFileSync, writeFileSync, existsSync, readdirSync } = await import('node:fs');
   const { join } = await import('node:path');
   const { execFileSync } = await import('node:child_process');
   const { ROOT } = await import('./sandbox.ts');
   const split = process.argv[2] ?? 'dev';
-  const dir = join(ROOT, '.work/results', split);
+  // Local results first; otherwise the copy committed under results/raw, so anyone can recompute.
+  const dir = existsSync(join(ROOT, '.work/results', split, 'cases.json')) ? join(ROOT, '.work/results', split) : join(ROOT, 'results/raw', split);
   const read = (f: string) => (existsSync(join(dir, f + '.json')) ? JSON.parse(readFileSync(join(dir, f + '.json'), 'utf8')) : undefined);
   const cases: CaseInfo[] | undefined = read('cases');
   if (!cases) { console.error(`No results in ${dir}. Run: node src/benchmark.ts ${split}`); process.exit(1); }
   const results = Object.fromEntries(APPROACHES.map((a) => [a, read(a)]).filter(([, v]) => v));
-  const gen = join(ROOT, '.work/gen');
+  const gen = existsSync(join(ROOT, '.work/gen')) ? join(ROOT, '.work/gen') : join(ROOT, 'results/raw/gen');
   const usage: Record<string, Usage[]> = {};
   for (const c of cases) {
     const d = join(gen, c.id);
@@ -212,6 +213,10 @@ if (import.meta.main) {
       diffLines[c.id] = out.split('\n').filter(Boolean).reduce((n, l) => n + (+l.split('\t')[0] || 0) + (+l.split('\t')[1] || 0), 0);
     } catch {}
   }
+  // Without a clone, fall back to the line counts saved next to the committed raw results.
+  const savedLines = join(ROOT, 'results/raw/diff-lines.json');
+  if (!Object.keys(diffLines).length && existsSync(savedLines)) Object.assign(diffLines, JSON.parse(readFileSync(savedLines, 'utf8')));
+  else if (Object.keys(diffLines).length && existsSync(join(ROOT, 'results/raw'))) writeFileSync(savedLines, JSON.stringify({ ...(existsSync(savedLines) ? JSON.parse(readFileSync(savedLines, 'utf8')) : {}), ...diffLines }, null, 1));
   const runsDir = join(ROOT, '.work/runs');
   const liveRuns = existsSync(runsDir) ? readdirSync(runsDir).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(join(runsDir, f), 'utf8'))) : [];
   const s = score({ cases, results, usage, diffLines, liveRuns, sim: read('sim') });

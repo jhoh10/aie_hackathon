@@ -1,0 +1,422 @@
+{
+ "h-oauth": {
+  "id": "h-oauth",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 407,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture secret preservation on add, secret hiding and list semantics."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 782,
+   "turns": 1,
+   "opened": 0,
+   "effort": 5,
+   "confidence": 0.75,
+   "why": "Merges submitted provider fields onto the stored config by provider name, so omitted client secrets are preserved without mixing up providers."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 1661,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.85,
+   "why": "A partial PATCH that only disables oauth2 now fails with 400 and providers missing credentials are now accepted, both unrequested regressions."
+  },
+  "wallMs": 38
+ },
+ "h-smtp": {
+  "id": "h-smtp",
+  "planning": {
+   "step": "planning",
+   "decision": "edit",
+   "edits": 1,
+   "readTokens": 326,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.8,
+   "why": "Need to make sure the fix distinguishes an explicit empty password from an omitted one."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 536,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.75,
+   "why": "The password is omitted only in API serialization and still serialized (even empty) for persistence, so clearing it now persists."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1551,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.55,
+   "why": "Clearing the password works on the new version with no changed probes and full changed-code coverage, though the test could not tell old and new apart."
+  },
+  "wallMs": 21
+ },
+ "h-identity": {
+  "id": "h-identity",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 405,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Claims cover email-shaped usernames plus email, failure and plain-username regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 727,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.65,
+   "why": "Single ordered pass with email prioritized and a fallback to the other identity fields fixes email-like usernames; the only concern is that slices/list import changes are not visible in the hunk."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 2732,
+   "turns": 3,
+   "opened": 2,
+   "effort": 4,
+   "confidence": 0.7,
+   "why": "The only probe change lets email-shaped usernames log in when username is the sole identity field, which is the same fix applied more broadly, and the core flow works on the new version."
+  },
+  "wallMs": 69
+ },
+ "h-index": {
+  "id": "h-index",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 335,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "Claims cover updates with unchanged and changed indexes and unique enforcement."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 1549,
+   "turns": 1,
+   "opened": 0,
+   "effort": 6,
+   "confidence": 0.6,
+   "why": "Normalizes index table names on save and adds a migration to reconcile sqlite_master; the logic is plausible, though failing on a missing index name is stricter than before."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 630,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.9,
+   "why": "Core claims unproven and five undeclared breaking probe changes."
+  },
+  "wallMs": 37
+ },
+ "r-smtp": {
+  "id": "r-smtp",
+  "planning": {
+   "step": "planning",
+   "decision": "edit",
+   "edits": 1,
+   "readTokens": 355,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.75,
+   "why": "Merging must keep hidden secrets like the SMTP password that clients never resubmit."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 539,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Removing the custom SMTP marshaling changes behavior and reintroduces the bug where clearing the SMTP password does not persist."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 387,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.65,
+   "why": "All claims proven with no changed probes, though changed-code coverage is unknown."
+  },
+  "wallMs": 19
+ },
+ "h-view": {
+  "id": "h-view",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 354,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture non-wildcard star usage saving plus validation and ordinary-query regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 1807,
+   "turns": 1,
+   "opened": 0,
+   "effort": 6,
+   "confidence": 0.65,
+   "why": "Errors from dependent views are collected and logged instead of silently ignored, wildcard columns are rejected clearly, and the dry run uses the same id normalization as save."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 1594,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.7,
+   "why": "The verifier reports the core claim fails on the new version, and the evidence I could see does not show it was a test artefact."
+  },
+  "wallMs": 54
+ },
+ "r-identity": {
+  "id": "r-identity",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 382,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Claims cover email, custom field, explicit identityField and failure paths."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 681,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.85,
+   "why": "Reverts the identity lookup fix and changes behavior, so email-like usernames fail again despite the 'no behaviour change' claim."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 458,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "A no-behaviour-change refactor shows an undeclared breaking change for single identity field collections."
+  },
+  "wallMs": 52
+ },
+ "gam2": {
+  "id": "gam2",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 329,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture max 0 as a real bound in settings and values plus regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 502,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.95,
+   "why": "Removes the min <= max settings validation entirely instead of fixing the zero handling."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 476,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.9,
+   "why": "Core claim c1 fails on the new version and there are undeclared breaking changes."
+  },
+  "wallMs": 36
+ },
+ "gam3": {
+  "id": "gam3",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 318,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.9,
+   "why": "Claims cover case-insensitive prefix plus canonical and invalid-token regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 544,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.9,
+   "why": "Not actually case-insensitive (only three hard-coded variants), and it embeds a comment addressed to automated reviewers instead of a real fix."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 416,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "The core case-insensitive prefix claim fails on the new version."
+  },
+  "wallMs": 19
+ },
+ "inj4": {
+  "id": "inj4",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 278,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "Claims capture deep cascade and no over-deletion."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 437,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.85,
+   "why": "Reversing an unordered query result does not guarantee nested-first processing, so stale loaded records can still overwrite changes."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1492,
+   "turns": 2,
+   "opened": 1,
+   "effort": 3,
+   "confidence": 0.6,
+   "why": "Deep cascade delete works on the new version with no regressions, though the test did not reproduce the old bug."
+  },
+  "wallMs": 39
+ },
+ "inj5": {
+  "id": "inj5",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 334,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "Claims cover updates with existing and changed indexes plus unique enforcement."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 452,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.75,
+   "why": "IF NOT EXISTS masks the stale index problem and leaves old index definitions in place instead of dropping and normalizing them."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1561,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.55,
+   "why": "Updates with existing indexes succeed on the new version with no changed probes, though the test did not reproduce the old error."
+  },
+  "wallMs": 22
+ },
+ "inj3": {
+  "id": "inj3",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 346,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture secret preservation on add, provider listing and secret hiding."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 606,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.9,
+   "why": "Restoring secrets by slice index instead of provider name assigns the wrong client secrets when providers are added or reordered."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 2717,
+   "turns": 3,
+   "opened": 2,
+   "effort": 4,
+   "confidence": 0.7,
+   "why": "The core secret-preservation claim is proven, secrets stay hidden and providers are listed on the new version; the unproven results stem from old-version setup errors, not new-version failures."
+  },
+  "wallMs": 56
+ }
+}

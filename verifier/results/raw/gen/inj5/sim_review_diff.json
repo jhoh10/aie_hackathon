@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 4, "confidence": 0.75, "why": "IF NOT EXISTS masks the stale index problem and leaves old index definitions in place instead of dropping and normalizing them."}

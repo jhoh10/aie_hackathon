@@ -1,0 +1,263 @@
+{
+ "scenarios": [
+  {
+   "id": "index-wrong-table-normalized",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "jxone",
+      "type": "base",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX `idx_jxone_title` ON `wrongtable` (`title`)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX `idx_jxone_title` ON `jxone` (`title`)"
+      }
+     }
+    },
+    {
+     "id": "update-col",
+     "method": "PATCH",
+     "path": "/api/collections/jxone",
+     "as": "superuser",
+     "json": {
+      "listRule": ""
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "listRule": ""
+      },
+      "paths": {
+       "indexes.0": "CREATE INDEX `idx_jxone_title` ON `jxone` (`title`)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    },
+    {
+     "id": "update-col-again",
+     "method": "PATCH",
+     "path": "/api/collections/jxone",
+     "as": "superuser",
+     "json": {
+      "viewRule": ""
+     },
+     "expect": {
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "id": "index-empty-table-normalized",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "jxtwo",
+      "type": "base",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX `idx_jxtwo_title` ON `` (`title`)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE UNIQUE INDEX `idx_jxtwo_title` ON `jxtwo` (`title`)"
+      }
+     }
+    },
+    {
+     "id": "update-col",
+     "method": "PATCH",
+     "path": "/api/collections/jxtwo",
+     "as": "superuser",
+     "json": {
+      "createRule": ""
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "unique-enforced-1",
+     "method": "POST",
+     "path": "/api/collections/jxtwo/records",
+     "as": "anon",
+     "json": {
+      "title": "dup"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "unique-enforced-2",
+     "method": "POST",
+     "path": "/api/collections/jxtwo/records",
+     "as": "anon",
+     "json": {
+      "title": "dup"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "index-rename-collection",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "jxthree",
+      "type": "base",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX `idx_jxthree_title` ON `jxthree` (`title`)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rename-col",
+     "method": "PATCH",
+     "path": "/api/collections/jxthree",
+     "as": "superuser",
+     "json": {
+      "name": "jxthreerenamed"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX `idx_jxthree_title` ON `jxthreerenamed` (`title`)"
+      }
+     }
+    },
+    {
+     "id": "update-after-rename",
+     "method": "PATCH",
+     "path": "/api/collections/jxthreerenamed",
+     "as": "superuser",
+     "json": {
+      "listRule": ""
+     },
+     "expect": {
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "id": "index-definition-change-applied",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "jxfour",
+      "type": "base",
+      "createRule": "",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX `idx_jxfour_title` ON `` (`title`)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "make-unique",
+     "method": "PATCH",
+     "path": "/api/collections/jxfour",
+     "as": "superuser",
+     "json": {
+      "indexes": [
+       "CREATE UNIQUE INDEX `idx_jxfour_title` ON `jxfour` (`title`)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-1",
+     "method": "POST",
+     "path": "/api/collections/jxfour/records",
+     "as": "anon",
+     "json": {
+      "title": "same"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-2-dup",
+     "method": "POST",
+     "path": "/api/collections/jxfour/records",
+     "as": "anon",
+     "json": {
+      "title": "same"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  }
+ ]
+}

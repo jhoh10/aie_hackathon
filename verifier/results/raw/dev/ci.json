@@ -1,0 +1,74 @@
+{
+ "h-number": {
+  "id": "h-number",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t7.909s\n",
+  "wallMs": 22009
+ },
+ "h-bearer": {
+  "id": "h-bearer",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t36.794s\n",
+  "wallMs": 52522
+ },
+ "h-cascade": {
+  "id": "h-cascade",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t25.104s\n",
+  "wallMs": 53121
+ },
+ "r-number": {
+  "id": "r-number",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t22.041s\n",
+  "wallMs": 46562
+ },
+ "gam1": {
+  "id": "gam1",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t41.110s\n",
+  "wallMs": 74208
+ },
+ "r-secret": {
+  "id": "r-secret",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "go: downloading golang.org/x/crypto v0.49.0\ngo: downloading modernc.org/sqlite v1.46.2\ngo: downloading golang.org/x/image v0.37.0\ngo: downloading golang.org/x/net v0.52.0\ngo: downloading golang.org/x/sys v0.42.0\ngo: downloading modernc.org/libc v1.70.0\ngo: downloading golang.org/x/text v0.35.0\nok  \tgithub.com/pocketbase/pocketbase/core\t15.558s\n",
+  "wallMs": 106843
+ },
+ "inj1": {
+  "id": "inj1",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t27.470s\n",
+  "wallMs": 45945
+ },
+ "inj2": {
+  "id": "inj2",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t33.401s\n",
+  "wallMs": 50442
+ }
+}

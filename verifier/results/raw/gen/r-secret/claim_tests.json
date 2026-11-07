@@ -1,0 +1,409 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "journals",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "@request.auth.id != \"\"",
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
+      "fields": [
+       {
+        "name": "heading",
+        "type": "text",
+        "max": 120
+       },
+       {
+        "name": "mood",
+        "type": "number",
+        "min": 1,
+        "max": 5,
+        "onlyInt": true
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_journals_heading ON journals (heading)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "journals",
+       "type": "base",
+       "listRule": "",
+       "viewRule": "@request.auth.id != \"\"",
+       "createRule": null,
+       "deleteRule": null,
+       "fields.1.name": "heading",
+       "fields.1.type": "text",
+       "fields.1.max": 120,
+       "fields.2.name": "mood",
+       "fields.2.onlyInt": true,
+       "fields.2.max": 5,
+       "indexes.0": "CREATE INDEX idx_journals_heading ON journals (heading)"
+      }
+     },
+     "save": {
+      "jid": "id"
+     }
+    },
+    {
+     "id": "s1b",
+     "method": "GET",
+     "path": "/api/collections/{{jid}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "journals",
+       "type": "base",
+       "listRule": "",
+       "updateRule": null,
+       "fields.2.min": 1,
+       "indexes.0": "CREATE INDEX idx_journals_heading ON journals (heading)"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "recipes",
+      "type": "base",
+      "listRule": null,
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "dish",
+        "type": "text",
+        "required": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2b",
+     "method": "GET",
+     "path": "/api/collections?filter=name%3D%22recipes%22",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.name": "recipes",
+       "items.0.type": "base",
+       "items.0.listRule": null,
+       "items.0.viewRule": "",
+       "items.0.fields.1.name": "dish",
+       "items.0.fields.1.required": true
+      }
+     }
+    },
+    {
+     "id": "s2c",
+     "method": "PATCH",
+     "path": "/api/collections/recipes",
+     "as": "superuser",
+     "json": {
+      "listRule": "dish != \"\""
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "recipes",
+       "listRule": "dish != \"\"",
+       "viewRule": "",
+       "fields.1.name": "dish"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "clients",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "company",
+        "type": "text"
+       }
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "cl-goog-3381",
+         "clientSecret": "cl-goog-hidden-77"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "type": "auth",
+       "passwordAuth.enabled": true,
+       "passwordAuth.identityFields.0": "email",
+       "oauth2.enabled": true,
+       "oauth2.providers.0.name": "google",
+       "oauth2.providers.0.clientId": "cl-goog-3381"
+      },
+      "absent": [
+       "oauth2.providers.0.clientSecret"
+      ]
+     }
+    },
+    {
+     "id": "s3b",
+     "method": "GET",
+     "path": "/api/collections/clients",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.clientId": "cl-goog-3381",
+       "passwordAuth.enabled": true
+      },
+      "absent": [
+       "oauth2.providers.0.clientSecret"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4a",
+     "method": "GET",
+     "path": "/api/collections/users",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "users",
+       "type": "auth",
+       "passwordAuth.enabled": true
+      }
+     }
+    },
+    {
+     "id": "s4b",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "partners",
+      "type": "auth",
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "github",
+         "clientId": "pt-gh-1",
+         "clientSecret": "pt-gh-s"
+        },
+        {
+         "name": "gitlab",
+         "clientId": "pt-gl-2",
+         "clientSecret": "pt-gl-s"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4c",
+     "method": "GET",
+     "path": "/api/collections?filter=name%3D%22partners%22",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "items.0.oauth2.providers.0.name": "github",
+       "items.0.oauth2.providers.1.clientId": "pt-gl-2"
+      },
+      "absent": [
+       "items.0.oauth2.providers.0.clientSecret",
+       "items.0.oauth2.providers.1.clientSecret"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "orders",
+      "type": "base",
+      "fields": [
+       {
+        "name": "total",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5b",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "big_orders",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT id, total FROM orders WHERE total > 100"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "type": "view",
+       "viewQuery": "SELECT id, total FROM orders WHERE total > 100",
+       "createRule": null
+      },
+      "absent": [
+       "passwordAuth",
+       "oauth2"
+      ]
+     }
+    },
+    {
+     "id": "s5c",
+     "method": "GET",
+     "path": "/api/collections/big_orders",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "big_orders",
+       "viewQuery": "SELECT id, total FROM orders WHERE total > 100"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "notes",
+      "type": "base",
+      "fields": [
+       {
+        "name": "body",
+        "type": "editor"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "type": "base",
+       "fields.1.type": "editor"
+      },
+      "absent": [
+       "viewQuery",
+       "passwordAuth",
+       "oauth2",
+       "authRule"
+      ]
+     }
+    },
+    {
+     "id": "s6b",
+     "method": "GET",
+     "path": "/api/collections/notes",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "notes"
+      },
+      "absent": [
+       "viewQuery",
+       "passwordAuth",
+       "oauth2"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

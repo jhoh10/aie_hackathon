@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 4, "confidence": 0.85, "why": "Removing the zero early return makes optional number fields with value 0 fail min/max checks, which is a behavior regression."}

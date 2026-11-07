@@ -1,0 +1,1 @@
+{"decision":"block","effort":2,"confidence":0.85,"why":"A no-behaviour-change refactor shows an undeclared breaking change for single identity field collections."}

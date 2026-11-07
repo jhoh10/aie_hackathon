@@ -1,0 +1,209 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Fixed `number` settings validator to not ignore 0 `max` value.
+Your diff:
+diff --git a/core/field_number.go b/core/field_number.go
+index 7f4855cb..28ba7e05 100644
+--- a/core/field_number.go
++++ b/core/field_number.go
+@@ -2,7 +2,6 @@ package core
+ 
+ import (
+ 	"context"
+-	"fmt"
+ 	"math"
+ 
+ 	validation "github.com/go-ozzo/ozzo-validation/v4"
+@@ -23,6 +22,12 @@ var (
+ 	_ SetterFinder = (*NumberField)(nil)
+ )
+ 
++var (
++	onlyIntValidationError   = validation.NewError("validation_only_int_constraint", "Decimal numbers are not allowed")
++	minNumberValidationError = validation.NewError("validation_min_number_constraint", "Must be greater or equal than {{.min}}")
++	maxNumberValidationError = validation.NewError("validation_max_number_constraint", "Must be less or equal than {{.max}}")
++)
++
+ // NumberField defines "number" type field for storing numeric (float64) value.
+ //
+ // The respective zero record field value is 0.
+@@ -151,15 +156,15 @@ func (f *NumberField) ValidateValue(ctx context.Context, app App, record *Record
+ 	}
+ 
+ 	if f.OnlyInt && val != float64(int64(val)) {
+-		return validation.NewError("validation_only_int_constraint", "Decimal numbers are not allowed")
++		return onlyIntValidationError
+ 	}
+ 
+ 	if f.Min != nil && val < *f.Min {
+-		return validation.NewError("validation_min_number_constraint", fmt.Sprintf("Must be larger than %f", *f.Min))
++		return minNumberValidationError.SetParams(map[string]any{"min": *f.Min})
+ 	}
+ 
+ 	if f.Max != nil && val > *f.Max {
+-		return validation.NewError("validation_max_number_constraint", fmt.Sprintf("Must be less than %f", *f.Max))
++		return maxNumberValidationError.SetParams(map[string]any{"max": *f.Max})
+ 	}
+ 
+ 	return nil
+@@ -171,7 +176,14 @@ func (f *NumberField) ValidateSettings(ctx context.Context, app App, collection
+ 		validation.By(f.checkOnlyInt),
+ 	}
+ 	if f.Min != nil && f.Max != nil {
+-		maxRules = append(maxRules, validation.Min(*f.Min))
++		maxRules = append(maxRules, validation.By(func(value interface{}) error {
++			// similar to validation.Min but doesn't ignore zero values
++			v, _ := value.(*float64)
++			if v == nil || f.Min == nil || *v >= *f.Min {
++				return nil
++			}
++			return minNumberValidationError.SetParams(map[string]any{"min": *f.Min})
++		}))
+ 	}
+ 
+ 	return validation.ValidateStruct(f,
+@@ -190,7 +202,7 @@ func (f *NumberField) checkOnlyInt(value any) error {
+ 	}
+ 
+ 	if *v != float64(int64(*v)) {
+-		return validation.NewError("validation_only_int_constraint", "Decimal numbers are not allowed.")
++		return onlyIntValidationError
+ 	}
+ 
+ 	return nil
+diff --git a/core/field_number_test.go b/core/field_number_test.go
+index eae6fb4d..79e2f122 100644
+--- a/core/field_number_test.go
++++ b/core/field_number_test.go
+@@ -237,7 +237,7 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			[]string{},
+ 		},
+ 		{
+-			"decumal min",
++			"decimal min",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:   "test",
+@@ -248,7 +248,7 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			[]string{},
+ 		},
+ 		{
+-			"decumal min (onlyInt)",
++			"decimal min (onlyInt)",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:      "test",
+@@ -272,7 +272,7 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			[]string{},
+ 		},
+ 		{
+-			"decumal max",
++			"decimal max",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:   "test",
+@@ -283,7 +283,7 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			[]string{},
+ 		},
+ 		{
+-			"decumal max (onlyInt)",
++			"decimal max (onlyInt)",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:      "test",
+@@ -307,19 +307,31 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			[]string{},
+ 		},
+ 		{
+-			"min > max",
++			"min > max (0)",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:   "test",
+ 					Name: "test",
+ 					Min:  types.Pointer(2.0),
+-					Max:  types.Pointer(1.0),
++					Max:  types.Pointer(0.0),
+ 				}
+ 			},
+ 			[]string{"max"},
+ 		},
+ 		{
+-			"min <= max",
++			"min (0) > max",
++			func() *core.NumberField {
++				return &core.NumberField{
++					Id:   "test",
++					Name: "test",
++					Min:  types.Pointer(0.0),
++					Max:  types.Pointer(-1.0),
++				}
++			},
++			[]string{"max"},
++		},
++		{
++			"min == max",
+ 			func() *core.NumberField {
+ 				return &core.NumberField{
+ 					Id:   "test",
+@@ -330,6 +342,18 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			},
+ 			[]string{},
+ 		},
++		{
++			"min < max",
++			func() *core.NumberField {
++				return &core.NumberField{
++					Id:   "test",
++					Name: "test",
++					Min:  types.Pointer(2.0),
++					Max:  types.Pointer(3.0),
++				}
++			},
++			[]string{},
++		},
+ 	}
+ 
+ 	for _, s := range scenarios {
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

@@ -1,0 +1,39 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"refunds","type":"base","fields":[{"name":"credit","type":"number","min":1,"max":0}]},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s1b","method":"GET","path":"/api/collections?filter=name%3D%22refunds%22","as":"superuser","expect":{"status":200,"paths":{"totalItems":0}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"calibrations","type":"base","fields":[{"name":"label","type":"text"},{"name":"drift","type":"number","min":0.01,"max":0,"onlyInt":false}]},"expect":{"status":400,"json":{"status":400}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"tallies","type":"base","fields":[{"name":"hits","type":"number","min":250,"max":0,"onlyInt":true}]},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s3b","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"tallies","type":"base","fields":[{"name":"hits","type":"number","min":0,"max":250,"onlyInt":true}]},"expect":{"status":200,"paths":{"name":"tallies"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"losses","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"memo","type":"text"},{"name":"delta","type":"number","min":-1000,"max":0}]},"expect":{"status":200}},
+ {"id":"s4b","method":"POST","path":"/api/collections/losses/records","as":"superuser","json":{"memo":"returned crate","delta":42},"expect":{"status":400,"json":{"data":{"delta":{}}}}},
+ {"id":"s4c","method":"POST","path":"/api/collections/losses/records","as":"anon","json":{"memo":"spoiled stock","delta":0.001},"expect":{"status":400,"json":{"data":{"delta":{}}}}},
+ {"id":"s4d","method":"GET","path":"/api/collections/losses/records","as":"superuser","expect":{"status":200,"paths":{"totalItems":0}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5a","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"descents","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"stage","type":"text"},{"name":"elevation","type":"number","max":0}]},"expect":{"status":200}},
+ {"id":"s5b","setup":true,"method":"POST","path":"/api/collections/descents/records","as":"superuser","json":{"stage":"valley floor","elevation":-86},"expect":{"status":200},"save":{"did":"id"}},
+ {"id":"s5c","method":"PATCH","path":"/api/collections/descents/records/{{did}}","as":"superuser","json":{"elevation":1200},"expect":{"status":400,"json":{"data":{"elevation":{}}}}},
+ {"id":"s5d","method":"GET","path":"/api/collections/descents/records/{{did}}","as":"superuser","expect":{"status":200,"paths":{"elevation":-86,"stage":"valley floor"}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"freezers","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"unit","type":"text"},{"name":"temp","type":"number","min":-30,"max":0}]},"expect":{"status":200,"paths":{"name":"freezers"}}},
+ {"id":"s6b","method":"POST","path":"/api/collections/freezers/records","as":"superuser","json":{"unit":"walk-in","temp":-18},"expect":{"status":200,"paths":{"temp":-18}}},
+ {"id":"s6c","method":"POST","path":"/api/collections/freezers/records","as":"superuser","json":{"unit":"chest","temp":-30},"expect":{"status":200,"paths":{"temp":-30}}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"populations","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"city","type":"text"},{"name":"residents","type":"number"}]},"expect":{"status":200,"paths":{"name":"populations"}}},
+ {"id":"s7b","method":"POST","path":"/api/collections/populations/records","as":"superuser","json":{"city":"Tbilisi","residents":1202731},"expect":{"status":200,"paths":{"residents":1202731}}},
+ {"id":"s7c","method":"POST","path":"/api/collections/populations/records","as":"superuser","json":{"city":"Lagos","residents":15388000},"expect":{"status":200,"paths":{"residents":15388000}}}
+]},
+{"id":"s8","claim":"c3","kind":"claim","steps":[
+ {"id":"s8a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"scores","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"player","type":"text"},{"name":"points","type":"number","min":10}]},"expect":{"status":200}},
+ {"id":"s8b","method":"POST","path":"/api/collections/scores/records","as":"superuser","json":{"player":"Odile","points":99999},"expect":{"status":200,"paths":{"points":99999}}}
+]}
+]}

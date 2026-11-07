@@ -1,0 +1,5 @@
+{"verdict":"approve","comments":[
+{"file":"core/collection_model_auth_options.go","text":"The approach is sound: providers are merged per name on top of the previously stored config, so partially submitted providers (secrets are hidden in API responses and therefore never echoed back by clients) keep their clientSecret, while new providers and explicitly submitted keys (including null/\"\") still override. Cloning the original providers before the alias unmarshal is important since json/v2 may reuse the slice backing array; good. Removing a provider from the submitted list still removes it."},
+{"file":"core/collection_model_auth_options.go","text":"Nits: typos in comments (standrad, parially, reassigne, unmarshalized). The length-mismatch error is effectively unreachable but fine as a guard. If duplicate provider names are submitted, both merge onto the same original; validation should already reject duplicates. Unmarshalling the bytes twice is a negligible cost for collection updates."},
+{"file":"apis/collection_test.go","text":"Good end-to-end regression test that google keeps its clientId after being resubmitted without secret."}
+]}

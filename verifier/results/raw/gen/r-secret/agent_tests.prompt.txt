@@ -1,0 +1,135 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Simplify collection model serialization. No behaviour change intended.
+Your diff:
+diff --git a/core/collection_model.go b/core/collection_model.go
+index aeb0551e..bf068243 100644
+--- a/core/collection_model.go
++++ b/core/collection_model.go
+@@ -559,26 +559,19 @@ func (m Collection) MarshalJSON() ([]byte, error) {
+ 			collectionAuthOptions
+ 		}{m.baseCollection, m.collectionAuthOptions}
+ 
+-		// @todo to avoid the below changes consider omitting the field values from the individual structs json tags
+-		//
++		// ensure that it is always returned as array
++		if alias.OAuth2.Providers == nil {
++			alias.OAuth2.Providers = []OAuth2ProviderConfig{}
++		}
++
+ 		// hide secret keys from the serialization
+ 		alias.AuthToken.Secret = ""
+ 		alias.FileToken.Secret = ""
+ 		alias.PasswordResetToken.Secret = ""
+ 		alias.EmailChangeToken.Secret = ""
+ 		alias.VerificationToken.Secret = ""
+-
+-		if alias.OAuth2.Providers == nil {
+-			// ensure that it is always returned as array
+-			alias.OAuth2.Providers = []OAuth2ProviderConfig{}
+-		} else {
+-			// create a deep copy of the slice to avoid modifying the cached model state
+-			redactedProviders := make([]OAuth2ProviderConfig, len(alias.OAuth2.Providers))
+-			copy(redactedProviders, alias.OAuth2.Providers)
+-			for i := range redactedProviders {
+-				redactedProviders[i].ClientSecret = ""
+-			}
+-			alias.OAuth2.Providers = redactedProviders
++		for i := range alias.OAuth2.Providers {
++			alias.OAuth2.Providers[i].ClientSecret = ""
+ 		}
+ 
+ 		return json.Marshal(alias)
+diff --git a/core/collection_model_test.go b/core/collection_model_test.go
+index f8fca426..ba0abf88 100644
+--- a/core/collection_model_test.go
++++ b/core/collection_model_test.go
+@@ -760,46 +760,6 @@ func TestCollectionSerialize(t *testing.T) {
+ 	}
+ }
+ 
+-func TestCollectionSerializeNotModifyingCache(t *testing.T) {
+-	t.Parallel()
+-
+-	app, _ := tests.NewTestApp()
+-	defer app.Cleanup()
+-
+-	c, err := app.FindCachedCollectionByNameOrId("users")
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-
+-	_, err = json.Marshal(c)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-
+-	redactedFields := map[string]string{
+-		"AuthToken.Secret":          c.AuthToken.Secret,
+-		"FileToken.Secret":          c.FileToken.Secret,
+-		"PasswordResetToken.Secret": c.PasswordResetToken.Secret,
+-		"EmailChangeToken.Secret":   c.EmailChangeToken.Secret,
+-		"VerificationToken.Secret":  c.VerificationToken.Secret,
+-	}
+-
+-	if len(c.OAuth2.Providers) == 0 {
+-		t.Fatal("Expected at least one users OAuth2 provider, got 0")
+-	}
+-	for _, p := range c.OAuth2.Providers {
+-		redactedFields[p.Name+".ClientSecret"] = p.ClientSecret
+-	}
+-
+-	for k, v := range redactedFields {
+-		t.Run(k, func(t *testing.T) {
+-			if v == "" {
+-				t.Fatalf("Expected the redacted field %q to remain unmodified after serialization, got empty value", k)
+-			}
+-		})
+-	}
+-}
+-
+ func TestCollectionDBExport(t *testing.T) {
+ 	t.Parallel()
+ 
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

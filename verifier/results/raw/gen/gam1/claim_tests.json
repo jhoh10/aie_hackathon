@@ -1,0 +1,42 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"accounts","type":"auth","listRule":"","viewRule":"","fields":[{"name":"login","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_accounts_login ON accounts (login)"],"passwordAuth":{"enabled":true,"identityFields":["email","login"]}},"expect":{"status":200}},
+ {"id":"s1usr","setup":true,"method":"POST","path":"/api/collections/accounts/records","as":"superuser","json":{"email":"henrik.dahl@postnord.se","login":"henrik@dahl.family","password":"Spruce&harbor-604","passwordConfirm":"Spruce&harbor-604"},"expect":{"status":200}},
+ {"id":"s1auth","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"henrik@dahl.family","password":"Spruce&harbor-604"},"expect":{"status":200,"paths":{"record.login":"henrik@dahl.family","record.email":"henrik.dahl@postnord.se","record.collectionName":"accounts"}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"subscribers","type":"auth","fields":[{"name":"alias","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_subscribers_alias ON subscribers (alias)"],"passwordAuth":{"enabled":true,"identityFields":["email","alias"]}},"expect":{"status":200}},
+ {"id":"s2u1","setup":true,"method":"POST","path":"/api/collections/subscribers/records","as":"superuser","json":{"email":"priya.nair@kerala.in","alias":"pn.reader@bookclub.in","password":"Monsoon!tea-117","passwordConfirm":"Monsoon!tea-117"},"expect":{"status":200}},
+ {"id":"s2u2","setup":true,"method":"POST","path":"/api/collections/subscribers/records","as":"superuser","json":{"email":"arjun.menon@kerala.in","alias":"arjunm","password":"Coconut#bay-882","passwordConfirm":"Coconut#bay-882"},"expect":{"status":200}},
+ {"id":"s2auth","method":"POST","path":"/api/collections/subscribers/auth-with-password","as":"anon","json":{"identity":"pn.reader@bookclub.in","password":"Monsoon!tea-117"},"expect":{"status":200,"paths":{"record.email":"priya.nair@kerala.in","record.alias":"pn.reader@bookclub.in"}},"save":{"ptok":"token"}},
+ {"id":"s2me","method":"POST","path":"/api/collections/subscribers/auth-refresh","as":"ptok","expect":{"status":200,"paths":{"record.email":"priya.nair@kerala.in"}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"tenants","type":"auth","fields":[{"name":"uname","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_tenants_uname ON tenants (uname)"],"passwordAuth":{"enabled":true,"identityFields":["uname","email"]}},"expect":{"status":200}},
+ {"id":"s3usr","setup":true,"method":"POST","path":"/api/collections/tenants/records","as":"superuser","json":{"email":"leasing@stonebridge.co.uk","uname":"flat4b@stonebridge.co.uk","password":"Chimney-pot-2290","passwordConfirm":"Chimney-pot-2290"},"expect":{"status":200}},
+ {"id":"s3auth","method":"POST","path":"/api/collections/tenants/auth-with-password","as":"anon","json":{"identity":"flat4b@stonebridge.co.uk","password":"Chimney-pot-2290"},"expect":{"status":200,"paths":{"record.email":"leasing@stonebridge.co.uk"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"accounts","type":"auth","fields":[{"name":"login","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_accounts_login ON accounts (login)"],"passwordAuth":{"enabled":true,"identityFields":["email","login"]}},"expect":{"status":200}},
+ {"id":"s4usr","setup":true,"method":"POST","path":"/api/collections/accounts/records","as":"superuser","json":{"email":"carmen.vidal@sevilla.es","login":"cvidal@flamenco.es","password":"Azahar_patio-55","passwordConfirm":"Azahar_patio-55"},"expect":{"status":200}},
+ {"id":"s4auth","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"carmen.vidal@sevilla.es","password":"Azahar_patio-55"},"expect":{"status":200,"paths":{"record.login":"cvidal@flamenco.es"}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"listeners","type":"auth","fields":[{"name":"nick","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_listeners_nick ON listeners (nick)"],"passwordAuth":{"enabled":true,"identityFields":["email","nick"]}},"expect":{"status":200}},
+ {"id":"s5usr","setup":true,"method":"POST","path":"/api/collections/listeners/records","as":"superuser","json":{"email":"dmitri.volkov@radiowave.ru","nick":"nightowl","password":"Birch*river-713","passwordConfirm":"Birch*river-713"},"expect":{"status":200}},
+ {"id":"s5auth","method":"POST","path":"/api/collections/listeners/auth-with-password","as":"anon","json":{"identity":"dmitri.volkov@radiowave.ru","password":"Birch*river-713"},"expect":{"status":200,"paths":{"record.nick":"nightowl"}}},
+ {"id":"s5auth2","method":"POST","path":"/api/collections/listeners/auth-with-password","as":"anon","json":{"identity":"nightowl","password":"Birch*river-713"},"expect":{"status":200,"paths":{"record.email":"dmitri.volkov@radiowave.ru"}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"accounts","type":"auth","fields":[{"name":"login","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_accounts_login ON accounts (login)"],"passwordAuth":{"enabled":true,"identityFields":["email","login"]}},"expect":{"status":200}},
+ {"id":"s6usr","setup":true,"method":"POST","path":"/api/collections/accounts/records","as":"superuser","json":{"email":"felix.braun@alpenpost.at","login":"felix@braun.at","password":"Edelweiss-peak-37","passwordConfirm":"Edelweiss-peak-37"},"expect":{"status":200}},
+ {"id":"s6bad1","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"felix@braun.at","password":"Edelweiss-peak-38"},"expect":{"status":400}},
+ {"id":"s6bad2","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"felix.braun@alpenpost.at","password":"edelweiss-peak-37"},"expect":{"status":400}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"accounts","type":"auth","fields":[{"name":"login","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_accounts_login ON accounts (login)"],"passwordAuth":{"enabled":true,"identityFields":["email","login"]}},"expect":{"status":200}},
+ {"id":"s7usr","setup":true,"method":"POST","path":"/api/collections/accounts/records","as":"superuser","json":{"email":"ines.costa@lisboa.pt","login":"ines@costa.pt","password":"Azulejo#tile-406","passwordConfirm":"Azulejo#tile-406"},"expect":{"status":200}},
+ {"id":"s7bad","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"ines@costa.com","password":"Azulejo#tile-406"},"expect":{"status":400}},
+ {"id":"s7bad2","method":"POST","path":"/api/collections/accounts/auth-with-password","as":"anon","json":{"identity":"unknown.person@lisboa.pt","password":"Azulejo#tile-406"},"expect":{"status":400}}
+]}
+]}

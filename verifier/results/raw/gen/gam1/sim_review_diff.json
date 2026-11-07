@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 2, "confidence": 0.95, "why": "A substring hack on 'test' and example domains is an arbitrary heuristic that misroutes lookups and does not fix the general case."}

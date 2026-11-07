@@ -1,0 +1,880 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "rooms",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "capacity",
+        "type": "number",
+        "min": 2,
+        "max": 40
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1bad1",
+     "method": "POST",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "json": {
+      "label": "Attic",
+      "capacity": 1
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "capacity": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s1bad2",
+     "method": "POST",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "json": {
+      "label": "Hall",
+      "capacity": 41
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "capacity": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s1ok3",
+     "method": "POST",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "json": {
+      "label": "row3",
+      "capacity": 2
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "capacity": 2
+      }
+     }
+    },
+    {
+     "id": "s1ok4",
+     "method": "POST",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "json": {
+      "label": "row4",
+      "capacity": 40
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "capacity": 40
+      }
+     }
+    },
+    {
+     "id": "s1ok5",
+     "method": "POST",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "json": {
+      "label": "row5",
+      "capacity": 17
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "capacity": 17
+      }
+     }
+    },
+    {
+     "id": "s1cnt",
+     "method": "GET",
+     "path": "/api/collections/rooms/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 3
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "sensors",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "reading",
+        "type": "number",
+        "min": -12.5,
+        "max": 3.75
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2bad6",
+     "method": "POST",
+     "path": "/api/collections/sensors/records",
+     "as": "superuser",
+     "json": {
+      "label": "north",
+      "reading": -12.6
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "reading": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s2bad7",
+     "method": "POST",
+     "path": "/api/collections/sensors/records",
+     "as": "superuser",
+     "json": {
+      "label": "south",
+      "reading": 3.76
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "reading": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s2ok8",
+     "method": "POST",
+     "path": "/api/collections/sensors/records",
+     "as": "superuser",
+     "json": {
+      "label": "row8",
+      "reading": -12.5
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "reading": -12.5
+      }
+     }
+    },
+    {
+     "id": "s2ok9",
+     "method": "POST",
+     "path": "/api/collections/sensors/records",
+     "as": "superuser",
+     "json": {
+      "label": "row9",
+      "reading": 3.75
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "reading": 3.75
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "bids",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "amount",
+        "type": "number",
+        "min": 100
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3seed",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/bids/records",
+     "as": "superuser",
+     "json": {
+      "label": "opening",
+      "amount": 150
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "bid": "id"
+     }
+    },
+    {
+     "id": "s3up",
+     "method": "PATCH",
+     "path": "/api/collections/bids/records/{{bid}}",
+     "as": "superuser",
+     "json": {
+      "amount": 99
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "amount": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s3get",
+     "method": "GET",
+     "path": "/api/collections/bids/records/{{bid}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "amount": 150
+      }
+     }
+    },
+    {
+     "id": "s3ok10",
+     "method": "POST",
+     "path": "/api/collections/bids/records",
+     "as": "superuser",
+     "json": {
+      "label": "row10",
+      "amount": 987654
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "amount": 987654
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "pallets",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "boxes",
+        "type": "number",
+        "onlyInt": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4bad11",
+     "method": "POST",
+     "path": "/api/collections/pallets/records",
+     "as": "superuser",
+     "json": {
+      "label": "dock A",
+      "boxes": 3.5
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "boxes": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s4bad12",
+     "method": "POST",
+     "path": "/api/collections/pallets/records",
+     "as": "superuser",
+     "json": {
+      "label": "dock B",
+      "boxes": -0.1
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "boxes": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s4ok13",
+     "method": "POST",
+     "path": "/api/collections/pallets/records",
+     "as": "superuser",
+     "json": {
+      "label": "row13",
+      "boxes": 12
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "boxes": 12
+      }
+     }
+    },
+    {
+     "id": "s4ok14",
+     "method": "POST",
+     "path": "/api/collections/pallets/records",
+     "as": "superuser",
+     "json": {
+      "label": "row14",
+      "boxes": -4
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "boxes": -4
+      }
+     }
+    },
+    {
+     "id": "s4cnt",
+     "method": "GET",
+     "path": "/api/collections/pallets/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "seats",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "row",
+        "type": "number",
+        "onlyInt": true,
+        "min": 1,
+        "max": 30
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5bad15",
+     "method": "POST",
+     "path": "/api/collections/seats/records",
+     "as": "superuser",
+     "json": {
+      "label": "aisle",
+      "row": 29.99
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "row": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s5ok16",
+     "method": "POST",
+     "path": "/api/collections/seats/records",
+     "as": "superuser",
+     "json": {
+      "label": "row16",
+      "row": 30
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "row": 30
+      }
+     }
+    },
+    {
+     "id": "s5bad17",
+     "method": "POST",
+     "path": "/api/collections/seats/records",
+     "as": "superuser",
+     "json": {
+      "label": "rear",
+      "row": 31
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "row": {}
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "donations",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "sum",
+        "type": "number",
+        "required": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6bad18",
+     "method": "POST",
+     "path": "/api/collections/donations/records",
+     "as": "superuser",
+     "json": {
+      "label": "anon"
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "sum": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s6bad19",
+     "method": "POST",
+     "path": "/api/collections/donations/records",
+     "as": "superuser",
+     "json": {
+      "label": "zero",
+      "sum": 0
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "sum": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s6ok20",
+     "method": "POST",
+     "path": "/api/collections/donations/records",
+     "as": "superuser",
+     "json": {
+      "label": "row20",
+      "sum": 25
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "sum": 25
+      }
+     }
+    },
+    {
+     "id": "s6ok21",
+     "method": "POST",
+     "path": "/api/collections/donations/records",
+     "as": "superuser",
+     "json": {
+      "label": "row21",
+      "sum": -3
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "sum": -3
+      }
+     }
+    },
+    {
+     "id": "s6cnt",
+     "method": "GET",
+     "path": "/api/collections/donations/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "laps",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "seconds",
+        "type": "number",
+        "required": true,
+        "min": -5,
+        "max": 5
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7bad22",
+     "method": "POST",
+     "path": "/api/collections/laps/records",
+     "as": "superuser",
+     "json": {
+      "label": "none",
+      "seconds": 0
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "seconds": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s7ok23",
+     "method": "POST",
+     "path": "/api/collections/laps/records",
+     "as": "superuser",
+     "json": {
+      "label": "row23",
+      "seconds": 0.5
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "seconds": 0.5
+      }
+     }
+    },
+    {
+     "id": "s7bad24",
+     "method": "POST",
+     "path": "/api/collections/laps/records",
+     "as": "superuser",
+     "json": {
+      "label": "over",
+      "seconds": 6
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "seconds": {}
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "grades",
+      "type": "base",
+      "fields": [
+       {
+        "name": "mark",
+        "type": "number",
+        "min": 10,
+        "max": 3
+       }
+      ]
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s8b",
+     "method": "GET",
+     "path": "/api/collections/grades",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s8c",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "grades",
+      "type": "base",
+      "fields": [
+       {
+        "name": "mark",
+        "type": "number",
+        "min": 3,
+        "max": 10
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "grades",
+       "fields.1.name": "mark",
+       "fields.1.min": 3,
+       "fields.1.max": 10
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s9a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "altitudes",
+      "type": "base",
+      "fields": [
+       {
+        "name": "meters",
+        "type": "number",
+        "min": -20.5,
+        "max": -30
+       }
+      ]
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s9b",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "depths",
+      "type": "base",
+      "fields": [
+       {
+        "name": "meters",
+        "type": "number",
+        "min": 7,
+        "max": 7
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "depths"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

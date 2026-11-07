@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 3, "confidence": 0.9, "why": "Not a no-op refactor: it brings back validation.Min, which skips zero and so ignores max: 0 again, and it changes the error messages."}

@@ -1,0 +1,203 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_fresh_settings",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "get_settings",
+          "method": "GET",
+          "path": "/api/settings",
+          "as": "superuser"
+        },
+        {
+          "id": "get_smtp_only",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p2_set_password_then_read",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "patch",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "smtp": {
+              "enabled": true,
+              "host": "mail.probe.io",
+              "port": 587,
+              "username": "u1",
+              "password": "p1secret"
+            }
+          }
+        },
+        {
+          "id": "get_settings",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp",
+          "as": "superuser"
+        },
+        {
+          "id": "get_full",
+          "method": "GET",
+          "path": "/api/settings",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p3_disabled_smtp_and_empty_password",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "patch_disabled",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "smtp": {
+              "enabled": false,
+              "host": "",
+              "port": 25,
+              "username": "",
+              "password": ""
+            }
+          }
+        },
+        {
+          "id": "get_settings",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp",
+          "as": "superuser"
+        },
+        {
+          "id": "patch_other",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "meta": {
+              "appName": "probeapp"
+            }
+          }
+        },
+        {
+          "id": "get_after_meta",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp,meta.appName",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p4_validation_and_permissions",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "invalid_smtp",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "smtp": {
+              "enabled": true,
+              "host": "",
+              "port": 0,
+              "password": "p"
+            }
+          }
+        },
+        {
+          "id": "anon_get",
+          "method": "GET",
+          "path": "/api/settings",
+          "as": "anon"
+        },
+        {
+          "id": "anon_patch",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "anon",
+          "json": {
+            "smtp": {
+              "password": "x"
+            }
+          }
+        },
+        {
+          "id": "test_email",
+          "method": "POST",
+          "path": "/api/settings/test/email",
+          "as": "superuser",
+          "json": {
+            "template": "verification",
+            "email": "to@probe.io"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p5_s3_and_smtp_secrets",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "patch",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "smtp": {
+              "enabled": true,
+              "host": "h",
+              "port": 25,
+              "username": "u",
+              "password": "p"
+            },
+            "s3": {
+              "enabled": false,
+              "bucket": "b",
+              "region": "r",
+              "endpoint": "e",
+              "accessKey": "ak",
+              "secret": "sk"
+            }
+          }
+        },
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp,s3",
+          "as": "superuser"
+        },
+        {
+          "id": "patch_keep",
+          "method": "PATCH",
+          "path": "/api/settings",
+          "as": "superuser",
+          "json": {
+            "smtp": {
+              "host": "h2"
+            }
+          }
+        },
+        {
+          "id": "get_after",
+          "method": "GET",
+          "path": "/api/settings?fields=smtp",
+          "as": "superuser"
+        }
+      ]
+    }
+  ]
+}

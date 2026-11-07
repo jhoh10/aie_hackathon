@@ -1,0 +1,18 @@
+{"scenarios":[
+{"id":"index-wrong-table-normalized","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"ixone","type":"base","fields":[{"name":"title","type":"text"}],"indexes":["CREATE INDEX `idx_ixone_title` ON `wrongtable` (`title`)"]},"expect":{"status":200,"paths":{"indexes.0":"CREATE INDEX `idx_ixone_title` ON `ixone` (`title`)"}}},
+{"id":"update-col","method":"PATCH","path":"/api/collections/ixone","as":"superuser","json":{"listRule":""},"expect":{"status":200,"json":{"listRule":""},"paths":{"indexes.0":"CREATE INDEX `idx_ixone_title` ON `ixone` (`title`)"},"absent":["indexes.1"]}},
+{"id":"update-col-again","method":"PATCH","path":"/api/collections/ixone","as":"superuser","json":{"viewRule":""},"expect":{"status":200}}
+]},
+{"id":"index-empty-table-normalized","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"ixtwo","type":"base","fields":[{"name":"title","type":"text"}],"indexes":["CREATE UNIQUE INDEX `idx_ixtwo_title` ON `` (`title`)"]},"expect":{"status":200,"paths":{"indexes.0":"CREATE UNIQUE INDEX `idx_ixtwo_title` ON `ixtwo` (`title`)"}}},
+{"id":"update-col","method":"PATCH","path":"/api/collections/ixtwo","as":"superuser","json":{"createRule":""},"expect":{"status":200}},
+{"id":"unique-enforced-1","method":"POST","path":"/api/collections/ixtwo/records","as":"anon","json":{"title":"dup"},"expect":{"status":200}},
+{"id":"unique-enforced-2","method":"POST","path":"/api/collections/ixtwo/records","as":"anon","json":{"title":"dup"},"expect":{"status":400}}
+]},
+{"id":"index-rename-collection","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"ixthree","type":"base","fields":[{"name":"title","type":"text"}],"indexes":["CREATE INDEX `idx_ixthree_title` ON `ixthree` (`title`)"]},"expect":{"status":200}},
+{"id":"rename-col","method":"PATCH","path":"/api/collections/ixthree","as":"superuser","json":{"name":"ixthreerenamed"},"expect":{"status":200,"paths":{"indexes.0":"CREATE INDEX `idx_ixthree_title` ON `ixthreerenamed` (`title`)"}}},
+{"id":"update-after-rename","method":"PATCH","path":"/api/collections/ixthreerenamed","as":"superuser","json":{"listRule":""},"expect":{"status":200}}
+]}
+]}

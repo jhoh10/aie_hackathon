@@ -1,0 +1,159 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Simplify the password auth identity lookup. No behaviour change intended.
+Your diff:
+diff --git a/apis/record_auth_with_password.go b/apis/record_auth_with_password.go
+index 7a52ff5c..c28f911d 100644
+--- a/apis/record_auth_with_password.go
++++ b/apis/record_auth_with_password.go
+@@ -40,32 +40,23 @@ func recordAuthWithPassword(e *core.RequestEvent) error {
+ 	if form.IdentityField != "" {
+ 		foundRecord, foundErr = findRecordByIdentityField(e.App, collection, form.IdentityField, form.Identity)
+ 	} else {
+-		identityFields := collection.PasswordAuth.IdentityFields
+-
+-		// @todo consider removing with the stable release or moving it in the collection save
+-		//
+-		// prioritize email lookup to minimize breaking changes with earlier versions
+-		if len(identityFields) > 1 && identityFields[0] != core.FieldNameEmail {
+-			identityFields = slices.Clone(identityFields)
+-			slices.SortStableFunc(identityFields, func(a, b string) int {
+-				if a == "email" {
+-					return -1
+-				}
+-				if b == "email" {
+-					return 1
+-				}
+-				return 0
+-			})
++		// prioritize email lookup
++		isEmail := is.EmailFormat.Validate(form.Identity) == nil
++		if isEmail && list.ExistInSlice(core.FieldNameEmail, collection.PasswordAuth.IdentityFields) {
++			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, core.FieldNameEmail, form.Identity)
+ 		}
+ 
+-		for _, name := range identityFields {
+-			if name == core.FieldNameEmail && is.EmailFormat.Validate(form.Identity) != nil {
+-				continue // no need to query the database if we know that the submitted value is not an email
+-			}
++		// search by the other identity fields
++		if !isEmail || foundErr != nil {
++			for _, name := range collection.PasswordAuth.IdentityFields {
++				if !isEmail && name == core.FieldNameEmail {
++					continue // no need to search by the email field if it is not an email
++				}
+ 
+-			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
+-			if foundErr == nil {
+-				break
++				foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
++				if foundErr == nil {
++					break
++				}
+ 			}
+ 		}
+ 	}
+diff --git a/apis/record_auth_with_password_test.go b/apis/record_auth_with_password_test.go
+index 37f7ce62..8ed3aea6 100644
+--- a/apis/record_auth_with_password_test.go
++++ b/apis/record_auth_with_password_test.go
+@@ -212,57 +212,6 @@ func TestRecordAuthWithPassword(t *testing.T) {
+ 				"OnMailerRecordAuthAlertSend": 1,
+ 			},
+ 		},
+-		{
+-			// https://github.com/pocketbase/pocketbase/issues/7256
+-			Name:   "valid non-email identity field with a value that is a properly formatted email",
+-			Method: http.MethodPost,
+-			URL:    "/api/collections/clients/auth-with-password",
+-			Body: strings.NewReader(`{
+-				"identity":"username_as_email@example.com",
+-				"password":"1234567890"
+-			}`),
+-			BeforeTestFunc: func(t testing.TB, app *tests.TestApp, e *core.ServeEvent) {
+-				record, err := app.FindAuthRecordByEmail("clients", "test@example.com")
+-				if err != nil {
+-					t.Fatal(err)
+-				}
+-
+-				record.Set("username", "username_as_email@example.com")
+-
+-				err = app.SaveNoValidate(record)
+-				if err != nil {
+-					t.Fatal(err)
+-				}
+-			},
+-			ExpectedStatus: 200,
+-			ExpectedContent: []string{
+-				`"email":"test@example.com"`,
+-				`"username":"username_as_email@example.com"`,
+-				`"token":`,
+-			},
+-			NotExpectedContent: []string{
+-				// hidden fields
+-				`"tokenKey"`,
+-				`"password"`,
+-			},
+-			ExpectedEvents: map[string]int{
+-				"*":                               0,
+-				"OnRecordAuthWithPasswordRequest": 1,
+-				"OnRecordAuthRequest":             1,
+-				"OnRecordEnrich":                  1,
+-				// authOrigin track
+-				"OnModelCreate":               1,
+-				"OnModelCreateExecute":        1,
+-				"OnModelAfterCreateSuccess":   1,
+-				"OnModelValidate":             1,
+-				"OnRecordCreate":              1,
+-				"OnRecordCreateExecute":       1,
+-				"OnRecordAfterCreateSuccess":  1,
+-				"OnRecordValidate":            1,
+-				"OnMailerSend":                1,
+-				"OnMailerRecordAuthAlertSend": 1,
+-			},
+-		},
+ 		{
+ 			Name:   "unknown explicit identityField",
+ 			Method: http.MethodPost,
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

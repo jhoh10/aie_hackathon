@@ -1,0 +1,494 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_patch_provider_without_secret",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_no_secret",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "get_coll",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        },
+        {
+          "id": "auth_methods",
+          "method": "GET",
+          "path": "/api/collections/members/auth-methods",
+          "as": "anon"
+        }
+      ]
+    },
+    {
+      "id": "p2_reordered_providers",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                },
+                {
+                  "name": "github",
+                  "clientId": "hid",
+                  "clientSecret": "hsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_reorder",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "github",
+                  "clientId": "hid"
+                },
+                {
+                  "name": "google",
+                  "clientId": "gid"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "get_coll",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        },
+        {
+          "id": "auth_methods",
+          "method": "GET",
+          "path": "/api/collections/members/auth-methods",
+          "as": "anon"
+        }
+      ]
+    },
+    {
+      "id": "p3_new_provider_without_secret",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_swap",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "github",
+                  "clientId": "hid"
+                },
+                {
+                  "name": "google",
+                  "clientId": "gid"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "patch_add",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "google"
+                },
+                {
+                  "name": "github",
+                  "clientId": "hid"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "get_coll",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p4_partial_oauth2_updates",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                },
+                {
+                  "name": "github",
+                  "clientId": "hid",
+                  "clientSecret": "hsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "disable_only",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "id": "get_after_disable",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        },
+        {
+          "id": "reenable_with_one",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "github"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "get_after_one",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        },
+        {
+          "id": "clear",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": []
+            }
+          }
+        },
+        {
+          "id": "get_after_clear",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p5_explicit_empty_secret_and_resave",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "get_first",
+          "method": "GET",
+          "path": "/api/collections/members",
+          "as": "superuser"
+        },
+        {
+          "id": "list_all",
+          "method": "GET",
+          "path": "/api/collections?filter=name='members'",
+          "as": "superuser"
+        },
+        {
+          "id": "patch_rule_only",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "listRule": null
+          }
+        },
+        {
+          "id": "patch_empty_secret",
+          "method": "PATCH",
+          "path": "/api/collections/members",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "auth_methods",
+          "method": "GET",
+          "path": "/api/collections/members/auth-methods",
+          "as": "anon"
+        },
+        {
+          "id": "get_coll",
+          "method": "GET",
+          "path": "/api/collections/members?fields=oauth2",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p6_permissions_and_users_collection",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "users_set",
+          "setup": true,
+          "method": "PATCH",
+          "path": "/api/collections/users",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid",
+                  "clientSecret": "gsecret"
+                }
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "anon_patch",
+          "method": "PATCH",
+          "path": "/api/collections/users",
+          "as": "anon",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "evil"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "users_patch_partial",
+          "method": "PATCH",
+          "path": "/api/collections/users",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "google",
+                  "clientId": "gid3",
+                  "displayName": "G"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "users_invalid_name",
+          "method": "PATCH",
+          "path": "/api/collections/users",
+          "as": "superuser",
+          "json": {
+            "oauth2": {
+              "providers": [
+                {
+                  "name": "nosuchprovider"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "users_get",
+          "method": "GET",
+          "path": "/api/collections/users?fields=oauth2",
+          "as": "superuser"
+        },
+        {
+          "id": "users_auth_methods",
+          "method": "GET",
+          "path": "/api/collections/users/auth-methods",
+          "as": "anon"
+        }
+      ]
+    }
+  ]
+}

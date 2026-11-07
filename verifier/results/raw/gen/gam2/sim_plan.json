@@ -1,0 +1,1 @@
+{"decision":"approve","edits":[],"effort":3,"confidence":0.8,"why":"Claims capture max 0 as a real bound in settings and values plus regressions."}

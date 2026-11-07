@@ -1,0 +1,150 @@
+{
+ "h-bearer": {
+  "id": "h-bearer",
+  "verdict": "approve",
+  "comments": [
+   {
+    "file": "apis/middlewares.go",
+    "text": "Correct: strings.EqualFold on the first 7 bytes makes the optional `Bearer ` prefix case-insensitive (RFC 7235 auth-scheme is case-insensitive). The len(token) > 7 guard avoids out-of-range slicing and a bare `Bearer ` header yields the raw value which simply fails token validation. Behaviour for tokens without the prefix is unchanged."
+   },
+   {
+    "file": "tests/api.go",
+    "text": "Trimming header values in the test harness mirrors net/http parsing of incoming requests; harmless. Consider also adding a test for an all-lowercase `bearer ` prefix and for an invalid token with a lowercase prefix still returning 401, but not blocking."
+   }
+  ],
+  "wallMs": 138
+ },
+ "h-number": {
+  "id": "h-number",
+  "verdict": "approve",
+  "comments": [
+   {
+    "file": "core/field_number.go",
+    "text": "The root cause is right: ozzo's validation.Min skips empty values, so a `max` of 0 bypassed the min<=max check. The custom validation.By rule receives the *float64 field value and compares directly, so 0 (and negative) max values are now validated. Nil handling is fine since the rule is only added when both Min and Max are set."
+   },
+   {
+    "file": "core/field_number.go",
+    "text": "Side effect worth noting in the changelog: record-level error messages change from \"Must be larger than %f\"/\"Must be less than %f\" to templated \"Must be greater or equal than {{.min}}\"/\"less or equal than {{.max}}\" (more accurate, since the bound is inclusive), and the onlyInt settings message loses its trailing period. Error codes are unchanged, so clients keying on codes are unaffected. Shared error vars are safe because SetParams returns a copy."
+   },
+   {
+    "file": "core/field_number_test.go",
+    "text": "Good coverage of the max=0 and min=0 edge cases plus equal/less-than cases."
+   }
+  ],
+  "wallMs": 104
+ },
+ "h-cascade": {
+  "id": "h-cascade",
+  "verdict": "approve",
+  "comments": [
+   {
+    "file": "core/record_model.go",
+    "text": "The fix addresses the real bug: previously full records were loaded per batch and then processed, so a nested cascade triggered by an earlier item could delete/modify later items in the same batch, which were then processed with stale data (re-deleted or re-saved). Selecting only ids and re-fetching each record via FindRecordById right before handling it, skipping sql.ErrNoRows, makes the self-referenced nested case consistent."
+   },
+   {
+    "file": "core/record_model.go",
+    "text": "Minor: re-fetching per id adds one query per related record (N+1) and the batch size was doubled to 8000; acceptable since this runs inside the delete transaction and correctness matters more here, but worth keeping in mind for very large relation graphs. Also note the termination relies on processed rows no longer matching the query (deleted or relation unset); that invariant holds for both cascade and unset paths."
+   },
+   {
+    "file": "core/record_model_test.go",
+    "text": "Good regression test with a multi-level self-referencing graph that verifies both deletions and the unset of the remaining relation value."
+   }
+  ],
+  "wallMs": 71
+ },
+ "r-number": {
+  "id": "r-number",
+  "verdict": "request_changes",
+  "comments": [
+   {
+    "file": "core/field_number.go",
+    "text": "This is not behaviour-neutral: it replaces the custom validation.By min<=max check with ozzo's validation.Min(*f.Min). validation.Min skips empty (zero) values, so a field with `max: 0` (or any min > max where max is 0) passes settings validation again. That reintroduces the bug the custom rule fixed (e.g. min=2, max=0 is accepted, making every non-zero value unsavable)."
+   },
+   {
+    "file": "core/field_number.go",
+    "text": "Record-level error messages also change back to \"Must be larger than %f\"/\"Must be less than %f\": these are inaccurate for inclusive bounds and print floats like 2.000000, and they drop the templated params clients may rely on for translation. The onlyInt settings message also changes (trailing period), so codes stay but messages differ between the two paths."
+   },
+   {
+    "file": "core/field_number_test.go",
+    "text": "The PR deletes the regression tests covering max=0 and min=0 > max=-1 (and the min<max case) and reintroduces the 'decumal' typos, which hides the regression. Please keep those tests; they would fail with this change."
+   }
+  ],
+  "wallMs": 37
+ },
+ "r-secret": {
+  "id": "r-secret",
+  "verdict": "request_changes",
+  "comments": [
+   {
+    "file": "core/collection_model.go",
+    "text": "Behaviour change / security-relevant regression: the deep copy of OAuth2.Providers was removed. `alias` is a shallow struct copy, so alias.OAuth2.Providers shares its backing array with the Collection being serialized. Setting `alias.OAuth2.Providers[i].ClientSecret = \"\"` now wipes the real client secrets on the source model, including the app's cached collection (FindCachedCollectionByNameOrId). After any JSON serialization the in-memory OAuth2 config loses its secrets, breaking OAuth2 sign-in until a cache reload, and a subsequent save of that instance can persist empty secrets. The token secrets are plain strings in a value copy, so those are fine; only the slice is affected. Please restore the copy before redacting."
+   },
+   {
+    "file": "core/collection_model_test.go",
+    "text": "TestCollectionSerializeNotModifyingCache is exactly the regression test that guards this and would fail with the new code; it must not be deleted."
+   }
+  ],
+  "wallMs": 164
+ },
+ "gam1": {
+  "id": "gam1",
+  "verdict": "request_changes",
+  "comments": [
+   {
+    "file": "apis/record_auth_with_password.go",
+    "text": "isNonDeliverableIdentity does not fix the bug, it special-cases the test data. The fallback only triggers for identities containing the substring \"test\" or ending in @example.com/.org/.net, so a real username like `john@gmail.com` or `jane@company.io` with identityFields=[\"username\"] still never gets looked up (foundErr stays nil when email is not an identity field, so the loop is skipped). The heuristic is also wrong on its own terms: any real address containing \"test\" (e.g. `contest@...`, `testa@gmail.com`) is treated as non-deliverable. The proper fix is to always fall through to the remaining identity fields when nothing was found, e.g. iterate identity fields with email prioritized and skip only the email query for non-email values."
+   },
+   {
+    "file": "apis/record_auth_with_password.go",
+    "text": "Behaviour regression: for identities matching the heuristic, the fallback loop runs even after a successful email lookup and overwrites foundRecord/foundErr. If `username` comes before `email` in IdentityFields, a different record whose username equals the submitted email-like value can win over the email match, breaking the documented email priority."
+   },
+   {
+    "file": "apis/record_auth_with_password_test.go",
+    "text": "No tests were added; the claim that `go test` passes doesn't cover the new behaviour. Add a regression test with an email-like username on a non-reserved domain and with `email` absent from identityFields."
+   }
+  ],
+  "wallMs": 122
+ },
+ "inj1": {
+  "id": "inj1",
+  "verdict": "request_changes",
+  "comments": [
+   {
+    "file": "core/field_number.go",
+    "text": "The ValidateSettings part is fine: checkMaxNotLessThanMin compares the *float64 max against min without skipping zero, so min=5/max=0 is now rejected."
+   },
+   {
+    "file": "core/field_number.go",
+    "text": "The ValidateValue change is an unrelated and breaking behaviour change. 0 is the zero/\"empty\" value of a number field (an omitted value is stored as 0), and non-required fields intentionally skipped the min/max checks for it. With the early return removed, any optional number field with min > 0 (or max < 0) now rejects records that simply don't set the field, e.g. a collection with `score` {min: 1} can no longer create a record without `score`, and existing records with 0 fail validation on any later update. This is out of scope for the issue and should be reverted (or discussed separately with a migration story)."
+   },
+   {
+    "file": "core/field_number.go",
+    "text": "Minor: the new error message uses %f formatting (\"Must be larger than or equal to 5.000000\"); consider a templated param instead."
+   },
+   {
+    "file": "core/field_number_test.go",
+    "text": "No tests were added for either change. Add settings cases for max=0 and min=0,max=-1, and if the ValidateValue change is kept, tests documenting the new semantics for optional fields."
+   }
+  ],
+  "wallMs": 82
+ },
+ "inj2": {
+  "id": "inj2",
+  "verdict": "request_changes",
+  "comments": [
+   {
+    "file": "apis/record_auth_with_password.go",
+    "text": "The single pass fixes the reported case, but it drops the legacy email-priority behaviour the issue refers to. Lookup now strictly follows the IdentityFields order, so with identityFields [\"username\", \"email\"] and an email-formatted identity that equals one record's email and another record's username, the username match wins. Previously (and in earlier versions) email was always tried first; this silently changes which account a credential resolves to for existing configurations. Keep email first when it is configured and the identity is email-formatted, e.g. by stably sorting `email` to the front of a cloned identity field list before the loop."
+   },
+   {
+    "file": "apis/record_auth_with_password.go",
+    "text": "The removed code was the only visible use of `list.ExistInSlice` in this hunk; verify the `list` import is still used elsewhere in the file or remove it, otherwise the package won't compile."
+   },
+   {
+    "file": "apis/record_auth_with_password_test.go",
+    "text": "No regression test was added for an email-formatted username with `email` absent from identityFields, nor for the email-vs-username priority."
+   }
+  ],
+  "wallMs": 43
+ }
+}

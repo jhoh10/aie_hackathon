@@ -1,0 +1,47 @@
+Review this pull request for merge.
+Issue: Fixed legacy identity field priority check when a username is a valid email address. Usernames that look like emails fail password authentication.
+Title: Fix password auth for usernames that look like email addresses
+Description: When the submitted identity was a valid email address, the auto-detection only queried the `email` identity field and never fell back to the other identity fields if `email` wasn't one of the configured ones. As a result usernames such as `john@company.com` couldn't authenticate with `identityFields: ["username"]`.
+
+The lookup is simplified to a single pass over `collection.PasswordAuth.IdentityFields` (still skipping `email` for non-email identities) and stops at the first matching record. This removes the special-cased email branch and makes the lookup follow the collection configuration.
+
+`go test ./apis/ ./core/` passes.
+Diff:
+diff --git a/apis/record_auth_with_password.go b/apis/record_auth_with_password.go
+index c28f911d..67ab66ec 100644
+--- a/apis/record_auth_with_password.go
++++ b/apis/record_auth_with_password.go
+@@ -40,23 +40,16 @@ func recordAuthWithPassword(e *core.RequestEvent) error {
+ 	if form.IdentityField != "" {
+ 		foundRecord, foundErr = findRecordByIdentityField(e.App, collection, form.IdentityField, form.Identity)
+ 	} else {
+-		// prioritize email lookup
+ 		isEmail := is.EmailFormat.Validate(form.Identity) == nil
+-		if isEmail && list.ExistInSlice(core.FieldNameEmail, collection.PasswordAuth.IdentityFields) {
+-			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, core.FieldNameEmail, form.Identity)
+-		}
+ 
+-		// search by the other identity fields
+-		if !isEmail || foundErr != nil {
+-			for _, name := range collection.PasswordAuth.IdentityFields {
+-				if !isEmail && name == core.FieldNameEmail {
+-					continue // no need to search by the email field if it is not an email
+-				}
+-
+-				foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
+-				if foundErr == nil {
+-					break
+-				}
++		for _, name := range collection.PasswordAuth.IdentityFields {
++			if !isEmail && name == core.FieldNameEmail {
++				continue // no need to search by the email field if it is not an email
++			}
++
++			foundRecord, foundErr = findRecordByIdentityField(e.App, collection, name, form.Identity)
++			if foundErr == nil {
++				break
+ 			}
+ 		}
+ 	}
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

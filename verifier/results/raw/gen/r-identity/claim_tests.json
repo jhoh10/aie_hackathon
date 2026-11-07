@@ -1,0 +1,630 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1u1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/users/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Baobab#dawn-71",
+      "email": "amara.diallo@greenfield.sn",
+      "password": "Baobab#dawn-71"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1a2",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "amara.diallo@greenfield.sn",
+      "password": "Baobab#dawn-71"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "amara.diallo@greenfield.sn",
+       "record.collectionName": "users"
+      }
+     }
+    },
+    {
+     "id": "s1tok",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "amara.diallo@greenfield.sn",
+      "password": "Baobab#dawn-71"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "tk": "token"
+     }
+    },
+    {
+     "id": "s1ref",
+     "method": "POST",
+     "path": "/api/collections/users/auth-refresh",
+     "as": "tk",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "amara.diallo@greenfield.sn"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2u3",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/users/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Lavande!42coast",
+      "email": "hugo.martin@rivage.fr",
+      "password": "Lavande!42coast"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2u4",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/users/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Fjell*snow-903",
+      "email": "elsa.berg@rivage.fr",
+      "password": "Fjell*snow-903"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2a5",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "elsa.berg@rivage.fr",
+      "password": "Fjell*snow-903"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "elsa.berg@rivage.fr"
+      }
+     }
+    },
+    {
+     "id": "s2a6",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "hugo.martin@rivage.fr",
+      "password": "Lavande!42coast"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "hugo.martin@rivage.fr"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "crew",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_crew_handle ON crew (handle)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "handle"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3u7",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/crew/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Anchor%rope-58",
+      "email": "tomas.novak@deckhand.cz",
+      "handle": "tnovak",
+      "password": "Anchor%rope-58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3a8",
+     "method": "POST",
+     "path": "/api/collections/crew/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "tnovak",
+      "password": "Anchor%rope-58"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "tomas.novak@deckhand.cz",
+       "record.handle": "tnovak"
+      }
+     }
+    },
+    {
+     "id": "s3a9",
+     "method": "POST",
+     "path": "/api/collections/crew/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "tnovak",
+      "password": "Anchor%rope-58",
+      "identityField": "handle"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.handle": "tnovak"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "pilots",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_pilots_handle ON pilots (handle)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "handle"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4u10",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/pilots/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Sakura@wing-27",
+      "email": "yuki.sato@skyline.jp",
+      "handle": "falcon_9",
+      "password": "Sakura@wing-27"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4a11",
+     "method": "POST",
+     "path": "/api/collections/pilots/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "falcon_9",
+      "password": "Sakura@wing-27"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "yuki.sato@skyline.jp"
+      }
+     }
+    },
+    {
+     "id": "s4a12",
+     "method": "POST",
+     "path": "/api/collections/pilots/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "yuki.sato@skyline.jp",
+      "password": "Sakura@wing-27"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5u13",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/users/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Cedar^grove-66",
+      "email": "nadia.haddad@cedarline.lb",
+      "password": "Cedar^grove-66"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5a14",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "nadia.haddad@cedarline.lb",
+      "password": "Cedar^grove-67"
+     },
+     "expect": {
+      "status": 400,
+      "paths": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s5a15",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "nadia.h@cedarline.lb",
+      "password": "Cedar^grove-66"
+     },
+     "expect": {
+      "status": 400,
+      "paths": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s5a16",
+     "method": "POST",
+     "path": "/api/collections/users/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "",
+      "password": "Cedar^grove-66"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "vendors",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_vendors_handle ON vendors (handle)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6u17",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/vendors/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Kente&loom-305",
+      "email": "kwame.asante@goldcoast.gh",
+      "handle": "kasante",
+      "password": "Kente&loom-305"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6a18",
+     "method": "POST",
+     "path": "/api/collections/vendors/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "kasante",
+      "password": "Kente&loom-305"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s6a19",
+     "method": "POST",
+     "path": "/api/collections/vendors/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "kwame.asante@goldcoast.gh",
+      "password": "Kente&loom-305"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.handle": "kasante"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "crew",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_crew_handle ON crew (handle)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "handle"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7u20",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/crew/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Naranja$mar-814",
+      "email": "lucia.romero@puerto.es",
+      "handle": "lromero",
+      "password": "Naranja$mar-814"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7a21",
+     "method": "POST",
+     "path": "/api/collections/crew/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lucia.romero@puerto.es",
+      "password": "Naranja$mar-814",
+      "identityField": "handle"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s7a22",
+     "method": "POST",
+     "path": "/api/collections/crew/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lromero",
+      "password": "Naranja$mar-814",
+      "identityField": "email"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s7a23",
+     "method": "POST",
+     "path": "/api/collections/crew/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lucia.romero@puerto.es",
+      "password": "Naranja$mar-814",
+      "identityField": "email"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.handle": "lromero"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "staffers",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_staffers_handle ON staffers (handle)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8u24",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/staffers/records",
+     "as": "superuser",
+     "json": {
+      "passwordConfirm": "Olive+stone-29",
+      "email": "oren.levi@dunebank.il",
+      "handle": "olevi",
+      "password": "Olive+stone-29"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8a25",
+     "method": "POST",
+     "path": "/api/collections/staffers/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "olevi",
+      "password": "Olive+stone-29",
+      "identityField": "handle"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  }
+ ]
+}

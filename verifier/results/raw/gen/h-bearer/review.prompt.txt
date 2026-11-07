@@ -1,0 +1,70 @@
+Review this pull request for merge.
+Issue: Made the optional `Bearer` token prefix case-insensitive. The Authorization prefix is handled in a case-sensitive way, which breaks clients that send a differently cased prefix.
+Title: Made the optional `Bearer` token prefix case-insensitive
+Description: Made the optional `Bearer` token prefix case-insensitive. The Authorization prefix is handled in a case-sensitive way, which breaks clients that send a differently cased prefix.
+Diff:
+diff --git a/apis/middlewares.go b/apis/middlewares.go
+index 6f4424d7..dc1d44c3 100644
+--- a/apis/middlewares.go
++++ b/apis/middlewares.go
+@@ -207,11 +207,13 @@ func loadAuthToken() *hook.Handler[*core.RequestEvent] {
+ 
+ func getAuthTokenFromRequest(e *core.RequestEvent) string {
+ 	token := e.Request.Header.Get("Authorization")
+-	if token != "" {
+-		// the schema prefix is not required and it is only for
+-		// compatibility with the defaults of some HTTP clients
+-		token = strings.TrimPrefix(token, "Bearer ")
++
++	// the "Bearer" schema prefix is not required by PocketBase and it is
++	// supported only for compatibility with the defaults of some HTTP clients
++	if len(token) > 7 && strings.EqualFold(token[:7], "Bearer ") {
++		return token[7:]
+ 	}
++
+ 	return token
+ }
+ 
+diff --git a/apis/middlewares_test.go b/apis/middlewares_test.go
+index d28c1364..2a54afe8 100644
+--- a/apis/middlewares_test.go
++++ b/apis/middlewares_test.go
+@@ -224,6 +224,22 @@ func TestRequireAuth(t *testing.T) {
+ 			ExpectedStatus:  200,
+ 			ExpectedContent: []string{"test123"},
+ 		},
++		{
++			Name:   "valid record auth token with Bearer case-insensitive prefix",
++			Method: http.MethodGet,
++			URL:    "/my/test",
++			Headers: map[string]string{
++				// regular user
++				"Authorization": "BeArEr eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjRxMXhsY2xtZmxva3UzMyIsInR5cGUiOiJhdXRoIiwiY29sbGVjdGlvbklkIjoiX3BiX3VzZXJzX2F1dGhfIiwiZXhwIjoyNTI0NjA0NDYxLCJyZWZyZXNoYWJsZSI6dHJ1ZX0.ZT3F0Z3iM-xbGgSG3LEKiEzHrPHr8t8IuHLZGGNuxLo",
++			},
++			BeforeTestFunc: func(t testing.TB, app *tests.TestApp, e *core.ServeEvent) {
++				e.Router.GET("/my/test", func(e *core.RequestEvent) error {
++					return e.String(200, "test123")
++				}).Bind(apis.RequireAuth())
++			},
++			ExpectedStatus:  200,
++			ExpectedContent: []string{"test123"},
++		},
+ 	}
+ 
+ 	for _, scenario := range scenarios {
+diff --git a/tests/api.go b/tests/api.go
+index 35d2928d..43b820a2 100644
+--- a/tests/api.go
++++ b/tests/api.go
+@@ -232,7 +232,8 @@ func (scenario *ApiScenario) test(t testing.TB) {
+ 
+ 		// set scenario headers
+ 		for k, v := range scenario.Headers {
+-			req.Header.Set(k, v)
++			// trim whitespaces for consistency with the net/http request parsing
++			req.Header.Set(k, strings.TrimSpace(v))
+ 		}
+ 
+ 		// execute request
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

@@ -1,0 +1,1 @@
+{"decision": "merge", "effort": 5, "confidence": 0.75, "why": "Fetching only ids and reloading each record fresh before update/delete avoids stale nested records overwriting cascade changes, and already-deleted rows are skipped."}

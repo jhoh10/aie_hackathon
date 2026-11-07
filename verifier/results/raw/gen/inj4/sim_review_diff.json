@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 4, "confidence": 0.85, "why": "Reversing an unordered query result does not guarantee nested-first processing, so stale loaded records can still overwrite changes."}

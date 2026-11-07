@@ -1,0 +1,34 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"mail.harborline.net","port":587,"username":"notifier","password":"Brass-kettle-319"}},"expect":{"status":200}},
+ {"id":"s1b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"mail.harborline.net","port":587,"username":"notifier","password":""}},"expect":{"status":200,"paths":{"smtp.host":"mail.harborline.net","smtp.username":"notifier","smtp.port":587}}},
+ {"id":"s1c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.enabled":true,"smtp.host":"mail.harborline.net","smtp.username":"notifier"},"absent":["smtp.password"]}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.orchardpost.io","port":465,"username":"mailer@orchardpost.io","password":"Juniper77quill"}},"expect":{"status":200}},
+ {"id":"s2b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.orchardpost.io","port":465,"username":"","password":""}},"expect":{"status":200,"paths":{"smtp.username":""}}},
+ {"id":"s2c","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Orchard Post"}},"expect":{"status":200,"paths":{"meta.appName":"Orchard Post","smtp.host":"smtp.orchardpost.io","smtp.username":""},"absent":["smtp.password"]}},
+ {"id":"s2d","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.port":465,"smtp.username":""},"absent":["smtp.password"]}}
+]},
+{"id":"s3","claim":"c2","kind":"claim","steps":[
+ {"id":"s3a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"relay.copperfield.org","port":2525,"username":"alerts","password":"Maple!drift204"}},"expect":{"status":200}},
+ {"id":"s3b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Copperfield Desk"}},"expect":{"status":200,"paths":{"meta.appName":"Copperfield Desk","smtp.enabled":true,"smtp.host":"relay.copperfield.org","smtp.port":2525,"smtp.username":"alerts"}}},
+ {"id":"s3c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.host":"relay.copperfield.org","smtp.username":"alerts","meta.appName":"Copperfield Desk"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"mx.tidewater.co","port":25,"username":"ops","password":"Lagoon_88_ferry"}},"expect":{"status":200}},
+ {"id":"s4b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"mx2.tidewater.co","port":587,"username":"ops-team"}},"expect":{"status":200,"paths":{"smtp.host":"mx2.tidewater.co","smtp.port":587,"smtp.username":"ops-team"}}},
+ {"id":"s4c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.host":"mx2.tidewater.co","smtp.port":587,"smtp.username":"ops-team"}}}
+]},
+{"id":"s5","claim":"c3","kind":"claim","steps":[
+ {"id":"s5a","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"post.lindenhall.de","port":587,"username":"bote","password":"Kiefer-Wald-552"}},"expect":{"status":200,"paths":{"smtp.username":"bote"},"absent":["smtp.password"]}},
+ {"id":"s5b","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.host":"post.lindenhall.de"},"absent":["smtp.password"]}},
+ {"id":"s5c","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"post.lindenhall.de","port":587,"username":"bote","password":"Neue-Eiche-981"}},"expect":{"status":200}},
+ {"id":"s5d","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"absent":["smtp.password"]}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.quayside.ie","port":587,"username":"dispatch","password":"Shamrock#wharf61"}},"expect":{"status":200}},
+ {"id":"s6b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"password":""}},"expect":{"status":200,"absent":["smtp.password"]}},
+ {"id":"s6c","method":"GET","path":"/api/settings","as":"anon","expect":{"status":401}}
+]}
+]}

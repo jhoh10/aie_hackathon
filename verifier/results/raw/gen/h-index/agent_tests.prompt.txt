@@ -1,0 +1,321 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Fixed indexes collection update error: updating a collection fails with 'index already exists'.
+Your diff:
+diff --git a/core/collection_model.go b/core/collection_model.go
+index aeb0551e..fff62412 100644
+--- a/core/collection_model.go
++++ b/core/collection_model.go
+@@ -348,6 +348,7 @@ func (app *BaseApp) registerCollectionHooks() {
+ }
+ 
+ // @todo experiment eventually replacing the rules *string with a struct?
++// @todo consider changing the Indexes field to a "getter" for the sqlite_master table?
+ type baseCollection struct {
+ 	BaseModel
+ 
+@@ -820,6 +821,25 @@ func onCollectionSave(e *CollectionEvent) error {
+ 
+ 	e.Collection.updateGeneratedIdIfExists(e.App)
+ 
++	// normalize indexes table name
++	for i, raw := range e.Collection.Indexes {
++		parsed := dbutils.ParseIndex(raw)
++
++		// no need to normalize
++		if parsed.TableName == e.Collection.Name {
++			continue
++		}
++
++		parsed.TableName = e.Collection.Name
++
++		normalized := parsed.Build()
++		if normalized == "" {
++			continue // leave to the model validator to decide whether to return an error
++		}
++
++		e.Collection.Indexes[i] = normalized
++	}
++
+ 	return e.Next()
+ }
+ 
+diff --git a/core/collection_model_test.go b/core/collection_model_test.go
+index c328118e..fec1e041 100644
+--- a/core/collection_model_test.go
++++ b/core/collection_model_test.go
+@@ -1678,3 +1678,40 @@ func TestCollectionSaveViewWrapping(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestCollectionSaveIndexesTableNameNormalization(t *testing.T) {
++	t.Parallel()
++
++	app, _ := tests.NewTestApp()
++	defer app.Cleanup()
++
++	dummyCollection := core.NewBaseCollection("new_test")
++	dummyCollection.Fields.Add(&core.TextField{Name: "test"})
++	dummyCollection.Indexes = []string{
++		"create index `new_test_idx1` on `` (`test`) where 1=1",
++		"create index `new_test_idx2` on `test` (`test`) where 1=2",
++		"create index `new_test_idx3` on `someting_else` (`test`) where 1=3",
++	}
++
++	err := app.Save(dummyCollection)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	// refetch a clean state
++	dummyCollection, err = app.FindCollectionByNameOrId(dummyCollection.Name)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	if len(dummyCollection.Indexes) != 3 {
++		t.Fatalf("Expected 3 indexes, got %v", dummyCollection.Indexes)
++	}
++
++	for _, raw := range dummyCollection.Indexes {
++		parsed := dbutils.ParseIndex(raw)
++		if parsed.TableName != dummyCollection.Name {
++			t.Fatalf("Expected all indexes to have tableName %q, found %q:\n%s", dummyCollection.Name, parsed.TableName, raw)
++		}
++	}
++}
+diff --git a/core/collection_record_table_sync.go b/core/collection_record_table_sync.go
+index 35eda70f..b7362fa0 100644
+--- a/core/collection_record_table_sync.go
++++ b/core/collection_record_table_sync.go
+@@ -306,8 +306,10 @@ func dropCollectionIndexes(app App, collection *Collection) error {
+ 		for _, raw := range collection.Indexes {
+ 			parsed := dbutils.ParseIndex(raw)
+ 
+-			if !parsed.IsValid() {
+-				continue
++			// note: don't check IsValid because the index table name may not be populated
++			// (https://github.com/pocketbase/pocketbase/issues/7689)
++			if parsed.IndexName == "" {
++				return fmt.Errorf("failed to dop index - missing index name: %s", raw)
+ 			}
+ 
+ 			_, err := txApp.DB().NewQuery(fmt.Sprintf("DROP INDEX IF EXISTS [[%s]]", parsed.IndexName)).Execute()
+diff --git a/core/collection_record_table_sync_test.go b/core/collection_record_table_sync_test.go
+index 38beeb6f..48b22e10 100644
+--- a/core/collection_record_table_sync_test.go
++++ b/core/collection_record_table_sync_test.go
+@@ -294,3 +294,49 @@ func TestSingleVsMultipleValuesNormalization(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestDropIndexWithoutTableName(t *testing.T) {
++	t.Parallel()
++
++	app, _ := tests.NewTestApp()
++	defer app.Cleanup()
++
++	properIndex := "CREATE INDEX `new_test_idx2` ON `new_test` (`test`)"
++	indexWithoutTableName := "CREATE INDEX `new_test_idx2` ON `` (`test`)"
++
++	dummyCollection := core.NewBaseCollection("new_test")
++	dummyCollection.Fields.Add(&core.TextField{Name: "test"})
++	dummyCollection.Indexes = []string{properIndex}
++
++	err := app.Save(dummyCollection)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	// resave without table name but without hooks to avoid the normalizations
++	dummyCollection.Indexes[0] = indexWithoutTableName
++	err = app.UnsafeWithoutHooks().Save(dummyCollection)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	dummyCollection, err = app.FindCollectionByNameOrId(dummyCollection.Name)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	// resave should normalize the index
++	err = app.Save(dummyCollection)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	dummyCollection, err = app.FindCollectionByNameOrId(dummyCollection.Name)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	if len(dummyCollection.Indexes) != 1 || dummyCollection.Indexes[0] != properIndex {
++		t.Fatalf("Expected exactly 1 index\n%s\ngot\n%v", properIndex, dummyCollection.Indexes)
++	}
++}
+diff --git a/migrations/1778828400_normalize_indexes.go b/migrations/1778828400_normalize_indexes.go
+new file mode 100644
+index 00000000..ced218a9
+--- /dev/null
++++ b/migrations/1778828400_normalize_indexes.go
+@@ -0,0 +1,115 @@
++package migrations
++
++import (
++	"fmt"
++	"strings"
++
++	"github.com/pocketbase/dbx"
++	"github.com/pocketbase/pocketbase/core"
++	"github.com/pocketbase/pocketbase/tools/dbutils"
++)
++
++// see https://github.com/pocketbase/pocketbase/issues/7689
++func init() {
++	core.SystemMigrations.Register(func(txApp core.App) error {
++		collections, err := txApp.FindAllCollections()
++		if err != nil {
++			return err
++		}
++
++		for _, collection := range collections {
++			// existing system collection indexes can't be modified and view don't have indexes
++			if collection.System || collection.IsView() {
++				continue
++			}
++
++			masterIndexes := []struct {
++				Name string `db:"name"`
++				SQL  string `db:"sql"`
++			}{}
++
++			err := txApp.DB().Select("name", "sql").
++				From("sqlite_master").
++				AndWhere(dbx.HashExp{
++					"type":     "index",
++					"tbl_name": collection.Name,
++				}).
++				AndWhere(dbx.NewExp("sql IS NOT NULL AND name NOT LIKE 'sqlite_autoindex_%'")).
++				All(&masterIndexes)
++			if err != nil {
++				return err
++			}
++
++			// no indexes
++			if len(masterIndexes) == 0 && len(collection.Indexes) == 0 {
++				continue
++			}
++
++			missingParsedIndexes := map[string]dbutils.Index{}
++
++			// find missing master indexes
++		masterLoop:
++			for _, masterIndex := range masterIndexes {
++				mParsed := dbutils.ParseIndex(masterIndex.SQL)
++				mParsed.SchemaName = ""
++				mParsed.TableName = collection.Name
++
++				for _, raw := range collection.Indexes {
++					cParsed := dbutils.ParseIndex(raw)
++
++					// index already exists (if needed it will be normalized on resave)
++					if strings.EqualFold(cParsed.IndexName, mParsed.IndexName) {
++						continue masterLoop
++					}
++				}
++
++				missingParsedIndexes[masterIndex.Name] = mParsed
++			}
++
++		missingIndexesLoop:
++			for _, missing := range missingParsedIndexes {
++				missingSQL := missing.Build()
++
++				// drop the missing index to recreate later
++				_, err := txApp.DB().DropIndex(missing.TableName, missing.IndexName).Execute()
++				if err != nil {
++					return fmt.Errorf("failed to drop index %s: %w", missing.IndexName, err)
++				}
++
++				// no recreate: duplicated single unique tokenKey or email
++				// (auth collections are guaranteed to have them)
++				if collection.IsAuth() && missing.Unique && len(missing.Columns) == 1 &&
++					(strings.EqualFold(missing.Columns[0].Name, core.FieldNameTokenKey) || strings.EqualFold(missing.Columns[0].Name, core.FieldNameEmail)) {
++					continue missingIndexesLoop
++				}
++
++				// no recreate: the same index definition alreay exists
++				// in the collection but with different name
++				for _, raw := range collection.Indexes {
++					cParsed := dbutils.ParseIndex(raw)
++					cParsed.IndexName = missing.IndexName
++					cParsed.SchemaName = missing.SchemaName
++					cParsed.TableName = missing.TableName
++					cSQL := cParsed.Build()
++
++					if missingSQL == cSQL {
++						continue missingIndexesLoop
++					}
++				}
++
++				// recreate: add the missing index to the collection list and
++				// leave the user to decide whether they want to keep it or not
++				// (the index could have been previously created externally, e.g. via the sqlite3 cli)
++				collection.Indexes = append(collection.Indexes, missingSQL)
++			}
++
++			// resave to trigger indexes normalization
++			err = txApp.Save(collection)
++			if err != nil {
++				return err
++			}
++		}
++
++		return nil
++	}, nil)
++}
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

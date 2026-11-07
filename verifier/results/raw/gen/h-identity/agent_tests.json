@@ -1,0 +1,21 @@
+{"scenarios":[
+{"id":"username-only-identity-email-like","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"members1","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_members1_username ON members1 (username)"],"passwordAuth":{"enabled":true,"identityFields":["username"]}},"expect":{"status":200}},
+{"id":"create-rec","setup":true,"method":"POST","path":"/api/collections/members1/records","as":"superuser","json":{"email":"real1@example.com","username":"uname1@example.com","password":"Passw0rd123!","passwordConfirm":"Passw0rd123!"},"expect":{"status":200}},
+{"id":"auth-by-username","method":"POST","path":"/api/collections/members1/auth-with-password","as":"anon","json":{"identity":"uname1@example.com","password":"Passw0rd123!"},"expect":{"status":200,"json":{"record":{"email":"real1@example.com","username":"uname1@example.com"}}}}
+]},
+{"id":"username-second-identity-email-like","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"members2","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_members2_username ON members2 (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+{"id":"create-rec","setup":true,"method":"POST","path":"/api/collections/members2/records","as":"superuser","json":{"email":"real2@example.com","username":"uname2@example.com","password":"Passw0rd123!","passwordConfirm":"Passw0rd123!"},"expect":{"status":200}},
+{"id":"auth-by-username","method":"POST","path":"/api/collections/members2/auth-with-password","as":"anon","json":{"identity":"uname2@example.com","password":"Passw0rd123!"},"expect":{"status":200,"json":{"record":{"email":"real2@example.com"}}}},
+{"id":"auth-by-email","method":"POST","path":"/api/collections/members2/auth-with-password","as":"anon","json":{"identity":"real2@example.com","password":"Passw0rd123!"},"expect":{"status":200,"json":{"record":{"username":"uname2@example.com"}}}},
+{"id":"auth-wrong-password","method":"POST","path":"/api/collections/members2/auth-with-password","as":"anon","json":{"identity":"uname2@example.com","password":"WrongPass999!"},"expect":{"status":400}}
+]},
+{"id":"email-priority-over-username","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"members3","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_members3_username ON members3 (username)"],"passwordAuth":{"enabled":true,"identityFields":["username","email"]}},"expect":{"status":200}},
+{"id":"create-rec-a","setup":true,"method":"POST","path":"/api/collections/members3/records","as":"superuser","json":{"email":"shared3@example.com","username":"usera3","password":"PasswordA123!","passwordConfirm":"PasswordA123!"},"expect":{"status":200}},
+{"id":"create-rec-b","setup":true,"method":"POST","path":"/api/collections/members3/records","as":"superuser","json":{"email":"other3@example.com","username":"shared3@example.com","password":"PasswordB123!","passwordConfirm":"PasswordB123!"},"expect":{"status":200}},
+{"id":"auth-matches-email-first","method":"POST","path":"/api/collections/members3/auth-with-password","as":"anon","json":{"identity":"shared3@example.com","password":"PasswordA123!"},"expect":{"status":200,"json":{"record":{"username":"usera3"}}}},
+{"id":"auth-plain-username","method":"POST","path":"/api/collections/members3/auth-with-password","as":"anon","json":{"identity":"usera3","password":"PasswordA123!"},"expect":{"status":200,"json":{"record":{"email":"shared3@example.com"}}}}
+]}
+]}

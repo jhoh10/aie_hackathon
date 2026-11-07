@@ -1,0 +1,1 @@
+{"findings":[{"id":"p5_single_identity_field","triage":"undeclared","severity":"breaking","why":"In a collection whose only identity field is username, logging in with the user's email-shaped username now fails (200 -> 400), which contradicts c2 (no behaviour change for custom identity fields)."}]}

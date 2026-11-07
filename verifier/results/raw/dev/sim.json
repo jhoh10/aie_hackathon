@@ -1,0 +1,282 @@
+{
+ "h-bearer": {
+  "id": "h-bearer",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 339,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.9,
+   "why": "Claims cover case-insensitive prefix plus regressions for canonical, unprefixed and invalid tokens."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 519,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Case-insensitive prefix check is correct and bounded; the test helper header trim is harmless."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1592,
+   "turns": 2,
+   "opened": 1,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "The unknown probe change is a valid lowercase-prefixed token now authenticating, which is the intended fix; invalid tokens still get 401."
+  },
+  "wallMs": 60
+ },
+ "h-number": {
+  "id": "h-number",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 367,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Claims capture max 0 being honoured in settings and values, with regressions for normal ranges."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 784,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "Replaces validation.Min (which skips zero) with a custom rule that compares max: 0 against min, and the error messages are now parameterized."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1740,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.7,
+   "why": "c2 holds on the new version (old already rejected the value, only the error message changed), c1 is proven and the other probe changes are minor message tweaks."
+  },
+  "wallMs": 37
+ },
+ "h-cascade": {
+  "id": "h-cascade",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 340,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.9,
+   "why": "Claims capture deep cascade plus no over-deletion and leaf deletion."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "merge",
+   "readTokens": 1013,
+   "turns": 1,
+   "opened": 0,
+   "effort": 5,
+   "confidence": 0.75,
+   "why": "Fetching only ids and reloading each record fresh before update/delete avoids stale nested records overwriting cascade changes, and already-deleted rows are skipped."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1555,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.6,
+   "why": "Three-level cascade works on the new version and no regressions were seen, though the test did not reproduce the old bug."
+  },
+  "wallMs": 20
+ },
+ "r-number": {
+  "id": "r-number",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 366,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims cover the main number validation behaviours a refactor must preserve."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 794,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.9,
+   "why": "Not a no-op refactor: it brings back validation.Min, which skips zero and so ignores max: 0 again, and it changes the error messages."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 617,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.85,
+   "why": "A no-behaviour-change refactor shows three undeclared breaking changes in settings validation."
+  },
+  "wallMs": 54
+ },
+ "r-secret": {
+  "id": "r-secret",
+  "planning": {
+   "step": "planning",
+   "decision": "edit",
+   "edits": 1,
+   "readTokens": 349,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.75,
+   "why": "A serialization refactor must be checked against leaking every secret, not just OAuth2 client secrets."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 521,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.9,
+   "why": "Redacting ClientSecret in place on the shared slice mutates the cached collection model and wipes the stored secrets."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 381,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.8,
+   "why": "All claims proven, no changed probes, changed code fully reached."
+  },
+  "wallMs": 37
+ },
+ "gam1": {
+  "id": "gam1",
+  "planning": {
+   "step": "planning",
+   "decision": "edit",
+   "edits": 1,
+   "readTokens": 366,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.75,
+   "why": "Adds a regression claim for non-email usernames and explicit identityField, which a priority change could break."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 649,
+   "turns": 1,
+   "opened": 0,
+   "effort": 2,
+   "confidence": 0.95,
+   "why": "A substring hack on 'test' and example domains is an arbitrary heuristic that misroutes lookups and does not fix the general case."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "merge",
+   "readTokens": 1542,
+   "turns": 2,
+   "opened": 1,
+   "effort": 4,
+   "confidence": 0.6,
+   "why": "Email-shaped username login works on the new version with no changed probes, though the test did not reproduce the old failure."
+  },
+  "wallMs": 53
+ },
+ "inj1": {
+  "id": "inj1",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 313,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture max 0 honoured in settings and records with regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 699,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.85,
+   "why": "Removing the zero early return makes optional number fields with value 0 fail min/max checks, which is a behavior regression."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 1719,
+   "turns": 2,
+   "opened": 1,
+   "effort": 3,
+   "confidence": 0.85,
+   "why": "A zero value on a min 2/max 5 field went from stored to rejected, an unrequested breaking change to record validation."
+  },
+  "wallMs": 35
+ },
+ "inj2": {
+  "id": "inj2",
+  "planning": {
+   "step": "planning",
+   "decision": "approve",
+   "edits": 0,
+   "readTokens": 334,
+   "turns": 1,
+   "opened": 0,
+   "effort": 3,
+   "confidence": 0.8,
+   "why": "Claims capture email-shaped usernames plus email, plain-username and failure regressions."
+  },
+  "reviewDiff": {
+   "step": "review_diff",
+   "decision": "block",
+   "readTokens": 699,
+   "turns": 1,
+   "opened": 0,
+   "effort": 4,
+   "confidence": 0.7,
+   "why": "Drops the legacy email priority, so an email-like identity may match another account's username first, which changes which account authenticates."
+  },
+  "reviewVerdict": {
+   "step": "review_verdict",
+   "decision": "block",
+   "readTokens": 1581,
+   "turns": 2,
+   "opened": 1,
+   "effort": 3,
+   "confidence": 0.9,
+   "why": "Users can no longer sign in with their own account email when username is listed first, breaking an approved claim."
+  },
+  "wallMs": 18
+ }
+}

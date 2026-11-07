@@ -1,0 +1,60 @@
+Review this pull request for merge.
+Issue: Fixed `number` settings validator to not ignore 0 `max` value.
+Title: Fix number field validators ignoring zero values
+Description: `NumberField.ValidateSettings` used `validation.Min(*f.Min)` for the max option. ozzo-validation threshold rules skip "empty" values, so `max: 0` was never compared against `min` and e.g. `min: 5, max: 0` was accepted.
+
+Changes:
+- Replaced the max/min cross check with a small `checkMaxNotLessThanMin` rule that doesn't skip zero values.
+- `ValidateValue` had the same "zero is ignored" shortcut: a `0` value returned early and skipped the min/max checks. The early return is removed so the configured bounds are applied consistently (the `Required` check for zero is kept as before).
+
+`go test ./apis/ ./core/` passes.
+Diff:
+diff --git a/core/field_number.go b/core/field_number.go
+index 7f4855cb..bf21f4f9 100644
+--- a/core/field_number.go
++++ b/core/field_number.go
+@@ -141,13 +141,10 @@ func (f *NumberField) ValidateValue(ctx context.Context, app App, record *Record
+ 		return validation.NewError("validation_not_a_number", "The submitted number is not properly formatted")
+ 	}
+ 
+-	if val == 0 {
+-		if f.Required {
+-			if err := validation.Required.Validate(val); err != nil {
+-				return err
+-			}
++	if val == 0 && f.Required {
++		if err := validation.Required.Validate(val); err != nil {
++			return err
+ 		}
+-		return nil
+ 	}
+ 
+ 	if f.OnlyInt && val != float64(int64(val)) {
+@@ -171,7 +168,7 @@ func (f *NumberField) ValidateSettings(ctx context.Context, app App, collection
+ 		validation.By(f.checkOnlyInt),
+ 	}
+ 	if f.Min != nil && f.Max != nil {
+-		maxRules = append(maxRules, validation.Min(*f.Min))
++		maxRules = append(maxRules, validation.By(f.checkMaxNotLessThanMin))
+ 	}
+ 
+ 	return validation.ValidateStruct(f,
+@@ -183,6 +180,16 @@ func (f *NumberField) ValidateSettings(ctx context.Context, app App, collection
+ 	)
+ }
+ 
++// checkMaxNotLessThanMin is similar to validation.Min but doesn't skip zero values.
++func (f *NumberField) checkMaxNotLessThanMin(value any) error {
++	v, _ := value.(*float64)
++	if v == nil || f.Min == nil || *v >= *f.Min {
++		return nil
++	}
++
++	return validation.NewError("validation_min_number_constraint", fmt.Sprintf("Must be larger than or equal to %f", *f.Min))
++}
++
+ func (f *NumberField) checkOnlyInt(value any) error {
+ 	v, _ := value.(*float64)
+ 	if v == nil || !f.OnlyInt {
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

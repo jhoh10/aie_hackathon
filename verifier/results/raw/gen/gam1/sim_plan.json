@@ -1,0 +1,1 @@
+{"decision":"edit","edits":[{"id":"c4","text":"Plain (non-email) usernames and an explicitly passed identityField continue to work for password authentication."}],"effort":4,"confidence":0.75,"why":"Adds a regression claim for non-email usernames and explicit identityField, which a priority change could break."}

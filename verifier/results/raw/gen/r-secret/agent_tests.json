@@ -1,0 +1,17 @@
+{"scenarios":[
+{"id":"serialization-hides-secrets","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"secusers1","type":"auth","oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"sgid1","clientSecret":"sgsecret1"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.clientId":"sgid1"},"absent":["oauth2.providers.0.clientSecret","authToken.secret","fileToken.secret","passwordResetToken.secret","emailChangeToken.secret","verificationToken.secret"]}},
+{"id":"get-col","method":"GET","path":"/api/collections/secusers1","as":"superuser","expect":{"status":200,"paths":{"oauth2.providers.0.name":"google"},"absent":["oauth2.providers.0.clientSecret","authToken.secret"]}}
+]},
+{"id":"serialization-does-not-wipe-stored-secret","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"secusers2","type":"auth","oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"sgid2","clientSecret":"sgsecret2"}]}},"expect":{"status":200}},
+{"id":"get-col-1","method":"GET","path":"/api/collections/secusers2","as":"superuser","expect":{"status":200}},
+{"id":"list-cols","method":"GET","path":"/api/collections","as":"superuser","expect":{"status":200}},
+{"id":"patch-unrelated","method":"PATCH","path":"/api/collections/secusers2","as":"superuser","json":{"listRule":""},"expect":{"status":200}},
+{"id":"patch-providers-without-secret","method":"PATCH","path":"/api/collections/secusers2","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"google","displayName":"Still Secret"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.clientId":"sgid2","oauth2.providers.0.displayName":"Still Secret"}}},
+{"id":"auth-methods","method":"GET","path":"/api/collections/secusers2/auth-methods","as":"anon","expect":{"status":200,"json":{"oauth2":{"enabled":true}}}}
+]},
+{"id":"providers-always-array","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"secusers3","type":"auth"},"expect":{"status":200,"json":{"oauth2":{"providers":[]}}}}
+]}
+]}

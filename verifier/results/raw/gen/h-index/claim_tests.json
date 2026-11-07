@@ -1,0 +1,663 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "shipments",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "carrier",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_shipments_carrier ON shipments (carrier)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1p1",
+     "method": "PATCH",
+     "path": "/api/collections/shipments",
+     "as": "superuser",
+     "json": {
+      "listRule": "@request.auth.id != \"\"",
+      "indexes": [
+       "CREATE INDEX idx_shipments_carrier ON shipments (carrier)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "listRule": "@request.auth.id != \"\"",
+       "indexes.0": "CREATE INDEX idx_shipments_carrier ON shipments (carrier)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    },
+    {
+     "id": "s1g2",
+     "method": "GET",
+     "path": "/api/collections/shipments",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX idx_shipments_carrier ON shipments (carrier)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "venues",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "slug",
+        "type": "text"
+       },
+       {
+        "name": "city",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_venues_slug ON venues (slug)",
+       "CREATE INDEX idx_venues_city ON venues (city)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2p3",
+     "method": "PATCH",
+     "path": "/api/collections/venues",
+     "as": "superuser",
+     "json": {
+      "viewRule": null
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "viewRule": null,
+       "indexes.0": "CREATE UNIQUE INDEX idx_venues_slug ON venues (slug)",
+       "indexes.1": "CREATE INDEX idx_venues_city ON venues (city)"
+      }
+     }
+    },
+    {
+     "id": "s2p4",
+     "method": "PATCH",
+     "path": "/api/collections/venues",
+     "as": "superuser",
+     "json": {
+      "deleteRule": null,
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_venues_slug ON venues (slug)",
+       "CREATE INDEX idx_venues_city ON venues (city)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "deleteRule": null,
+       "indexes.0": "CREATE UNIQUE INDEX idx_venues_slug ON venues (slug)",
+       "indexes.1": "CREATE INDEX idx_venues_city ON venues (city)"
+      }
+     }
+    },
+    {
+     "id": "s2g5",
+     "method": "GET",
+     "path": "/api/collections/venues",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE UNIQUE INDEX idx_venues_slug ON venues (slug)",
+       "indexes.1": "CREATE INDEX idx_venues_city ON venues (city)"
+      },
+      "absent": [
+       "indexes.2"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "parcels",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "zone",
+        "type": "text"
+       },
+       {
+        "name": "weight",
+        "type": "number"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_parcels_zone ON parcels (zone, weight)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3p6",
+     "method": "PATCH",
+     "path": "/api/collections/parcels",
+     "as": "superuser",
+     "json": {
+      "updateRule": null,
+      "indexes": [
+       "CREATE INDEX idx_parcels_zone ON parcels (zone, weight)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "updateRule": null
+      }
+     }
+    },
+    {
+     "id": "s3p7",
+     "method": "PATCH",
+     "path": "/api/collections/parcels",
+     "as": "superuser",
+     "json": {
+      "createRule": null,
+      "indexes": [
+       "CREATE INDEX idx_parcels_zone ON parcels (zone, weight)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "createRule": null,
+       "indexes.0": "CREATE INDEX idx_parcels_zone ON parcels (zone, weight)"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "guests",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "lastname",
+        "type": "text"
+       },
+       {
+        "name": "country",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_guests_lastname ON guests (lastname)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4p8",
+     "method": "PATCH",
+     "path": "/api/collections/guests",
+     "as": "superuser",
+     "json": {
+      "indexes": [
+       "CREATE INDEX idx_guests_lastname ON guests (lastname)",
+       "CREATE INDEX idx_guests_country ON guests (country)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX idx_guests_lastname ON guests (lastname)",
+       "indexes.1": "CREATE INDEX idx_guests_country ON guests (country)"
+      }
+     }
+    },
+    {
+     "id": "s4p9",
+     "method": "PATCH",
+     "path": "/api/collections/guests",
+     "as": "superuser",
+     "json": {
+      "indexes": [
+       "CREATE INDEX idx_guests_country ON guests (country)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX idx_guests_country ON guests (country)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    },
+    {
+     "id": "s4g10",
+     "method": "GET",
+     "path": "/api/collections/guests",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX idx_guests_country ON guests (country)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "meters",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "serial",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_meters_serial ON meters (serial)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5p11",
+     "method": "PATCH",
+     "path": "/api/collections/meters",
+     "as": "superuser",
+     "json": {
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_meters_serial ON meters (serial)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE UNIQUE INDEX idx_meters_serial ON meters (serial)"
+      },
+      "absent": [
+       "indexes.1"
+      ]
+     }
+    },
+    {
+     "id": "s5r12",
+     "method": "POST",
+     "path": "/api/collections/meters/records",
+     "as": "superuser",
+     "json": {
+      "serial": "MTR-20931"
+     },
+     "expect": {
+      "status": 200
+     },
+     "setup": true
+    },
+    {
+     "id": "s5r13",
+     "method": "POST",
+     "path": "/api/collections/meters/records",
+     "as": "superuser",
+     "json": {
+      "serial": "MTR-20931"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "routes",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "origin",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE INDEX idx_routes_origin ON routes (origin)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6p14",
+     "method": "PATCH",
+     "path": "/api/collections/routes",
+     "as": "superuser",
+     "json": {
+      "indexes": []
+     },
+     "expect": {
+      "status": 200,
+      "absent": [
+       "indexes.0"
+      ]
+     }
+    },
+    {
+     "id": "s6p15",
+     "method": "PATCH",
+     "path": "/api/collections/routes",
+     "as": "superuser",
+     "json": {
+      "indexes": [
+       "CREATE INDEX idx_routes_origin ON routes (origin)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE INDEX idx_routes_origin ON routes (origin)"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members_dir",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "handle",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_handle ON members_dir (handle)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7r16",
+     "method": "POST",
+     "path": "/api/collections/members_dir/records",
+     "as": "superuser",
+     "json": {
+      "handle": "quietfox"
+     },
+     "expect": {
+      "status": 200
+     },
+     "setup": true
+    },
+    {
+     "id": "s7p17",
+     "method": "PATCH",
+     "path": "/api/collections/members_dir",
+     "as": "superuser",
+     "json": {
+      "listRule": null,
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_handle ON members_dir (handle)"
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "indexes.0": "CREATE UNIQUE INDEX idx_members_handle ON members_dir (handle)"
+      }
+     }
+    },
+    {
+     "id": "s7r18",
+     "method": "POST",
+     "path": "/api/collections/members_dir/records",
+     "as": "superuser",
+     "json": {
+      "handle": "quietfox"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s7r19",
+     "method": "POST",
+     "path": "/api/collections/members_dir/records",
+     "as": "superuser",
+     "json": {
+      "handle": "loudowl"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7cnt",
+     "method": "GET",
+     "path": "/api/collections/members_dir/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "plates",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "number",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_plates_number ON plates (number)"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8p20",
+     "method": "PATCH",
+     "path": "/api/collections/plates",
+     "as": "superuser",
+     "json": {
+      "viewRule": null
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "viewRule": null
+      }
+     }
+    },
+    {
+     "id": "s8r21",
+     "method": "POST",
+     "path": "/api/collections/plates/records",
+     "as": "superuser",
+     "json": {
+      "number": "KA-4471"
+     },
+     "expect": {
+      "status": 200
+     },
+     "setup": true
+    },
+    {
+     "id": "s8r22",
+     "method": "POST",
+     "path": "/api/collections/plates/records",
+     "as": "superuser",
+     "json": {
+      "number": "KA-4471"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  }
+ ]
+}

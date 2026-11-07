@@ -1,0 +1,5 @@
+{"verdict":"request_changes","comments":[
+{"file":"core/field_number.go","text":"This is not behaviour-neutral: it replaces the custom validation.By min<=max check with ozzo's validation.Min(*f.Min). validation.Min skips empty (zero) values, so a field with `max: 0` (or any min > max where max is 0) passes settings validation again. That reintroduces the bug the custom rule fixed (e.g. min=2, max=0 is accepted, making every non-zero value unsavable)."},
+{"file":"core/field_number.go","text":"Record-level error messages also change back to \"Must be larger than %f\"/\"Must be less than %f\": these are inaccurate for inclusive bounds and print floats like 2.000000, and they drop the templated params clients may rely on for translation. The onlyInt settings message also changes (trailing period), so codes stay but messages differ between the two paths."},
+{"file":"core/field_number_test.go","text":"The PR deletes the regression tests covering max=0 and min=0 > max=-1 (and the min<max case) and reintroduces the 'decumal' typos, which hides the regression. Please keep those tests; they would fail with this change."}
+]}

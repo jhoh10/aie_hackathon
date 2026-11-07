@@ -1,0 +1,530 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_wrong_table_name",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX idx_posts_title ON wrongtable (title)"
+            ]
+          }
+        },
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "resave",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "listRule": null
+          }
+        },
+        {
+          "id": "get_after",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p2_rename_collection",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_posts_code ON posts (code)",
+              "CREATE INDEX idx_posts_title ON `posts` (`title`)"
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "rename",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "name": "articles"
+          }
+        },
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/collections/articles?fields=name,indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "rec1",
+          "method": "POST",
+          "path": "/api/collections/articles/records",
+          "as": "superuser",
+          "json": {
+            "title": "a",
+            "code": "c1"
+          }
+        },
+        {
+          "id": "rec_dup",
+          "method": "POST",
+          "path": "/api/collections/articles/records",
+          "as": "superuser",
+          "json": {
+            "title": "b",
+            "code": "c1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p3_unique_wrong_table_enforced",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "items",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_items_code ON other (code)"
+            ]
+          }
+        },
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/collections/items?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "rec1",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "code": "x1"
+          }
+        },
+        {
+          "id": "rec_dup",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "code": "x1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p4_schema_and_quoted_names",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_schema",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "a1",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX idx_a1_title ON main.a1 (title)"
+            ]
+          }
+        },
+        {
+          "id": "get_schema",
+          "method": "GET",
+          "path": "/api/collections/a1?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "create_quoted",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "a2",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX \"idx_a2_title\" ON \"A2\" (\"title\")"
+            ]
+          }
+        },
+        {
+          "id": "get_quoted",
+          "method": "GET",
+          "path": "/api/collections/a2?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "create_no_name",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "a3",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX ON a3 (title)"
+            ]
+          }
+        },
+        {
+          "id": "create_garbage",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "a4",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "not an index"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "p5_update_indexes",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX idx_posts_title ON posts (title)"
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "replace_wrong_table",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "indexes": [
+              "CREATE INDEX idx_posts_code ON zzz (code)"
+            ]
+          }
+        },
+        {
+          "id": "get1",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "duplicate_names",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "indexes": [
+              "CREATE INDEX idx_dup ON posts (title)",
+              "CREATE INDEX idx_dup ON posts (code)"
+            ]
+          }
+        },
+        {
+          "id": "get2",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "clear",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "indexes": []
+          }
+        },
+        {
+          "id": "get3",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "anon_patch",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "anon",
+          "json": {
+            "indexes": [
+              "CREATE INDEX idx_x ON posts (title)"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "p7_recreate_existing_index",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX idx_posts_title ON posts (title)"
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "add_index",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "indexes": [
+              "CREATE INDEX idx_posts_title ON posts (title)",
+              "CREATE INDEX idx_posts_code ON posts (code)"
+            ]
+          }
+        },
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=indexes",
+          "as": "superuser"
+        },
+        {
+          "id": "other_same_index_name",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "others",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldcode001",
+                "name": "code",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE INDEX idx_posts_title ON others (title)"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"decision": "merge", "effort": 4, "confidence": 0.65, "why": "Single ordered pass with email prioritized and a fallback to the other identity fields fixes email-like usernames; the only concern is that slices/list import changes are not visible in the hunk."}

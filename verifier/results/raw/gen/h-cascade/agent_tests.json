@@ -1,0 +1,17 @@
+{"scenarios":[
+{"id":"self-ref-nested-cascade","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"selfrel","type":"base","fields":[]},"expect":{"status":200},"save":{"cid":"id","idfid":"fields.0.id"}},
+{"id":"add-rel","setup":true,"method":"PATCH","path":"/api/collections/selfrel","as":"superuser","json":{"fields":[{"id":"{{idfid}}","name":"id","type":"text","system":true,"primaryKey":true,"required":true,"min":15,"max":15,"pattern":"^[a-z0-9]+$","autogeneratePattern":"[a-z0-9]{15}"},{"name":"rels","type":"relation","collectionId":"{{cid}}","maxSelect":99,"cascadeDelete":true}]},"expect":{"status":200}},
+{"id":"rec-a","setup":true,"method":"POST","path":"/api/collections/selfrel/records","as":"superuser","json":{"id":"recaaaaaaaaaaaa","rels":[]},"expect":{"status":200}},
+{"id":"rec-b","setup":true,"method":"POST","path":"/api/collections/selfrel/records","as":"superuser","json":{"id":"recbbbbbbbbbbbb","rels":["recaaaaaaaaaaaa"]},"expect":{"status":200}},
+{"id":"rec-c","setup":true,"method":"POST","path":"/api/collections/selfrel/records","as":"superuser","json":{"id":"recccccccccccccc","rels":["recaaaaaaaaaaaa","recbbbbbbbbbbbb"]},"expect":{"status":200}},
+{"id":"rec-d","setup":true,"method":"POST","path":"/api/collections/selfrel/records","as":"superuser","json":{"id":"recddddddddddddd","rels":[]},"expect":{"status":200}},
+{"id":"rec-e","setup":true,"method":"POST","path":"/api/collections/selfrel/records","as":"superuser","json":{"id":"receeeeeeeeeeee","rels":["recccccccccccccc","recddddddddddddd"]},"expect":{"status":200}},
+{"id":"delete-a","method":"DELETE","path":"/api/collections/selfrel/records/recaaaaaaaaaaaa","as":"superuser","expect":{"status":204}},
+{"id":"b-gone","method":"GET","path":"/api/collections/selfrel/records/recbbbbbbbbbbbb","as":"superuser","expect":{"status":404}},
+{"id":"c-gone","method":"GET","path":"/api/collections/selfrel/records/recccccccccccccc","as":"superuser","expect":{"status":404}},
+{"id":"d-stays","method":"GET","path":"/api/collections/selfrel/records/recddddddddddddd","as":"superuser","expect":{"status":200,"json":{"id":"recddddddddddddd"}}},
+{"id":"e-stays-rels-unset","method":"GET","path":"/api/collections/selfrel/records/receeeeeeeeeeee","as":"superuser","expect":{"status":200,"json":{"id":"receeeeeeeeeeee","rels":["recddddddddddddd"]},"paths":{"rels.0":"recddddddddddddd"},"absent":["rels.1"]}},
+{"id":"total-two","method":"GET","path":"/api/collections/selfrel/records","as":"superuser","expect":{"status":200,"json":{"totalItems":2}}}
+]}
+]}

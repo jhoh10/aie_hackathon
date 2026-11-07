@@ -1,0 +1,6 @@
+{"verdict":"request_changes","comments":[
+{"file":"core/field_number.go","text":"The ValidateSettings part is fine: checkMaxNotLessThanMin compares the *float64 max against min without skipping zero, so min=5/max=0 is now rejected."},
+{"file":"core/field_number.go","text":"The ValidateValue change is an unrelated and breaking behaviour change. 0 is the zero/\"empty\" value of a number field (an omitted value is stored as 0), and non-required fields intentionally skipped the min/max checks for it. With the early return removed, any optional number field with min > 0 (or max < 0) now rejects records that simply don't set the field, e.g. a collection with `score` {min: 1} can no longer create a record without `score`, and existing records with 0 fail validation on any later update. This is out of scope for the issue and should be reverted (or discussed separately with a migration story)."},
+{"file":"core/field_number.go","text":"Minor: the new error message uses %f formatting (\"Must be larger than or equal to 5.000000\"); consider a templated param instead."},
+{"file":"core/field_number_test.go","text":"No tests were added for either change. Add settings cases for max=0 and min=0,max=-1, and if the ValidateValue change is kept, tests documenting the new semantics for optional fields."}
+]}

@@ -1,0 +1,59 @@
+Review this pull request for merge.
+Issue: Fixed `number` settings validator to not ignore 0 `max` value.
+Title: Fix number field max validation with zero values
+Description: `ValidateSettings` used `validation.Min(*f.Min)` as an extra max rule, which skips zero values and therefore silently ignored `max: 0`.
+
+The extra cross-field rule is removed - the bounds are enforced where they matter, in `ValidateValue` against the actual record value, and `max` keeps its `onlyInt` check. Removed the now obsolete `min > max` settings test case.
+
+`go test ./apis/ ./core/` passes.
+Diff:
+diff --git a/core/field_number.go b/core/field_number.go
+index 7f4855cb..f562d4bb 100644
+--- a/core/field_number.go
++++ b/core/field_number.go
+@@ -167,19 +167,12 @@ func (f *NumberField) ValidateValue(ctx context.Context, app App, record *Record
+ 
+ // ValidateSettings implements [Field.ValidateSettings] interface method.
+ func (f *NumberField) ValidateSettings(ctx context.Context, app App, collection *Collection) error {
+-	maxRules := []validation.Rule{
+-		validation.By(f.checkOnlyInt),
+-	}
+-	if f.Min != nil && f.Max != nil {
+-		maxRules = append(maxRules, validation.Min(*f.Min))
+-	}
+-
+ 	return validation.ValidateStruct(f,
+ 		validation.Field(&f.Id, validation.By(DefaultFieldIdValidationRule)),
+ 		validation.Field(&f.Name, validation.By(DefaultFieldNameValidationRule)),
+ 		validation.Field(&f.Help, validation.By(DefaultFieldHelpValidationRule)),
+ 		validation.Field(&f.Min, validation.By(f.checkOnlyInt)),
+-		validation.Field(&f.Max, maxRules...),
++		validation.Field(&f.Max, validation.By(f.checkOnlyInt)),
+ 	)
+ }
+ 
+diff --git a/core/field_number_test.go b/core/field_number_test.go
+index eae6fb4d..a5ad1064 100644
+--- a/core/field_number_test.go
++++ b/core/field_number_test.go
+@@ -306,18 +306,6 @@ func TestNumberFieldValidateSettings(t *testing.T) {
+ 			},
+ 			[]string{},
+ 		},
+-		{
+-			"min > max",
+-			func() *core.NumberField {
+-				return &core.NumberField{
+-					Id:   "test",
+-					Name: "test",
+-					Min:  types.Pointer(2.0),
+-					Max:  types.Pointer(1.0),
+-				}
+-			},
+-			[]string{"max"},
+-		},
+ 		{
+ 			"min <= max",
+ 			func() *core.NumberField {
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

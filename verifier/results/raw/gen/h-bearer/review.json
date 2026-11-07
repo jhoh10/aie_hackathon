@@ -1,0 +1,4 @@
+{"verdict":"approve","comments":[
+{"file":"apis/middlewares.go","text":"Correct: strings.EqualFold on the first 7 bytes makes the optional `Bearer ` prefix case-insensitive (RFC 7235 auth-scheme is case-insensitive). The len(token) > 7 guard avoids out-of-range slicing and a bare `Bearer ` header yields the raw value which simply fails token validation. Behaviour for tokens without the prefix is unchanged."},
+{"file":"tests/api.go","text":"Trimming header values in the test harness mirrors net/http parsing of incoming requests; harmless. Consider also adding a test for an all-lowercase `bearer ` prefix and for an invalid token with a lowercase prefix still returning 401, but not blocking."}
+]}

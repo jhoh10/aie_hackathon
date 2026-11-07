@@ -1,0 +1,1 @@
+{"decision":"merge","effort":4,"confidence":0.6,"why":"Email-shaped username login works on the new version with no changed probes, though the test did not reproduce the old failure."}

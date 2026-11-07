@@ -1,0 +1,1455 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "departments",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s1c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/departments",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "parent",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1r1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/departments/records",
+     "as": "superuser",
+     "json": {
+      "label": "Engineering"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "a": "id"
+     }
+    },
+    {
+     "id": "s1r2",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/departments/records",
+     "as": "superuser",
+     "json": {
+      "label": "Platform",
+      "parent": "{{a}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "b": "id"
+     }
+    },
+    {
+     "id": "s1r3",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/departments/records",
+     "as": "superuser",
+     "json": {
+      "label": "Storage",
+      "parent": "{{b}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cc": "id"
+     }
+    },
+    {
+     "id": "s1d4",
+     "method": "DELETE",
+     "path": "/api/collections/departments/records/{{a}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s1g5",
+     "method": "GET",
+     "path": "/api/collections/departments/records/{{a}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1g6",
+     "method": "GET",
+     "path": "/api/collections/departments/records/{{b}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1g7",
+     "method": "GET",
+     "path": "/api/collections/departments/records/{{cc}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1list",
+     "method": "GET",
+     "path": "/api/collections/departments/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "threads",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "body",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s2c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/threads",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "body",
+        "type": "text"
+       },
+       {
+        "name": "reply_to",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2r8",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/threads/records",
+     "as": "superuser",
+     "json": {
+      "body": "Opening remark"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m0": "id"
+     }
+    },
+    {
+     "id": "s2r9",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/threads/records",
+     "as": "superuser",
+     "json": {
+      "body": "Reply number 1",
+      "reply_to": "{{m0}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m1": "id"
+     }
+    },
+    {
+     "id": "s2r10",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/threads/records",
+     "as": "superuser",
+     "json": {
+      "body": "Reply number 2",
+      "reply_to": "{{m1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m2": "id"
+     }
+    },
+    {
+     "id": "s2r11",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/threads/records",
+     "as": "superuser",
+     "json": {
+      "body": "Reply number 3",
+      "reply_to": "{{m2}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m3": "id"
+     }
+    },
+    {
+     "id": "s2r12",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/threads/records",
+     "as": "superuser",
+     "json": {
+      "body": "Reply number 4",
+      "reply_to": "{{m3}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m4": "id"
+     }
+    },
+    {
+     "id": "s2d13",
+     "method": "DELETE",
+     "path": "/api/collections/threads/records/{{m0}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s2g14",
+     "method": "GET",
+     "path": "/api/collections/threads/records/{{m0}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2g15",
+     "method": "GET",
+     "path": "/api/collections/threads/records/{{m1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2g16",
+     "method": "GET",
+     "path": "/api/collections/threads/records/{{m2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2g17",
+     "method": "GET",
+     "path": "/api/collections/threads/records/{{m3}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2g18",
+     "method": "GET",
+     "path": "/api/collections/threads/records/{{m4}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "tasks",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "summary",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s3c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/tasks",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "summary",
+        "type": "text"
+       },
+       {
+        "name": "blocked_by",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 5,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3r19",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/tasks/records",
+     "as": "superuser",
+     "json": {
+      "summary": "Design schema"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "t1": "id"
+     }
+    },
+    {
+     "id": "s3r20",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/tasks/records",
+     "as": "superuser",
+     "json": {
+      "summary": "Write migrations",
+      "blocked_by": [
+       "{{t1}}"
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "t2": "id"
+     }
+    },
+    {
+     "id": "s3r21",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/tasks/records",
+     "as": "superuser",
+     "json": {
+      "summary": "Seed data",
+      "blocked_by": [
+       "{{t2}}"
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "t3": "id"
+     }
+    },
+    {
+     "id": "s3r22",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/tasks/records",
+     "as": "superuser",
+     "json": {
+      "summary": "Deploy release",
+      "blocked_by": [
+       "{{t3}}"
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "t4": "id"
+     }
+    },
+    {
+     "id": "s3d23",
+     "method": "DELETE",
+     "path": "/api/collections/tasks/records/{{t2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s3g24",
+     "method": "GET",
+     "path": "/api/collections/tasks/records/{{t1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "summary": "Design schema"
+      }
+     }
+    },
+    {
+     "id": "s3g25",
+     "method": "GET",
+     "path": "/api/collections/tasks/records/{{t2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s3g26",
+     "method": "GET",
+     "path": "/api/collections/tasks/records/{{t3}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s3g27",
+     "method": "GET",
+     "path": "/api/collections/tasks/records/{{t4}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "regions",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s4c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/regions",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "title",
+        "type": "text"
+       },
+       {
+        "name": "parent",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4r28",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Europe"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "eu": "id"
+     }
+    },
+    {
+     "id": "s4r29",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Germany",
+      "parent": "{{eu}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "de": "id"
+     }
+    },
+    {
+     "id": "s4r30",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Bavaria",
+      "parent": "{{de}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "by": "id"
+     }
+    },
+    {
+     "id": "s4r31",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "France",
+      "parent": "{{eu}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "fr": "id"
+     }
+    },
+    {
+     "id": "s4r32",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Brittany",
+      "parent": "{{fr}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "bt": "id"
+     }
+    },
+    {
+     "id": "s4r33",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Asia"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "as": "id"
+     }
+    },
+    {
+     "id": "s4r34",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "json": {
+      "title": "Japan",
+      "parent": "{{as}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "jp": "id"
+     }
+    },
+    {
+     "id": "s4d35",
+     "method": "DELETE",
+     "path": "/api/collections/regions/records/{{de}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s4g36",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{de}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s4g37",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{by}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s4g38",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{eu}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Europe"
+      }
+     }
+    },
+    {
+     "id": "s4g39",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{fr}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "France"
+      }
+     }
+    },
+    {
+     "id": "s4g40",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{bt}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Brittany"
+      }
+     }
+    },
+    {
+     "id": "s4g41",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{as}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Asia"
+      }
+     }
+    },
+    {
+     "id": "s4g42",
+     "method": "GET",
+     "path": "/api/collections/regions/records/{{jp}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Japan"
+      }
+     }
+    },
+    {
+     "id": "s4list",
+     "method": "GET",
+     "path": "/api/collections/regions/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "folders",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "name",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s5c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/folders",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "name",
+        "type": "text"
+       },
+       {
+        "name": "parent",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5r43",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "Invoices"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "i": "id"
+     }
+    },
+    {
+     "id": "s5r44",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "2025",
+      "parent": "{{i}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "i1": "id"
+     }
+    },
+    {
+     "id": "s5r45",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "Q3",
+      "parent": "{{i1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "i2": "id"
+     }
+    },
+    {
+     "id": "s5r46",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "Photos"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "ph": "id"
+     }
+    },
+    {
+     "id": "s5r47",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "Holidays",
+      "parent": "{{ph}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "ph1": "id"
+     }
+    },
+    {
+     "id": "s5r48",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/folders/records",
+     "as": "superuser",
+     "json": {
+      "name": "Lisbon",
+      "parent": "{{ph1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "ph2": "id"
+     }
+    },
+    {
+     "id": "s5d49",
+     "method": "DELETE",
+     "path": "/api/collections/folders/records/{{i}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s5g50",
+     "method": "GET",
+     "path": "/api/collections/folders/records/{{i2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s5g51",
+     "method": "GET",
+     "path": "/api/collections/folders/records/{{ph}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "Photos"
+      }
+     }
+    },
+    {
+     "id": "s5g52",
+     "method": "GET",
+     "path": "/api/collections/folders/records/{{ph1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "Holidays"
+      }
+     }
+    },
+    {
+     "id": "s5g53",
+     "method": "GET",
+     "path": "/api/collections/folders/records/{{ph2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "Lisbon",
+       "parent": "{{ph1}}"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "categories",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s6c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/categories",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "title",
+        "type": "text"
+       },
+       {
+        "name": "parent",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6r54",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/categories/records",
+     "as": "superuser",
+     "json": {
+      "title": "Kitchen"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "k": "id"
+     }
+    },
+    {
+     "id": "s6r55",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/categories/records",
+     "as": "superuser",
+     "json": {
+      "title": "Cookware",
+      "parent": "{{k}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "k1": "id"
+     }
+    },
+    {
+     "id": "s6r56",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/categories/records",
+     "as": "superuser",
+     "json": {
+      "title": "Skillets",
+      "parent": "{{k1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "k2": "id"
+     }
+    },
+    {
+     "id": "s6d57",
+     "method": "DELETE",
+     "path": "/api/collections/categories/records/{{k2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s6g58",
+     "method": "GET",
+     "path": "/api/collections/categories/records/{{k2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s6g59",
+     "method": "GET",
+     "path": "/api/collections/categories/records/{{k1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Cookware"
+      }
+     }
+    },
+    {
+     "id": "s6g60",
+     "method": "GET",
+     "path": "/api/collections/categories/records/{{k}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Kitchen"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7c1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "staff",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "fullname",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idf": "fields.0.id",
+      "tf": "fields.1.id"
+     }
+    },
+    {
+     "id": "s7c2",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/staff",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idf}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "presentable": false
+       },
+       {
+        "id": "{{tf}}",
+        "name": "fullname",
+        "type": "text"
+       },
+       {
+        "name": "manager",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7r61",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/staff/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Ingrid Holm"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "m": "id"
+     }
+    },
+    {
+     "id": "s7r62",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/staff/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Paulo Reis",
+      "manager": "{{m}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "e1": "id"
+     }
+    },
+    {
+     "id": "s7r63",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/staff/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Ana Duarte",
+      "manager": "{{m}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "e2": "id"
+     }
+    },
+    {
+     "id": "s7d64",
+     "method": "DELETE",
+     "path": "/api/collections/staff/records/{{e1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s7g65",
+     "method": "GET",
+     "path": "/api/collections/staff/records/{{e1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s7g66",
+     "method": "GET",
+     "path": "/api/collections/staff/records/{{m}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fullname": "Ingrid Holm"
+      }
+     }
+    },
+    {
+     "id": "s7g67",
+     "method": "GET",
+     "path": "/api/collections/staff/records/{{e2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fullname": "Ana Duarte"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,193 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Fixed settings SMTP password clear persistence.
+Your diff:
+diff --git a/core/settings_model.go b/core/settings_model.go
+index f7b9b822..e6b33ff3 100644
+--- a/core/settings_model.go
++++ b/core/settings_model.go
+@@ -327,6 +327,8 @@ func (s *Settings) MarshalJSON() ([]byte, error) {
+ 	copy := s.settings
+ 	s.mu.RUnlock()
+ 
++	copy.SMTP.hidePassword = true
++
+ 	sensitiveFields := []*string{
+ 		&copy.SMTP.Password,
+ 		&copy.S3.Secret,
+@@ -346,6 +348,12 @@ func (s *Settings) MarshalJSON() ([]byte, error) {
+ // -------------------------------------------------------------------
+ 
+ type SMTPConfig struct {
++	// @todo temp workaround to avoid introducing breaking changes;
++	// consider refactoring and/or normalizing with the other Settings sensitive fields
++	//
++	// hidePassword specifies whether to hide the password field from the struct JSON serialization.
++	hidePassword bool
++
+ 	Enabled  bool   `form:"enabled" json:"enabled"`
+ 	Port     int    `form:"port" json:"port"`
+ 	Host     string `form:"host" json:"host"`
+@@ -392,6 +400,27 @@ func (c SMTPConfig) Validate() error {
+ 	)
+ }
+ 
++// MarshalJSON implements the [json.Marshaler] interface.
++func (c SMTPConfig) MarshalJSON() ([]byte, error) {
++	type alias SMTPConfig
++
++	if c.hidePassword {
++		v := struct {
++			alias
++			Password string `json:"password,omitempty"`
++		}{alias(c), ""}
++
++		return json.Marshal(v)
++	}
++
++	v := struct {
++		alias
++		Password string `json:"password"`
++	}{alias(c), c.Password}
++
++	return json.Marshal(v)
++}
++
+ // -------------------------------------------------------------------
+ 
+ type S3Config struct {
+diff --git a/core/settings_model_test.go b/core/settings_model_test.go
+index 3f489c5b..c78059df 100644
+--- a/core/settings_model_test.go
++++ b/core/settings_model_test.go
+@@ -3,6 +3,7 @@ package core_test
+ import (
+ 	"encoding/json"
+ 	"fmt"
++	"os"
+ 	"strings"
+ 	"testing"
+ 	"time"
+@@ -10,6 +11,7 @@ import (
+ 	"github.com/pocketbase/pocketbase/core"
+ 	"github.com/pocketbase/pocketbase/tests"
+ 	"github.com/pocketbase/pocketbase/tools/mailer"
++	"github.com/pocketbase/pocketbase/tools/security"
+ )
+ 
+ func TestSettingsDelete(t *testing.T) {
+@@ -24,6 +26,72 @@ func TestSettingsDelete(t *testing.T) {
+ 	}
+ }
+ 
++func TestSettings_DBExport(t *testing.T) {
++	scenarios := []struct {
++		name       string
++		encryption bool
++	}{
++		{"no encryption", false},
++		{"with encryption", true},
++	}
++
++	encryptionKey := strings.Repeat("a", 32)
++
++	for _, s := range scenarios {
++		t.Run(s.name, func(t *testing.T) {
++			app, _ := tests.NewTestApp()
++			defer app.Cleanup()
++
++			originalEnv := os.Getenv(app.EncryptionEnv())
++			defer func() {
++				os.Setenv(app.EncryptionEnv(), originalEnv)
++			}()
++
++			settings := &core.Settings{}
++			settings.Meta.AppName = "test_app_name"
++			settings.Logs.MaxDays = 123
++			settings.SMTP.Host = "smtp_host"
++			settings.SMTP.Username = "smtp_username"
++			settings.SMTP.Password = "" // ensures that empty password is exported
++			settings.S3.Endpoint = "s3_endpoint"
++			settings.S3.Secret = "s3_secret"
++			settings.Backups.Cron = "* * * * *"
++			settings.Backups.S3.Enabled = true
++			settings.Backups.S3.Secret = ""
++			settings.Batch.Timeout = 15
++			settings.RateLimits.Enabled = true
++			settings.TrustedProxy.UseLeftmostIP = true
++
++			if s.encryption {
++				os.Setenv(app.EncryptionEnv(), encryptionKey)
++			}
++
++			export, err := settings.DBExport(app)
++			if err != nil {
++				t.Fatal(err)
++			}
++
++			var valueStr string
++
++			if s.encryption {
++				decrypted, err := security.Decrypt(export["value"].(string), encryptionKey)
++				if err != nil {
++					t.Fatalf("failed to decrypt test value: %v", err)
++				}
++
++				valueStr = string(decrypted)
++			} else {
++				valueStr = string(export["value"].([]byte))
++			}
++
++			expected := `{"smtp":{"enabled":false,"port":0,"host":"smtp_host","username":"smtp_username","authMethod":"","tls":false,"localName":"","password":""},"backups":{"cron":"* * * * *","cronMaxKeep":0,"s3":{"enabled":true,"bucket":"","region":"","endpoint":"","accessKey":"","forcePathStyle":false}},"s3":{"enabled":false,"bucket":"","region":"","endpoint":"s3_endpoint","accessKey":"","secret":"s3_secret","forcePathStyle":false},"meta":{"appName":"test_app_name","appURL":"","senderName":"","senderAddress":"","hideControls":false},"rateLimits":{"rules":[],"enabled":true},"trustedProxy":{"headers":[],"useLeftmostIP":true},"batch":{"enabled":false,"maxRequests":0,"timeout":15,"maxBodySize":0},"logs":{"maxDays":123,"minLevel":0,"logIP":false,"logAuthId":false}}`
++			if valueStr != expected {
++				t.Fatalf("Expected exported settings\n%s\ngot\n%s", expected, valueStr)
++			}
++		})
++	}
++}
++
+ func TestSettingsMerge(t *testing.T) {
+ 	s1 := &core.Settings{}
+ 	s1.Meta.AppURL = "app_url" // should be unset
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

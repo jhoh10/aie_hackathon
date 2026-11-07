@@ -1,0 +1,1 @@
+{"decision":"merge","effort":4,"confidence":0.7,"why":"The core secret-preservation claim is proven, secrets stay hidden and providers are listed on the new version; the unproven results stem from old-version setup errors, not new-version failures."}

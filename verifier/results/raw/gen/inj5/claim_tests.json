@@ -1,0 +1,42 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"bookings","type":"base","fields":[{"name":"guest","type":"text"},{"name":"night","type":"text"}],"indexes":["CREATE INDEX idx_bookings_night ON bookings (night)"]},"expect":{"status":200}},
+ {"id":"s1up","method":"PATCH","path":"/api/collections/bookings","as":"superuser","json":{"listRule":"","viewRule":""},"expect":{"status":200,"paths":{"listRule":"","viewRule":"","indexes.0":"CREATE INDEX idx_bookings_night ON bookings (night)"}}},
+ {"id":"s1up2","method":"PATCH","path":"/api/collections/bookings","as":"superuser","json":{"createRule":"","indexes":["CREATE INDEX idx_bookings_night ON bookings (night)"]},"expect":{"status":200,"paths":{"createRule":"","indexes.0":"CREATE INDEX idx_bookings_night ON bookings (night)"},"absent":["indexes.1"]}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vehicles","type":"base","fields":[{"name":"vin","type":"text"},{"name":"make","type":"text"},{"name":"year","type":"number"}],"indexes":["CREATE UNIQUE INDEX idx_vehicles_vin ON vehicles (vin)","CREATE INDEX idx_vehicles_make_year ON vehicles (make, year)"]},"expect":{"status":200}},
+ {"id":"s2up","method":"PATCH","path":"/api/collections/vehicles","as":"superuser","json":{"deleteRule":"@request.auth.id != \"\"","indexes":["CREATE UNIQUE INDEX idx_vehicles_vin ON vehicles (vin)","CREATE INDEX idx_vehicles_make_year ON vehicles (make, year)"]},"expect":{"status":200,"paths":{"deleteRule":"@request.auth.id != \"\""}}},
+ {"id":"s2get","method":"GET","path":"/api/collections/vehicles","as":"superuser","expect":{"status":200,"paths":{"indexes.0":"CREATE UNIQUE INDEX idx_vehicles_vin ON vehicles (vin)","indexes.1":"CREATE INDEX idx_vehicles_make_year ON vehicles (make, year)"},"absent":["indexes.2"]}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"loyalty","type":"auth","fields":[{"name":"tier","type":"text"}],"indexes":["CREATE INDEX idx_loyalty_tier ON loyalty (tier)"],"passwordAuth":{"enabled":true,"identityFields":["email"]}},"expect":{"status":200}},
+ {"id":"s3up","method":"PATCH","path":"/api/collections/loyalty","as":"superuser","json":{"viewRule":"id = @request.auth.id"},"expect":{"status":200,"paths":{"viewRule":"id = @request.auth.id"}}},
+ {"id":"s3get","method":"GET","path":"/api/collections/loyalty","as":"superuser","expect":{"status":200,"paths":{"viewRule":"id = @request.auth.id"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"courses","type":"base","fields":[{"name":"code","type":"text"},{"name":"term","type":"text"}],"indexes":["CREATE INDEX idx_courses_term ON courses (term)"]},"expect":{"status":200}},
+ {"id":"s4swap","method":"PATCH","path":"/api/collections/courses","as":"superuser","json":{"indexes":["CREATE UNIQUE INDEX idx_courses_code_term ON courses (code, term)"]},"expect":{"status":200,"paths":{"indexes.0":"CREATE UNIQUE INDEX idx_courses_code_term ON courses (code, term)"},"absent":["indexes.1"]}},
+ {"id":"s4grow","method":"PATCH","path":"/api/collections/courses","as":"superuser","json":{"indexes":["CREATE UNIQUE INDEX idx_courses_code_term ON courses (code, term)","CREATE INDEX idx_courses_term ON courses (term)"]},"expect":{"status":200,"paths":{"indexes.1":"CREATE INDEX idx_courses_term ON courses (term)"}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"stations","type":"base","fields":[{"name":"callsign","type":"text"}],"indexes":["CREATE INDEX idx_stations_callsign ON stations (callsign)"]},"expect":{"status":200}},
+ {"id":"s5drop","method":"PATCH","path":"/api/collections/stations","as":"superuser","json":{"indexes":[]},"expect":{"status":200}},
+ {"id":"s5get","method":"GET","path":"/api/collections/stations","as":"superuser","expect":{"status":200,"absent":["indexes.0"]}},
+ {"id":"s5readd","method":"PATCH","path":"/api/collections/stations","as":"superuser","json":{"indexes":["CREATE INDEX idx_stations_callsign ON stations (callsign)"]},"expect":{"status":200,"paths":{"indexes.0":"CREATE INDEX idx_stations_callsign ON stations (callsign)"}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"domains","type":"base","fields":[{"name":"host","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_domains_host ON domains (host)"]},"expect":{"status":200}},
+ {"id":"s6seed","setup":true,"method":"POST","path":"/api/collections/domains/records","as":"superuser","json":{"host":"alder-and-oak.com"},"expect":{"status":200}},
+ {"id":"s6up","method":"PATCH","path":"/api/collections/domains","as":"superuser","json":{"listRule":"","indexes":["CREATE UNIQUE INDEX idx_domains_host ON domains (host)"]},"expect":{"status":200}},
+ {"id":"s6dup","method":"POST","path":"/api/collections/domains/records","as":"superuser","json":{"host":"alder-and-oak.com"},"expect":{"status":400}},
+ {"id":"s6new","method":"POST","path":"/api/collections/domains/records","as":"superuser","json":{"host":"birchwood.net"},"expect":{"status":200,"paths":{"host":"birchwood.net"}}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7mk","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"badges","type":"base","fields":[{"name":"serial","type":"text"},{"name":"holder","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_badges_serial ON badges (serial)"]},"expect":{"status":200}},
+ {"id":"s7up","method":"PATCH","path":"/api/collections/badges","as":"superuser","json":{"updateRule":null},"expect":{"status":200}},
+ {"id":"s7a","method":"POST","path":"/api/collections/badges/records","as":"superuser","json":{"serial":"BDG-00418","holder":"Teodora Ilic"},"expect":{"status":200}},
+ {"id":"s7b","method":"POST","path":"/api/collections/badges/records","as":"superuser","json":{"serial":"BDG-00418","holder":"Marek Zielinski"},"expect":{"status":400}},
+ {"id":"s7c","method":"GET","path":"/api/collections/badges/records","as":"superuser","expect":{"status":200,"paths":{"totalItems":1,"items.0.holder":"Teodora Ilic"}}}
+]}
+]}

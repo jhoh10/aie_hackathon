@@ -1,0 +1,1 @@
+{"decision":"merge","effort":3,"confidence":0.6,"why":"Deep cascade delete works on the new version with no regressions, though the test did not reproduce the old bug."}

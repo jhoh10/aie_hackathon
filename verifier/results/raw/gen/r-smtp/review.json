@@ -1,0 +1,4 @@
+{"verdict":"request_changes","comments":[
+{"file":"core/settings_model.go","text":"Not behaviour-neutral: removing the custom SMTPConfig.MarshalJSON brings back `password,omitempty` for the DB export path. When an admin clears the SMTP password (sets it to \"\"), DBExport omits the key, and because settings are loaded/merged onto the existing in-memory settings, the old password survives a reload. That reintroduces the 'SMTP password clear is not persisted' bug. The hidePassword flag existed precisely to keep the field in DB exports while still hiding it from API responses."},
+{"file":"core/settings_model_test.go","text":"The PR deletes TestSettings_DBExport, which asserts that an empty SMTP password is exported (`\"password\":\"\"`) for both plain and encrypted storage; it would fail with this change. Please keep the test and the serializer, or provide an equivalent mechanism."}
+]}

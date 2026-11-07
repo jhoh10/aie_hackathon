@@ -1,0 +1,36 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"rebates","type":"base","fields":[{"name":"title","type":"text"},{"name":"portion","type":"number","min":3,"max":0}]},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s1b","method":"GET","path":"/api/collections/rebates","as":"superuser","expect":{"status":404}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"humidity_logs","type":"base","fields":[{"name":"percent","type":"number","min":0.5,"max":0,"onlyInt":false}]},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s2b","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"humidity_logs","type":"base","fields":[{"name":"percent","type":"number","min":0.5,"max":100}]},"expect":{"status":200,"paths":{"name":"humidity_logs"}}}
+]},
+{"id":"s3","claim":"c2","kind":"claim","steps":[
+ {"id":"s3a","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"withdrawals","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"teller","type":"text"},{"name":"change","type":"number","min":-500,"max":0}]},"expect":{"status":200}},
+ {"id":"s3b","method":"POST","path":"/api/collections/withdrawals/records","as":"superuser","json":{"teller":"Noor","change":15},"expect":{"status":400,"json":{"data":{"change":{}}}}},
+ {"id":"s3c","method":"POST","path":"/api/collections/withdrawals/records","as":"superuser","json":{"teller":"Ilse","change":-120},"expect":{"status":200,"paths":{"change":-120,"teller":"Ilse"}},"save":{"wid":"id"}},
+ {"id":"s3d","method":"PATCH","path":"/api/collections/withdrawals/records/{{wid}}","as":"superuser","json":{"change":0.75},"expect":{"status":400,"json":{"data":{"change":{}}}}},
+ {"id":"s3e","method":"GET","path":"/api/collections/withdrawals/records/{{wid}}","as":"superuser","expect":{"status":200,"paths":{"change":-120}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"tide_marks","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"harbor","type":"text"},{"name":"below_datum","type":"number","max":0}]},"expect":{"status":200}},
+ {"id":"s4b","method":"POST","path":"/api/collections/tide_marks/records","as":"superuser","json":{"harbor":"Kinsale","below_datum":3.2},"expect":{"status":400,"json":{"data":{"below_datum":{}}}}},
+ {"id":"s4c","method":"POST","path":"/api/collections/tide_marks/records","as":"superuser","json":{"harbor":"Cobh","below_datum":0},"expect":{"status":200,"paths":{"below_datum":0}}},
+ {"id":"s4d","method":"GET","path":"/api/collections/tide_marks/records","as":"superuser","expect":{"status":200,"paths":{"totalItems":1,"items.0.harbor":"Cobh"}}}
+]},
+{"id":"s5","claim":"c3","kind":"claim","steps":[
+ {"id":"s5a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"lane_speeds","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"lane","type":"text"},{"name":"kmh","type":"number","min":30,"max":130}]},"expect":{"status":200,"paths":{"name":"lane_speeds"}}},
+ {"id":"s5b","method":"POST","path":"/api/collections/lane_speeds/records","as":"superuser","json":{"lane":"A7 left","kmh":110},"expect":{"status":200,"paths":{"kmh":110}}},
+ {"id":"s5c","method":"POST","path":"/api/collections/lane_speeds/records","as":"superuser","json":{"lane":"A7 right","kmh":131},"expect":{"status":400,"json":{"data":{"kmh":{}}}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"donors","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"donor","type":"text"},{"name":"pledged","type":"number","min":5}]},"expect":{"status":200,"paths":{"name":"donors"}}},
+ {"id":"s6b","method":"POST","path":"/api/collections/donors/records","as":"superuser","json":{"donor":"Ottilie Marsh","pledged":250000.5},"expect":{"status":200,"paths":{"pledged":250000.5}}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7a","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"pressure_dips","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"station","type":"text"},{"name":"hpa_delta","type":"number","min":-60,"max":0}]},"expect":{"status":200,"paths":{"name":"pressure_dips"}}},
+ {"id":"s7b","method":"POST","path":"/api/collections/pressure_dips/records","as":"superuser","json":{"station":"Reykjanes","hpa_delta":-41.5},"expect":{"status":200,"paths":{"hpa_delta":-41.5}}}
+]}
+]}

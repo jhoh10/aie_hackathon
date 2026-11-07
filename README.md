@@ -73,16 +73,17 @@ We built a benchmark of **20 real-world PRs on [PocketBase](https://github.com/p
   | `beta@probe.io` + Beta's password | 200 | **400, Beta locked out** |
   | `betauser` + Beta's password | 200 | 200 |
 
-- A person reads **3.3 claims** on average instead of a median of **62 changed lines** per PR.
 - On the harness side, the lean prompt cut cost from $0.88 to $0.42 and time from 2.5 to 1.3 minutes per task on SWE-bench `pylint-8898`, with one engineer reply per task ([evaluation](verification-first-developer-harness/evaluation/)).
 
 **Where it falls short**
+
+- **The simulated engineer didn't confirm the reading savings.** At the approval step a person reads 3.3 claims on average instead of a median of 62 changed lines per PR. But in Jon's simulated-engineer measure, an agent stands in for the engineer at each human step. Working from the verifier's summary plus evidence, it read about 3× more tokens in total and made fewer right decisions than reviewing the diff did. On the 12 held-out cases it got 5 of 12 right, against 12 of 12 from the diff. It trusted claims that passed on both versions and merged 4 bad PRs. Its effort ratings were similar. See [results/raw/holdout/metrics.md](verifier/results/raw/holdout/metrics.md).
 
 - **Too many false alarms.** Only 1 of 8 honest fixes passed straight through. Two were blocked for real side effects their issues never mentioned, which a person may well want to know about, and one for a wrongly generated check. In the benchmark nobody edited the claims before approving them; in real use a person would.
 - **Two misses.** `r-secret` and `r-smtp` revert fixes whose bugs aren't visible through the HTTP API.
 - **AI review was very strong on this set**, catching all 12 bad PRs. Our case is the process, not a higher score: less to read, executed proof instead of an opinion, and independence from the implementer.
 
-**Caveats.** 20 cases show a direction, not significance. Claude subagents wrote all claims, checks, reviews and implementer tests (the Meta Model API wasn't billable yet). One rule was tuned on the 8 development cases before the 12 held-out ones were scored. Details in [verifier/results/summary.md](verifier/results/summary.md) and [docs/log.md](docs/log.md).
+**Caveats.** 20 cases show a direction, not significance. Claude subagents wrote all claims, checks, reviews and implementer tests (the Meta Model API wasn't billable yet). One rule was tuned on the 8 development cases before the 12 held-out ones were scored. The simulated engineers were also Claude agents, and the verdict reviewer could see the diff reviewer's decision in its tool output. Raw results, model answers and token estimates are in [verifier/results/raw/](verifier/results/raw/), and `node src/metrics.ts dev` recomputes the metrics from them. Details in [verifier/results/summary.md](verifier/results/summary.md) and [docs/log.md](docs/log.md).
 
 ## Team
 

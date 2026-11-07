@@ -1,0 +1,373 @@
+{
+ "scenarios": [
+  {
+   "id": "self-ref-nested-cascade",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "iselfrel",
+      "type": "base",
+      "fields": []
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idfid": "fields.0.id"
+     }
+    },
+    {
+     "id": "add-rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/iselfrel",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idfid}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "name": "rels",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 99,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "json": {
+      "id": "recaaaaaaaaaaaa",
+      "rels": []
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-b",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "json": {
+      "id": "recbbbbbbbbbbbb",
+      "rels": [
+       "recaaaaaaaaaaaa"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-c",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "json": {
+      "id": "recccccccccccccc",
+      "rels": [
+       "recaaaaaaaaaaaa",
+       "recbbbbbbbbbbbb"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-d",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "json": {
+      "id": "recddddddddddddd",
+      "rels": []
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-e",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "json": {
+      "id": "receeeeeeeeeeee",
+      "rels": [
+       "recccccccccccccc",
+       "recddddddddddddd"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "delete-a",
+     "method": "DELETE",
+     "path": "/api/collections/iselfrel/records/recaaaaaaaaaaaa",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "b-gone",
+     "method": "GET",
+     "path": "/api/collections/iselfrel/records/recbbbbbbbbbbbb",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "c-gone",
+     "method": "GET",
+     "path": "/api/collections/iselfrel/records/recccccccccccccc",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "d-stays",
+     "method": "GET",
+     "path": "/api/collections/iselfrel/records/recddddddddddddd",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "json": {
+       "id": "recddddddddddddd"
+      }
+     }
+    },
+    {
+     "id": "e-stays-rels-unset",
+     "method": "GET",
+     "path": "/api/collections/iselfrel/records/receeeeeeeeeeee",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "json": {
+       "id": "receeeeeeeeeeee",
+       "rels": [
+        "recddddddddddddd"
+       ]
+      },
+      "paths": {
+       "rels.0": "recddddddddddddd"
+      },
+      "absent": [
+       "rels.1"
+      ]
+     }
+    },
+    {
+     "id": "total-two",
+     "method": "GET",
+     "path": "/api/collections/iselfrel/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "json": {
+       "totalItems": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "self-ref-cascade-updated-older-record",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "create-col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "iselfrel2",
+      "type": "base",
+      "fields": []
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "cid": "id",
+      "idfid": "fields.0.id"
+     }
+    },
+    {
+     "id": "add-rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/iselfrel2",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{idfid}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "name": "rels",
+        "type": "relation",
+        "collectionId": "{{cid}}",
+        "maxSelect": 99,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-top",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel2/records",
+     "as": "superuser",
+     "json": {
+      "id": "topaaaaaaaaaaaa",
+      "rels": []
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-old",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel2/records",
+     "as": "superuser",
+     "json": {
+      "id": "oldcccccccccccc",
+      "rels": [
+       "topaaaaaaaaaaaa"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "rec-new",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/iselfrel2/records",
+     "as": "superuser",
+     "json": {
+      "id": "newbbbbbbbbbbbb",
+      "rels": [
+       "topaaaaaaaaaaaa"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "update-old-to-ref-new",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/iselfrel2/records/oldcccccccccccc",
+     "as": "superuser",
+     "json": {
+      "rels": [
+       "topaaaaaaaaaaaa",
+       "newbbbbbbbbbbbb"
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "delete-top",
+     "method": "DELETE",
+     "path": "/api/collections/iselfrel2/records/topaaaaaaaaaaaa",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "new-gone",
+     "method": "GET",
+     "path": "/api/collections/iselfrel2/records/newbbbbbbbbbbbb",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "old-gone",
+     "method": "GET",
+     "path": "/api/collections/iselfrel2/records/oldcccccccccccc",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "none-left",
+     "method": "GET",
+     "path": "/api/collections/iselfrel2/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "json": {
+       "totalItems": 0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

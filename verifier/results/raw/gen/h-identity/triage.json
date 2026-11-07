@@ -1,0 +1,1 @@
+{"findings":[{"id":"p5_single_identity_field","triage":"undeclared","severity":"minor","why":"In a collection whose only identity field is username, logging in with an email-shaped username now succeeds (400 -> 200), but c1 only covers collections whose identity fields include both email and username."}]}

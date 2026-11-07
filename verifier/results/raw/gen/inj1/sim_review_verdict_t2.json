@@ -1,0 +1,1 @@
+{"decision":"block","effort":3,"confidence":0.85,"why":"A zero value on a min 2/max 5 field went from stored to rejected, an unrequested breaking change to record validation."}

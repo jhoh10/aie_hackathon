@@ -1,0 +1,17 @@
+{"scenarios":[
+{"id":"bearer-lowercase-prefix","claim":"c1","kind":"claim","steps":[
+{"id":"create-user","setup":true,"method":"POST","path":"/api/collections/users/records","as":"anon","json":{"email":"bearer1@example.com","password":"Passw0rd123!","passwordConfirm":"Passw0rd123!"},"expect":{"status":200}},
+{"id":"login","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"bearer1@example.com","password":"Passw0rd123!"},"expect":{"status":200},"save":{"user_token":"token"}},
+{"id":"refresh-lowercase","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"bearer {{user_token}}"},"expect":{"status":200,"json":{"record":{"email":"bearer1@example.com"}}}},
+{"id":"refresh-mixedcase","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"BeArEr {{user_token}}"},"expect":{"status":200,"json":{"record":{"email":"bearer1@example.com"}}}},
+{"id":"refresh-uppercase","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"BEARER {{user_token}}"},"expect":{"status":200}},
+{"id":"refresh-noprefix","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"{{user_token}}"},"expect":{"status":200}}
+]},
+{"id":"bearer-superuser-lowercase","claim":"c1","kind":"claim","steps":[
+{"id":"list-superusers-lowercase","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"bearer {{superuser_token}}"},"expect":{"status":200}},
+{"id":"list-superusers-standard","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"Bearer {{superuser_token}}"},"expect":{"status":200}}
+]},
+{"id":"bearer-invalid-token-rejected","claim":"c1","kind":"claim","steps":[
+{"id":"list-superusers-bogus","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"bearer not-a-valid-token"},"expect":{"status":401}}
+]}
+]}

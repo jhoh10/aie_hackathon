@@ -1,0 +1,269 @@
+Review this pull request for merge.
+Issue: Fixed View collection `*` validator and added more friendly error messages. A complex query works in preview but fails on save.
+Title: Fixed View collection `*` validator and added more friendly error messages
+Description: Fixed View collection `*` validator and added more friendly error messages. A complex query works in preview but fails on save.
+Diff:
+diff --git a/core/collection_model.go b/core/collection_model.go
+index fff62412..bcf9e954 100644
+--- a/core/collection_model.go
++++ b/core/collection_model.go
+@@ -925,8 +925,14 @@ func onCollectionSaveExecute(e *CollectionEvent) error {
+ 	}
+ 
+ 	// trigger an update for all views with changed fields as a result of the current collection save
+-	// (ignoring view errors to allow users to update the query from the UI)
+-	resaveViewsWithChangedFields(e.App, e.Collection.Id)
++	// (only log the error to allow users to adjust the problematic view queries from the UI)
++	depViewsErr := resaveViewsWithChangedFields(e.App, e.Collection.Id)
++	if depViewsErr != nil {
++		e.App.Logger().Warn(
++			"Dependent view collection(s) may need to be updated after "+e.Collection.Name+" collection change",
++			"error", depViewsErr,
++		)
++	}
+ 
+ 	return nil
+ }
+diff --git a/core/collection_query.go b/core/collection_query.go
+index b19bb554..b6e47b6b 100644
+--- a/core/collection_query.go
++++ b/core/collection_query.go
+@@ -250,52 +250,6 @@ func (app *BaseApp) TruncateCollection(collection *Collection) error {
+ 
+ // -------------------------------------------------------------------
+ 
+-// saveViewCollection persists the provided View collection changes:
+-//   - deletes the old related SQL view (if any)
+-//   - creates a new SQL view with the latest newCollection.Options.Query
+-//   - generates new feilds list  based on newCollection.Options.Query
+-//   - updates newCollection.Fields based on the generated view table info and query
+-//   - saves the newCollection
+-//
+-// This method returns an error if newCollection is not a "view".
+-func saveViewCollection(app App, newCollection, oldCollection *Collection) error {
+-	if !newCollection.IsView() {
+-		return errors.New("not a view collection")
+-	}
+-
+-	return app.RunInTransaction(func(txApp App) error {
+-		query := newCollection.ViewQuery
+-
+-		// generate collection fields from the query
+-		viewFields, err := txApp.CreateViewFields(query)
+-		if err != nil {
+-			return err
+-		}
+-
+-		// delete old renamed view
+-		if oldCollection != nil {
+-			if err := txApp.DeleteView(oldCollection.Name); err != nil {
+-				return err
+-			}
+-		}
+-
+-		// wrap view query if necessary
+-		query, err = normalizeViewQueryId(txApp, query)
+-		if err != nil {
+-			return fmt.Errorf("failed to normalize view query id: %w", err)
+-		}
+-
+-		// (re)create the view
+-		if err := txApp.SaveView(newCollection.Name, query); err != nil {
+-			return err
+-		}
+-
+-		newCollection.Fields = viewFields
+-
+-		return txApp.Save(newCollection)
+-	})
+-}
+-
+ // normalizeViewQueryId wraps (if necessary) the provided view query
+ // with a subselect to ensure that the id column is a text since
+ // currently we don't support non-string model ids
+@@ -342,50 +296,59 @@ func resaveViewsWithChangedFields(app App, excludeIds ...string) error {
+ 	}
+ 
+ 	return app.RunInTransaction(func(txApp App) error {
++		var collectionErrors []error
++
+ 		for _, collection := range collections {
+ 			if len(excludeIds) > 0 && list.ExistInSlice(collection.Id, excludeIds) {
+ 				continue
+ 			}
+ 
+-			// clone the existing fields for temp modifications
+-			oldFields, err := collection.Fields.Clone()
+-			if err != nil {
+-				return err
+-			}
++			check := func() error {
++				// clone the existing fields for temp modifications
++				oldFields, err := collection.Fields.Clone()
++				if err != nil {
++					return err
++				}
+ 
+-			// generate new fields from the query
+-			newFields, err := txApp.CreateViewFields(collection.ViewQuery)
+-			if err != nil {
+-				return err
+-			}
++				// generate new fields from the query
++				newFields, err := txApp.CreateViewFields(collection.ViewQuery)
++				if err != nil {
++					return err
++				}
+ 
+-			// unset the fields' ids to exclude from the comparison
+-			for _, f := range oldFields {
+-				f.SetId("")
+-			}
+-			for _, f := range newFields {
+-				f.SetId("")
+-			}
++				// unset the fields' ids to exclude from the comparison
++				for _, f := range oldFields {
++					f.SetId("")
++				}
++				for _, f := range newFields {
++					f.SetId("")
++				}
+ 
+-			encodedNewFields, err := json.Marshal(newFields)
+-			if err != nil {
+-				return err
+-			}
++				encodedNewFields, err := json.Marshal(newFields)
++				if err != nil {
++					return err
++				}
+ 
+-			encodedOldFields, err := json.Marshal(oldFields)
+-			if err != nil {
+-				return err
+-			}
++				encodedOldFields, err := json.Marshal(oldFields)
++				if err != nil {
++					return err
++				}
+ 
+-			if bytes.EqualFold(encodedNewFields, encodedOldFields) {
+-				continue // no changes
++				if bytes.EqualFold(encodedNewFields, encodedOldFields) {
++					return nil // no changes
++				}
++
++				return txApp.Save(collection)
+ 			}
+ 
+-			if err := saveViewCollection(txApp, collection, nil); err != nil {
+-				return err
++			if err := check(); err != nil {
++				collectionErrors = append(
++					collectionErrors,
++					fmt.Errorf("[%s] %w", collection.Name, err),
++				)
+ 			}
+ 		}
+ 
+-		return nil
++		return errors.Join(collectionErrors...)
+ 	})
+ }
+diff --git a/core/view.go b/core/view.go
+index 5b44e8bc..33995dab 100644
+--- a/core/view.go
++++ b/core/view.go
+@@ -159,6 +159,12 @@ func (app *BaseApp) DryRunView(dangerousSelectQuery string, sampleSize int) (*Dr
+ 		}
+ 	}
+ 
++	// apply the same normalization as in the collection view query
++	dangerousSelectQuery, err = normalizeViewQueryId(app, dangerousSelectQuery)
++	if err != nil {
++		return nil, fmt.Errorf("failed to normalize view query id: %w", err)
++	}
++
+ 	records := []*Record{}
+ 
+ 	err = app.RecordQuery(tempCollection).
+@@ -337,6 +343,12 @@ func parseQueryToFields(app App, selectQuery string) (map[string]*queryField, er
+ 	}
+ 
+ 	for _, col := range p.columns {
++		// note: it should be safe to use the already parsed alias as there
++		// is no valid SQL where * column can be aliased to something else
++		if col.alias == "*" {
++			return nil, errors.New("wildcard columns (*) are not supported - manually type the collection field names you want the view query to have")
++		}
++
+ 		colLower := strings.ToLower(col.original)
+ 
+ 		// pk (always assume text field for now)
+@@ -424,10 +436,6 @@ func parseQueryToFields(app App, selectQuery string) (map[string]*queryField, er
+ 			continue
+ 		}
+ 
+-		if fieldName == "*" {
+-			return nil, errors.New("dynamic column names are not supported")
+-		}
+-
+ 		// find the first field by name (case insensitive)
+ 		var field Field
+ 		for _, f := range collection.Fields {
+diff --git a/core/view_test.go b/core/view_test.go
+index 384f3e23..5d9dc968 100644
+--- a/core/view_test.go
++++ b/core/view_test.go
+@@ -235,6 +235,12 @@ func TestCreateViewFields(t *testing.T) {
+ 			true,
+ 			nil,
+ 		},
++		{
++			"wrapped query with wildcard column",
++			"select * from (select 1 as id)",
++			true,
++			nil,
++		},
+ 		{
+ 			"query without id",
+ 			"select text, url, created, updated from demo1",
+@@ -781,7 +787,7 @@ func TestDryRunView(t *testing.T) {
+ 		},
+ 		{
+ 			"select resolving to records with missing id",
+-			"(select 'a' as id UNION ALL select null as id UNION ALL select 'c' as id)",
++			"select id from (select 'a' as id UNION ALL select null as id UNION ALL select 'c' as id)",
+ 			10,
+ 			true,
+ 			nil,
+@@ -789,7 +795,7 @@ func TestDryRunView(t *testing.T) {
+ 		},
+ 		{
+ 			"select resolving to records with duplicated ids",
+-			"(select 'a' as id UNION ALL select 'a' as id UNION ALL select 'c' as id)",
++			"select id from (select 'a' as id UNION ALL select 'a' as id UNION ALL select 'c' as id)",
+ 			10,
+ 			true,
+ 			nil,
+@@ -797,7 +803,7 @@ func TestDryRunView(t *testing.T) {
+ 		},
+ 		{
+ 			"no sample size and valid select query but with invalid records result",
+-			"(select 'a' as id UNION ALL select 'a' as id UNION ALL select 'c' as id)",
++			"select id from (select 'a' as id UNION ALL select 'a' as id UNION ALL select 'c' as id)",
+ 			0,
+ 			false, // still "valid" because there is no sample to check
+ 			map[string]string{"id": "text"},
+@@ -805,7 +811,7 @@ func TestDryRunView(t *testing.T) {
+ 		},
+ 		{
+ 			"sample size < total select records",
+-			"(select 'a' as id UNION ALL select 'b' as id UNION ALL select 'c' as id UNION ALL select 'd' as id)",
++			"select id from (select 'a' as id UNION ALL select 'b' as id UNION ALL select 'c' as id UNION ALL select 'd' as id)",
+ 			3,
+ 			false,
+ 			map[string]string{"id": "text"},
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

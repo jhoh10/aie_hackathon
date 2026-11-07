@@ -1,0 +1,1 @@
+{"findings":[{"id":"p1_wildcard_queries","triage":"undeclared","severity":"minor","why":"Top-level wildcard view queries are still rejected with 400 and the same validation_invalid_view_query code; only the error message text changed, which no claim mentions."}]}

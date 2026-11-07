@@ -1,0 +1,839 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1u1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "lena.fischer@mailbox.org",
+      "username": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "passwordConfirm": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1a2",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena@studio.design",
+      "password": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "lena@studio.design",
+       "record.email": "lena.fischer@mailbox.org"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "customers",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_customers_username ON customers (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2u3",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/customers/records",
+     "as": "superuser",
+     "json": {
+      "email": "r.okafor@quickpost.com",
+      "username": "ray.okafor@company.ng",
+      "password": "Meadow#lantern31",
+      "passwordConfirm": "Meadow#lantern31"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2u4",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/customers/records",
+     "as": "superuser",
+     "json": {
+      "email": "t.nguyen@quickpost.com",
+      "username": "tnguyen",
+      "password": "Velvet@orchard64",
+      "passwordConfirm": "Velvet@orchard64"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2a5",
+     "method": "POST",
+     "path": "/api/collections/customers/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "ray.okafor@company.ng",
+      "password": "Meadow#lantern31"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "r.okafor@quickpost.com"
+      }
+     }
+    },
+    {
+     "id": "s2tok",
+     "method": "POST",
+     "path": "/api/collections/customers/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "ray.okafor@company.ng",
+      "password": "Meadow#lantern31"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "tk": "token"
+     }
+    },
+    {
+     "id": "s2ref",
+     "method": "POST",
+     "path": "/api/collections/customers/auth-refresh",
+     "as": "tk",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "ray.okafor@company.ng"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "operators",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_operators_username ON operators (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "username",
+        "email"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3u6",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/operators/records",
+     "as": "superuser",
+     "json": {
+      "email": "dispatch.desk@fleetops.io",
+      "username": "night.shift@fleetops.io",
+      "password": "Tundra$beacon90",
+      "passwordConfirm": "Tundra$beacon90"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3a7",
+     "method": "POST",
+     "path": "/api/collections/operators/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "night.shift@fleetops.io",
+      "password": "Tundra$beacon90"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "dispatch.desk@fleetops.io"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4u8",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "lena.fischer@mailbox.org",
+      "username": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "passwordConfirm": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4a9",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena.fischer@mailbox.org",
+      "password": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "lena@studio.design"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "patrons",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_patrons_username ON patrons (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5u10",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/patrons/records",
+     "as": "superuser",
+     "json": {
+      "email": "kofi.mensah@inbox.gh",
+      "username": "kmensah",
+      "password": "Saffron^river27",
+      "passwordConfirm": "Saffron^river27"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5a11",
+     "method": "POST",
+     "path": "/api/collections/patrons/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "kofi.mensah@inbox.gh",
+      "password": "Saffron^river27"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "kmensah"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6u12",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "lena.fischer@mailbox.org",
+      "username": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "passwordConfirm": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6a13",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena@studio.design",
+      "password": "Harbor!sunset59"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s6a14",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena.fischer@mailbox.org",
+      "password": "wrongpass123"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7u15",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "lena.fischer@mailbox.org",
+      "username": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "passwordConfirm": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7a16",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "nobody.here@studio.design",
+      "password": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "clerks",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_clerks_username ON clerks (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8u17",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/clerks/records",
+     "as": "superuser",
+     "json": {
+      "email": "owner.box@ledgerly.com",
+      "username": "front.desk@ledgerly.com",
+      "password": "Quartz&meadow44",
+      "passwordConfirm": "Quartz&meadow44"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8a18",
+     "method": "POST",
+     "path": "/api/collections/clerks/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "front.desk@ledgerly.com",
+      "password": "Quartz&meadow44"
+     },
+     "expect": {
+      "status": 400
+     }
+    },
+    {
+     "id": "s8a19",
+     "method": "POST",
+     "path": "/api/collections/clerks/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "owner.box@ledgerly.com",
+      "password": "Quartz&meadow44"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "front.desk@ledgerly.com"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s9col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s9u20",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "sven.berg@fjordmail.no",
+      "username": "svenberg",
+      "password": "Glacier*pine12",
+      "passwordConfirm": "Glacier*pine12"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s9a21",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "svenberg",
+      "password": "Glacier*pine12"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "sven.berg@fjordmail.no"
+      }
+     }
+    },
+    {
+     "id": "s9a22",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "svenberg",
+      "password": "Glacier*pine13"
+     },
+     "expect": {
+      "status": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "s10",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s10col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "username",
+        "type": "text"
+       }
+      ],
+      "indexes": [
+       "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+      ],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email",
+        "username"
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s10u23",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/members/records",
+     "as": "superuser",
+     "json": {
+      "email": "lena.fischer@mailbox.org",
+      "username": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "passwordConfirm": "Harbor!sunset58"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s10a24",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena@studio.design",
+      "password": "Harbor!sunset58",
+      "identityField": "username"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.email": "lena.fischer@mailbox.org"
+      }
+     }
+    },
+    {
+     "id": "s10a25",
+     "method": "POST",
+     "path": "/api/collections/members/auth-with-password",
+     "as": "anon",
+     "json": {
+      "identity": "lena.fischer@mailbox.org",
+      "password": "Harbor!sunset58",
+      "identityField": "email"
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "record.username": "lena@studio.design"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

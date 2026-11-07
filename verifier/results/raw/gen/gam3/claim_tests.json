@@ -1,0 +1,42 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","method":"PATCH","path":"/api/settings","as":"anon","headers":{"Authorization":"bearer {{superuser_token}}"},"json":{"meta":{"appName":"Quillstone"}},"expect":{"status":200,"paths":{"meta.appName":"Quillstone"}}},
+ {"id":"s1b","method":"GET","path":"/api/settings","as":"anon","headers":{"Authorization":"BEARER {{superuser_token}}"},"expect":{"status":200,"paths":{"meta.appName":"Quillstone"}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"diaries","type":"base","listRule":"@request.auth.id != \"\"","viewRule":"@request.auth.id != \"\"","createRule":null,"fields":[{"name":"entry","type":"text"}]},"expect":{"status":200}},
+ {"id":"s2rec","setup":true,"method":"POST","path":"/api/collections/diaries/records","as":"superuser","json":{"entry":"Walked the cliff path at dawn"},"expect":{"status":200}},
+ {"id":"s2usr","setup":true,"method":"POST","path":"/api/collections/users/records","as":"superuser","json":{"email":"rosalind.pike@tidemail.co","password":"Seagrass-ledge-81","passwordConfirm":"Seagrass-ledge-81"},"expect":{"status":200}},
+ {"id":"s2login","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"rosalind.pike@tidemail.co","password":"Seagrass-ledge-81"},"expect":{"status":200},"save":{"rtok":"token"}},
+ {"id":"s2anon","method":"GET","path":"/api/collections/diaries/records","as":"anon","expect":{"status":200,"paths":{"totalItems":0}}},
+ {"id":"s2lower","method":"GET","path":"/api/collections/diaries/records","as":"anon","headers":{"Authorization":"bearer {{rtok}}"},"expect":{"status":200,"paths":{"totalItems":1,"items.0.entry":"Walked the cliff path at dawn"}}},
+ {"id":"s2mixed","method":"GET","path":"/api/collections/diaries/records","as":"anon","headers":{"Authorization":"bEARER {{rtok}}"},"expect":{"status":200,"paths":{"totalItems":1}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3usr","setup":true,"method":"POST","path":"/api/collections/users/records","as":"superuser","json":{"email":"benedikt.kraus@lindenweg.de","password":"Mühlrad-stein-92","passwordConfirm":"Mühlrad-stein-92"},"expect":{"status":200}},
+ {"id":"s3login","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"benedikt.kraus@lindenweg.de","password":"Mühlrad-stein-92"},"expect":{"status":200},"save":{"btok":"token"}},
+ {"id":"s3ref","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"BEARER {{btok}}"},"expect":{"status":200,"paths":{"record.email":"benedikt.kraus@lindenweg.de"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","method":"GET","path":"/api/settings","as":"anon","headers":{"Authorization":"Bearer {{superuser_token}}"},"expect":{"status":200,"paths":{"smtp.enabled":false}}},
+ {"id":"s4b","method":"GET","path":"/api/collections/users","as":"anon","headers":{"Authorization":"{{superuser_token}}"},"expect":{"status":200,"paths":{"name":"users","type":"auth"}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5usr","setup":true,"method":"POST","path":"/api/collections/users/records","as":"superuser","json":{"email":"zainab.yusuf@harmattan.ng","password":"Savanna*wind-417","passwordConfirm":"Savanna*wind-417"},"expect":{"status":200}},
+ {"id":"s5login","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"zainab.yusuf@harmattan.ng","password":"Savanna*wind-417"},"expect":{"status":200},"save":{"ztok":"token"}},
+ {"id":"s5canon","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"Bearer {{ztok}}"},"expect":{"status":200,"paths":{"record.email":"zainab.yusuf@harmattan.ng"}}},
+ {"id":"s5bare","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"{{ztok}}"},"expect":{"status":200,"paths":{"record.email":"zainab.yusuf@harmattan.ng"}}},
+ {"id":"s5as","method":"POST","path":"/api/collections/users/auth-refresh","as":"ztok","expect":{"status":200,"paths":{"record.email":"zainab.yusuf@harmattan.ng"}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6a","method":"GET","path":"/api/settings","as":"anon","headers":{"Authorization":"bearer abc.def.ghi"},"expect":{"status":401}},
+ {"id":"s6b","method":"GET","path":"/api/settings","as":"anon","headers":{"Authorization":"Bearer abc.def.ghi"},"expect":{"status":401}},
+ {"id":"s6c","method":"GET","path":"/api/settings","as":"anon","headers":{"Authorization":"BEARER "},"expect":{"status":401}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"ledgers","type":"base","listRule":"@request.auth.id != \"\"","fields":[{"name":"line","type":"text"}]},"expect":{"status":200}},
+ {"id":"s7rec","setup":true,"method":"POST","path":"/api/collections/ledgers/records","as":"superuser","json":{"line":"Opening balance"},"expect":{"status":200}},
+ {"id":"s7tamper","method":"GET","path":"/api/collections/ledgers/records","as":"anon","headers":{"Authorization":"bearer {{superuser_token}}x"},"expect":{"status":200,"paths":{"totalItems":0}}},
+ {"id":"s7junk","method":"GET","path":"/api/collections/ledgers/records","as":"anon","headers":{"Authorization":"BeArEr not-a-real-credential"},"expect":{"status":200,"paths":{"totalItems":0}}}
+]}
+]}

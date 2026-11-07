@@ -1,0 +1,1 @@
+{"decision":"approve","edits":[],"effort":3,"confidence":0.85,"why":"Claims capture max 0 being honoured in settings and values, with regressions for normal ranges."}

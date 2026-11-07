@@ -1,0 +1,344 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_case_variants_superuser",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "lower",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{superuser_token}}"
+          }
+        },
+        {
+          "id": "upper",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "BEARER {{superuser_token}}"
+          }
+        },
+        {
+          "id": "mixed",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "BeArEr {{superuser_token}}"
+          }
+        },
+        {
+          "id": "canonical",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer {{superuser_token}}"
+          }
+        },
+        {
+          "id": "raw",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "{{superuser_token}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p2_boundary_prefix_lengths",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "only_prefix",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer "
+          }
+        },
+        {
+          "id": "only_word",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer"
+          }
+        },
+        {
+          "id": "lower_only_prefix",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer "
+          }
+        },
+        {
+          "id": "prefix_plus_one",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer x"
+          }
+        },
+        {
+          "id": "double_space",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer  {{superuser_token}}"
+          }
+        },
+        {
+          "id": "double_prefix",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer Bearer {{superuser_token}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p3_user_token_case_variants",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_user",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/users/records",
+          "as": "superuser",
+          "json": {
+            "email": "bob@probe.io",
+            "password": "password123",
+            "passwordConfirm": "password123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "auth_user",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/users/auth-with-password",
+          "as": "anon",
+          "json": {
+            "identity": "bob@probe.io",
+            "password": "password123"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "user_token": "token"
+          }
+        },
+        {
+          "id": "refresh_lower",
+          "method": "POST",
+          "path": "/api/collections/users/auth-refresh",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{user_token}}"
+          }
+        },
+        {
+          "id": "refresh_upper",
+          "method": "POST",
+          "path": "/api/collections/users/auth-refresh",
+          "as": "anon",
+          "headers": {
+            "Authorization": "BEARER {{user_token}}"
+          }
+        },
+        {
+          "id": "refresh_canonical",
+          "method": "POST",
+          "path": "/api/collections/users/auth-refresh",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Bearer {{user_token}}"
+          }
+        },
+        {
+          "id": "user_on_superuser_endpoint_lower",
+          "method": "GET",
+          "path": "/api/collections/_superusers/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{user_token}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p4_rule_based_access_lowercase",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "notes",
+            "type": "base",
+            "listRule": "@request.auth.id != \"\"",
+            "viewRule": "@request.auth.id != \"\"",
+            "createRule": "@request.auth.id != \"\"",
+            "updateRule": null,
+            "deleteRule": null,
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "create_user",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/users/records",
+          "as": "superuser",
+          "json": {
+            "email": "bob@probe.io",
+            "password": "password123",
+            "passwordConfirm": "password123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "auth_user",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/users/auth-with-password",
+          "as": "anon",
+          "json": {
+            "identity": "bob@probe.io",
+            "password": "password123"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "user_token": "token"
+          }
+        },
+        {
+          "id": "create_lower",
+          "method": "POST",
+          "path": "/api/collections/notes/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{user_token}}"
+          },
+          "json": {
+            "title": "hello"
+          }
+        },
+        {
+          "id": "list_lower",
+          "method": "GET",
+          "path": "/api/collections/notes/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{user_token}}"
+          }
+        },
+        {
+          "id": "list_upper",
+          "method": "GET",
+          "path": "/api/collections/notes/records",
+          "as": "anon",
+          "headers": {
+            "Authorization": "BEARER {{user_token}}"
+          }
+        },
+        {
+          "id": "list_none",
+          "method": "GET",
+          "path": "/api/collections/notes/records",
+          "as": "anon"
+        }
+      ]
+    },
+    {
+      "id": "p5_invalid_tokens_with_prefix",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "lower_invalid",
+          "method": "GET",
+          "path": "/api/collections",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer invalid.token.value"
+          }
+        },
+        {
+          "id": "upper_invalid",
+          "method": "GET",
+          "path": "/api/collections",
+          "as": "anon",
+          "headers": {
+            "Authorization": "BEARER invalid.token.value"
+          }
+        },
+        {
+          "id": "other_scheme",
+          "method": "GET",
+          "path": "/api/collections",
+          "as": "anon",
+          "headers": {
+            "Authorization": "Basic {{superuser_token}}"
+          }
+        },
+        {
+          "id": "health_lower",
+          "method": "GET",
+          "path": "/api/health",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{superuser_token}}"
+          }
+        },
+        {
+          "id": "collections_lower",
+          "method": "GET",
+          "path": "/api/collections",
+          "as": "anon",
+          "headers": {
+            "Authorization": "bearer {{superuser_token}}"
+          }
+        }
+      ]
+    }
+  ]
+}

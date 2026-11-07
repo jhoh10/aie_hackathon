@@ -1,0 +1,17 @@
+{"scenarios":[
+{"id":"smtp-password-clear-accepted-and-hidden","claim":"c1","kind":"claim","steps":[
+{"id":"set-password","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.example.com","port":587,"username":"rmailer1","password":"initialpass1"}},"expect":{"status":200}},
+{"id":"clear-password","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"password":""}},"expect":{"status":200,"json":{"smtp":{"enabled":true,"host":"smtp.example.com","port":587,"username":"rmailer1"}},"absent":["smtp.password"]}},
+{"id":"get-settings","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"json":{"smtp":{"host":"smtp.example.com","username":"rmailer1"}},"absent":["smtp.password"]}}
+]},
+{"id":"smtp-password-never-exposed","claim":"c1","kind":"claim","steps":[
+{"id":"set-password","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":false,"host":"smtp2.example.com","port":25,"username":"rmailer2","password":"secretpass2"}},"expect":{"status":200,"absent":["smtp.password"]}},
+{"id":"get-settings","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"json":{"smtp":{"host":"smtp2.example.com","port":25}},"absent":["smtp.password"]}},
+{"id":"anon-denied","method":"GET","path":"/api/settings","as":"anon","expect":{"status":401}}
+]},
+{"id":"smtp-other-fields-update-after-clear","claim":"c1","kind":"claim","steps":[
+{"id":"set-password","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp3.example.com","port":465,"username":"rmailer3","password":"pass3"}},"expect":{"status":200}},
+{"id":"clear-password","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"password":""}},"expect":{"status":200}},
+{"id":"update-name","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"rsmtpclearapp"}},"expect":{"status":200,"json":{"meta":{"appName":"smtpclearapp"},"smtp":{"host":"smtp3.example.com","port":465}},"absent":["smtp.password"]}}
+]}
+]}

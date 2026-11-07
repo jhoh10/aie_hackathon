@@ -1,0 +1,1 @@
+{"decision":"block","effort":4,"confidence":0.85,"why":"A partial PATCH that only disables oauth2 now fails with 400 and providers missing credentials are now accepted, both unrequested regressions."}

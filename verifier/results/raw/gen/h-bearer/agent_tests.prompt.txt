@@ -1,0 +1,109 @@
+You implemented this change and now add HTTP tests for it.
+Issue: Made the optional `Bearer` token prefix case-insensitive. The Authorization prefix is handled in a case-sensitive way, which breaks clients that send a differently cased prefix.
+Your diff:
+diff --git a/apis/middlewares.go b/apis/middlewares.go
+index 6f4424d7..dc1d44c3 100644
+--- a/apis/middlewares.go
++++ b/apis/middlewares.go
+@@ -207,11 +207,13 @@ func loadAuthToken() *hook.Handler[*core.RequestEvent] {
+ 
+ func getAuthTokenFromRequest(e *core.RequestEvent) string {
+ 	token := e.Request.Header.Get("Authorization")
+-	if token != "" {
+-		// the schema prefix is not required and it is only for
+-		// compatibility with the defaults of some HTTP clients
+-		token = strings.TrimPrefix(token, "Bearer ")
++
++	// the "Bearer" schema prefix is not required by PocketBase and it is
++	// supported only for compatibility with the defaults of some HTTP clients
++	if len(token) > 7 && strings.EqualFold(token[:7], "Bearer ") {
++		return token[7:]
+ 	}
++
+ 	return token
+ }
+ 
+diff --git a/apis/middlewares_test.go b/apis/middlewares_test.go
+index d28c1364..2a54afe8 100644
+--- a/apis/middlewares_test.go
++++ b/apis/middlewares_test.go
+@@ -224,6 +224,22 @@ func TestRequireAuth(t *testing.T) {
+ 			ExpectedStatus:  200,
+ 			ExpectedContent: []string{"test123"},
+ 		},
++		{
++			Name:   "valid record auth token with Bearer case-insensitive prefix",
++			Method: http.MethodGet,
++			URL:    "/my/test",
++			Headers: map[string]string{
++				// regular user
++				"Authorization": "BeArEr eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjRxMXhsY2xtZmxva3UzMyIsInR5cGUiOiJhdXRoIiwiY29sbGVjdGlvbklkIjoiX3BiX3VzZXJzX2F1dGhfIiwiZXhwIjoyNTI0NjA0NDYxLCJyZWZyZXNoYWJsZSI6dHJ1ZX0.ZT3F0Z3iM-xbGgSG3LEKiEzHrPHr8t8IuHLZGGNuxLo",
++			},
++			BeforeTestFunc: func(t testing.TB, app *tests.TestApp, e *core.ServeEvent) {
++				e.Router.GET("/my/test", func(e *core.RequestEvent) error {
++					return e.String(200, "test123")
++				}).Bind(apis.RequireAuth())
++			},
++			ExpectedStatus:  200,
++			ExpectedContent: []string{"test123"},
++		},
+ 	}
+ 
+ 	for _, scenario := range scenarios {
+diff --git a/tests/api.go b/tests/api.go
+index 35d2928d..43b820a2 100644
+--- a/tests/api.go
++++ b/tests/api.go
+@@ -232,7 +232,8 @@ func (scenario *ApiScenario) test(t testing.TB) {
+ 
+ 		// set scenario headers
+ 		for k, v := range scenario.Headers {
+-			req.Header.Set(k, v)
++			// trim whitespaces for consistency with the net/http request parsing
++			req.Header.Set(k, strings.TrimSpace(v))
+ 		}
+ 
+ 		// execute request
+
+API reference:
+# PocketBase HTTP API reference (for writing black-box checks)
+
+Base app is empty apart from a superuser and the built-in `users` auth collection and `_superusers`.
+Auth: send the token in `Authorization`. The optional `Bearer ` prefix is allowed. Errors look like
+`{"status":400,"message":"...","data":{"field":{"code":"validation_...","message":"..."}}}`.
+
+## Collections (superuser only)
+- `GET /api/collections`, `GET /api/collections/{idOrName}`
+- `POST /api/collections`, body e.g.
+  `{"name":"posts","type":"base","listRule":"","viewRule":"","createRule":"","updateRule":"","deleteRule":"","fields":[{"name":"title","type":"text"},{"name":"score","type":"number","min":0,"max":10,"onlyInt":false},{"name":"parent","type":"relation","collectionId":"<id>","maxSelect":1,"cascadeDelete":true}],"indexes":["CREATE INDEX idx_posts_title ON posts (title)"]}`
+- `PATCH /api/collections/{idOrName}` updates; send `fields` as the full list, with existing field `id`s to keep them.
+- `DELETE /api/collections/{idOrName}`
+- A rule of `null` means superuser only, `""` means public, and an expression filters e.g. `@request.auth.id != ""`.
+- Types: `base`, `auth`, `view`. A view needs `viewQuery`, e.g. `{"name":"v","type":"view","viewQuery":"SELECT id, title FROM posts"}`.
+- Auth collections have `passwordAuth`: `{"enabled":true,"identityFields":["email","username"]}` and
+  `oauth2`: `{"enabled":true,"providers":[{"name":"google","clientId":"x","clientSecret":"y"}]}`. Secrets are hidden in responses.
+  Add a custom field such as `{"name":"username","type":"text"}` and a unique index on it to use it as an identity field.
+
+## Records
+- `GET /api/collections/{c}/records?filter=&sort=&expand=&fields=&page=&perPage=`
+- `GET /api/collections/{c}/records/{id}`, `POST /api/collections/{c}/records`, `PATCH .../{id}`, `DELETE .../{id}`
+- Auth collection records need `email`, `password`, `passwordConfirm`.
+
+## Auth
+- `POST /api/collections/{authCollection}/auth-with-password` with `{"identity":"...","password":"..."}` and optional `identityField`. Returns `{token, record}`.
+- `GET /api/collections/_superusers/records`, a simple superuser-only endpoint.
+- `POST /api/collections/{authCollection}/auth-refresh`, with the auth token.
+
+## Settings (superuser only)
+- `GET /api/settings`, `PATCH /api/settings`, e.g. `{"meta":{"appName":"x"},"smtp":{"enabled":true,"host":"h","port":25,"username":"u","password":"p"}}`. Secrets are hidden in responses.
+- SMTP password can't be read back. `POST /api/settings/test/email` can't reach a mail server in this sandbox.
+
+## Other
+- `GET /api/health` is public. `POST /api/batch` runs multiple record requests when enabled in settings.
+
+Scenario JSON: {"id":"s1","claim":"c1","kind":"claim","steps":[{"id":"...","setup":true,"method":"POST","path":"/api/...","as":"superuser","headers":{},"json":{},"expect":{"status":200,"json":{},"paths":{"a.b":1},"absent":["x.y"]},"save":{"var":"a.b"}}]}
+- "as": "superuser", "anon" or a saved variable that holds a token. "headers" can use {{var}}; {{superuser_token}} always exists.
+- "expect.json" is a deep subset match. "save" stores a response value for later {{var}} use.
+- Mark state-building steps "setup":true. A failed setup step means the check is inconclusive, not failed.
+- Each scenario starts on a fresh empty app, so it must create everything it needs. Use only values you've set, or {{var}}.
+Return JSON only: {"scenarios":[...]} with "kind":"claim" and "claim":"c1".

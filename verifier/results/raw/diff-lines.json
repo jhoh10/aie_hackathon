@@ -1,0 +1,22 @@
+{
+ "h-bearer": 13,
+ "h-number": 24,
+ "h-cascade": 36,
+ "r-number": 24,
+ "r-secret": 21,
+ "gam1": 13,
+ "inj1": 21,
+ "inj2": 23,
+ "h-identity": 37,
+ "h-oauth": 63,
+ "h-smtp": 29,
+ "h-view": 141,
+ "h-index": 141,
+ "r-smtp": 29,
+ "r-identity": 37,
+ "gam2": 9,
+ "gam3": 16,
+ "inj3": 23,
+ "inj4": 5,
+ "inj5": 4
+}

@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 3, "confidence": 0.85, "why": "Removing the custom SMTP marshaling changes behavior and reintroduces the bug where clearing the SMTP password does not persist."}

@@ -1,0 +1,43 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"volunteers","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_volunteers_username ON volunteers (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s1usr","setup":true,"method":"POST","path":"/api/collections/volunteers/records","as":"superuser","json":{"email":"mateo.rossi@cittadina.it","username":"mateo@foodbank.it","password":"Basilico#forno-58","passwordConfirm":"Basilico#forno-58"},"expect":{"status":200}},
+ {"id":"s1login","method":"POST","path":"/api/collections/volunteers/auth-with-password","as":"anon","json":{"identity":"mateo@foodbank.it","password":"Basilico#forno-58"},"expect":{"status":200,"paths":{"record.email":"mateo.rossi@cittadina.it","record.username":"mateo@foodbank.it"}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"coaches","type":"auth","fields":[{"name":"handle","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_coaches_handle ON coaches (handle)"],"passwordAuth":{"enabled":true,"identityFields":["email","handle"]}},"expect":{"status":200}},
+ {"id":"s2u1","setup":true,"method":"POST","path":"/api/collections/coaches/records","as":"superuser","json":{"email":"sione.taufa@reef.to","handle":"coach.sione@rugbyclub.to","password":"Lagoon$scrum-640","passwordConfirm":"Lagoon$scrum-640"},"expect":{"status":200}},
+ {"id":"s2u2","setup":true,"method":"POST","path":"/api/collections/coaches/records","as":"superuser","json":{"email":"mele.fonua@reef.to","handle":"coach.mele@rugbyclub.to","password":"Coral!lineout-23","passwordConfirm":"Coral!lineout-23"},"expect":{"status":200}},
+ {"id":"s2l1","method":"POST","path":"/api/collections/coaches/auth-with-password","as":"anon","json":{"identity":"coach.mele@rugbyclub.to","password":"Coral!lineout-23"},"expect":{"status":200,"paths":{"record.email":"mele.fonua@reef.to"}}},
+ {"id":"s2l2","method":"POST","path":"/api/collections/coaches/auth-with-password","as":"anon","json":{"identity":"coach.sione@rugbyclub.to","password":"Lagoon$scrum-640"},"expect":{"status":200,"paths":{"record.email":"sione.taufa@reef.to"}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"auditors","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_auditors_username ON auditors (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s3usr","setup":true,"method":"POST","path":"/api/collections/auditors/records","as":"superuser","json":{"email":"j.okonkwo@ledgerhaus.com","username":"audit-team@ledgerhaus.com","password":"Balance=sheet-77","passwordConfirm":"Balance=sheet-77"},"expect":{"status":200}},
+ {"id":"s3login","method":"POST","path":"/api/collections/auditors/auth-with-password","as":"anon","json":{"identity":"audit-team@ledgerhaus.com","password":"Balance=sheet-77"},"expect":{"status":200},"save":{"atok":"token"}},
+ {"id":"s3me","method":"POST","path":"/api/collections/auditors/auth-refresh","as":"atok","expect":{"status":200,"paths":{"record.username":"audit-team@ledgerhaus.com","record.email":"j.okonkwo@ledgerhaus.com"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"volunteers","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_volunteers_username ON volunteers (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s4usr","setup":true,"method":"POST","path":"/api/collections/volunteers/records","as":"superuser","json":{"email":"aiko.mori@hanamail.jp","username":"aiko@shelter.jp","password":"Momiji~leaf-305","passwordConfirm":"Momiji~leaf-305"},"expect":{"status":200}},
+ {"id":"s4login","method":"POST","path":"/api/collections/volunteers/auth-with-password","as":"anon","json":{"identity":"aiko.mori@hanamail.jp","password":"Momiji~leaf-305"},"expect":{"status":200,"paths":{"record.username":"aiko@shelter.jp"}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"rangers","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_rangers_username ON rangers (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s5usr","setup":true,"method":"POST","path":"/api/collections/rangers/records","as":"superuser","json":{"email":"cole.whitaker@parks.us","username":"ranger_cole","password":"Sequoia^trail-12","passwordConfirm":"Sequoia^trail-12"},"expect":{"status":200}},
+ {"id":"s5login","method":"POST","path":"/api/collections/rangers/auth-with-password","as":"anon","json":{"identity":"ranger_cole","password":"Sequoia^trail-12"},"expect":{"status":200,"paths":{"record.email":"cole.whitaker@parks.us"}}},
+ {"id":"s5login2","method":"POST","path":"/api/collections/rangers/auth-with-password","as":"anon","json":{"identity":"cole.whitaker@parks.us","password":"Sequoia^trail-12"},"expect":{"status":200,"paths":{"record.username":"ranger_cole"}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"volunteers","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_volunteers_username ON volunteers (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s6usr","setup":true,"method":"POST","path":"/api/collections/volunteers/records","as":"superuser","json":{"email":"lars.eriksen@nordlys.no","username":"lars@soupkitchen.no","password":"Aurora%night-930","passwordConfirm":"Aurora%night-930"},"expect":{"status":200}},
+ {"id":"s6w1","method":"POST","path":"/api/collections/volunteers/auth-with-password","as":"anon","json":{"identity":"lars@soupkitchen.no","password":"Aurora%night-931"},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s6w2","method":"POST","path":"/api/collections/volunteers/auth-with-password","as":"anon","json":{"identity":"lars.eriksen@nordlys.no","password":"aurora%night-930"},"expect":{"status":400}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"stewards","type":"auth","fields":[{"name":"username","type":"text"}],"indexes":["CREATE UNIQUE INDEX idx_stewards_username ON stewards (username)"],"passwordAuth":{"enabled":true,"identityFields":["email","username"]}},"expect":{"status":200}},
+ {"id":"s7usr","setup":true,"method":"POST","path":"/api/collections/stewards/records","as":"superuser","json":{"email":"fatima.zahra@atlas.ma","username":"fz@orchard.ma","password":"Argan&oil-246","passwordConfirm":"Argan&oil-246"},"expect":{"status":200}},
+ {"id":"s7u1","method":"POST","path":"/api/collections/stewards/auth-with-password","as":"anon","json":{"identity":"fz@orchard.org","password":"Argan&oil-246"},"expect":{"status":400}},
+ {"id":"s7u2","method":"POST","path":"/api/collections/stewards/auth-with-password","as":"anon","json":{"identity":"stranger","password":"Argan&oil-246"},"expect":{"status":400}}
+]}
+]}

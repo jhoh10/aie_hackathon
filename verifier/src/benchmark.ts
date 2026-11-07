@@ -57,10 +57,15 @@ async function runSim(c: Case) {
   verifierResults ??= existsSync(join(OUT, 'verifier.json')) ? JSON.parse(readFileSync(join(OUT, 'verifier.json'), 'utf8')) : {};
   const vr = verifierResults![c.id];
   const diff = diffFor(REPO, c.base, c.head);
-  const reviewDiff = await simReviewDiff(c.id, c, diff, model);
-  if (!vr || vr.error) return { id: c.id, reviewDiff, note: 'no verifier result, so no planning or verdict review' };
-  const planning = await simPlanning(c.id, c.issue, vr.locked?.claims ?? [], model);
-  const reviewVerdict = await simReviewVerdict(c.id, c.issue, vr, model);
+  // Each step's prompt is written even when another step is still waiting for its answer,
+  // so the diff reviewer and the verdict reviewer can be answered by separate writers at once.
+  const waiting: Pending[] = [];
+  const step = async <T>(f: () => Promise<T>) => { try { return await f(); } catch (e) { if (e instanceof Pending) { waiting.push(e); return undefined; } throw e; } };
+  const reviewDiff = await step(() => simReviewDiff(c.id, c, diff, model));
+  if (!vr || vr.error) { if (waiting.length) throw waiting[0]; return { id: c.id, reviewDiff, note: 'no verifier result, so no planning or verdict review' }; }
+  const planning = await step(() => simPlanning(c.id, c.issue, vr.locked?.claims ?? [], model));
+  const reviewVerdict = await step(() => simReviewVerdict(c.id, c.issue, vr, model));
+  if (waiting.length) { for (const w of waiting.slice(1)) pending.push(w.message); throw waiting[0]; }
   log(c.id, 'sim', `diff:${reviewDiff.decision} verdict:${reviewVerdict.decision}`);
   return { id: c.id, planning, reviewDiff, reviewVerdict };
 }

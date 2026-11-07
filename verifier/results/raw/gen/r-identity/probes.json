@@ -1,0 +1,730 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_username_first_email_collision",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "username",
+                "email"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "alpha@probe.io",
+            "username": "beta@probe.io",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_b",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "beta@probe.io",
+            "username": "betauser",
+            "password": "passwordB123",
+            "passwordConfirm": "passwordB123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "pw_a",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "pw_b",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordB123"
+          }
+        },
+        {
+          "id": "by_username",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "betauser",
+            "password": "passwordB123"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p2_email_first_email_collision",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "email",
+                "username"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "alpha@probe.io",
+            "username": "beta@probe.io",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_b",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "beta@probe.io",
+            "username": "betauser",
+            "password": "passwordB123",
+            "passwordConfirm": "passwordB123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "pw_a",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "pw_b",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordB123"
+          }
+        },
+        {
+          "id": "wrong",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "wrongpass123"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p3_nondeliverable_like_identities",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "email",
+                "username"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "alice@example.com",
+            "username": "alice",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_b",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "bob@probe.io",
+            "username": "alice@example.com",
+            "password": "passwordB123",
+            "passwordConfirm": "passwordB123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_c",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "carol@probe.io",
+            "username": "test@probe.io",
+            "password": "passwordC123",
+            "passwordConfirm": "passwordC123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_d",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "test@probe.io",
+            "username": "dave",
+            "password": "passwordD123",
+            "passwordConfirm": "passwordD123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "ex_pw_a",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "alice@example.com",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "ex_pw_b",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "alice@example.com",
+            "password": "passwordB123"
+          }
+        },
+        {
+          "id": "test_pw_c",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "test@probe.io",
+            "password": "passwordC123"
+          }
+        },
+        {
+          "id": "test_pw_d",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "test@probe.io",
+            "password": "passwordD123"
+          }
+        },
+        {
+          "id": "upper_ex",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "ALICE@EXAMPLE.COM",
+            "password": "passwordB123"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p4_email_like_username_no_email_match",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "username",
+                "email"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "real@probe.io",
+            "username": "joe@probe.io",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "by_email_like_username",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "joe@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "by_email",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "real@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "missing",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "nobody@probe.io",
+            "password": "passwordA123"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p5_single_identity_field",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "username"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "a1@probe.io",
+            "username": "a2@probe.io",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "email_value_username_only",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "a1@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "username_value",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "a2@probe.io",
+            "password": "passwordA123"
+          }
+        },
+        {
+          "id": "create_coll2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "mates",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_mates_username ON mates (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "email"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "mate",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/mates/records",
+          "as": "superuser",
+          "json": {
+            "email": "m1@probe.io",
+            "username": "m1",
+            "password": "passwordM123",
+            "passwordConfirm": "passwordM123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "non_email_email_only",
+          "method": "POST",
+          "path": "/api/collections/mates/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "m1",
+            "password": "passwordM123"
+          }
+        },
+        {
+          "id": "email_email_only",
+          "method": "POST",
+          "path": "/api/collections/mates/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "m1@probe.io",
+            "password": "passwordM123"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p6_explicit_identity_field_and_errors",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "members",
+            "type": "auth",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "username",
+                "type": "text"
+              }
+            ],
+            "indexes": [
+              "CREATE UNIQUE INDEX idx_members_username ON members (username)"
+            ],
+            "passwordAuth": {
+              "enabled": true,
+              "identityFields": [
+                "username",
+                "email"
+              ]
+            }
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_a",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "alpha@probe.io",
+            "username": "beta@probe.io",
+            "password": "passwordA123",
+            "passwordConfirm": "passwordA123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "member_b",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/members/records",
+          "as": "superuser",
+          "json": {
+            "email": "beta@probe.io",
+            "username": "betauser",
+            "password": "passwordB123",
+            "passwordConfirm": "passwordB123"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "explicit_username",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordA123",
+            "identityField": "username"
+          }
+        },
+        {
+          "id": "explicit_email",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordB123",
+            "identityField": "email"
+          }
+        },
+        {
+          "id": "explicit_invalid",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordB123",
+            "identityField": "name"
+          }
+        },
+        {
+          "id": "empty_identity",
+          "method": "POST",
+          "path": "/api/collections/members/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "",
+            "password": "passwordB123"
+          }
+        },
+        {
+          "id": "users_default",
+          "method": "POST",
+          "path": "/api/collections/users/auth-with-password?fields=record.email,record.username",
+          "as": "anon",
+          "json": {
+            "identity": "beta@probe.io",
+            "password": "passwordB123"
+          }
+        }
+      ]
+    }
+  ]
+}

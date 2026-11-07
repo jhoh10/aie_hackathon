@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 3, "confidence": 0.9, "why": "Restoring secrets by slice index instead of provider name assigns the wrong client secrets when providers are added or reordered."}

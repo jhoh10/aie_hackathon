@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 3, "confidence": 0.9, "why": "Redacting ClientSecret in place on the shared slice mutates the cached collection model and wipes the stored secrets."}

@@ -1,0 +1,928 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_single_cascade",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_authors",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "authors",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "authors_id": "id"
+          }
+        },
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "author",
+                "type": "relation",
+                "collectionId": "{{authors_id}}",
+                "maxSelect": 1,
+                "cascadeDelete": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "author_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ann"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a1": "id"
+          }
+        },
+        {
+          "id": "author_2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ben"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a2": "id"
+          }
+        },
+        {
+          "id": "post_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t1",
+            "author": "{{a1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p1": "id"
+          }
+        },
+        {
+          "id": "post_2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t2",
+            "author": "{{a1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p2": "id"
+          }
+        },
+        {
+          "id": "post_3",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t3",
+            "author": "{{a2}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p3": "id"
+          }
+        },
+        {
+          "id": "delete_author",
+          "method": "DELETE",
+          "path": "/api/collections/authors/records/{{a1}}",
+          "as": "superuser"
+        },
+        {
+          "id": "list_posts",
+          "method": "GET",
+          "path": "/api/collections/posts/records?sort=title&fields=title",
+          "as": "superuser"
+        },
+        {
+          "id": "get_deleted_post",
+          "method": "GET",
+          "path": "/api/collections/posts/records/{{p1}}",
+          "as": "superuser"
+        },
+        {
+          "id": "get_kept_post",
+          "method": "GET",
+          "path": "/api/collections/posts/records/{{p3}}?fields=title,author",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p2_multi_unset_no_cascade",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_authors",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "authors",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "authors_id": "id"
+          }
+        },
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "author",
+                "type": "relation",
+                "collectionId": "{{authors_id}}",
+                "maxSelect": 5,
+                "cascadeDelete": false
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "author_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ann"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a1": "id"
+          }
+        },
+        {
+          "id": "author_2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ben"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a2": "id"
+          }
+        },
+        {
+          "id": "post_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t1",
+            "author": [
+              "{{a1}}",
+              "{{a2}}"
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p1": "id"
+          }
+        },
+        {
+          "id": "post_2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t2",
+            "author": [
+              "{{a1}}"
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p2": "id"
+          }
+        },
+        {
+          "id": "delete_author",
+          "method": "DELETE",
+          "path": "/api/collections/authors/records/{{a1}}",
+          "as": "superuser"
+        },
+        {
+          "id": "list_posts",
+          "method": "GET",
+          "path": "/api/collections/posts/records?sort=title&fields=title",
+          "as": "superuser"
+        },
+        {
+          "id": "count_with_a2",
+          "method": "GET",
+          "path": "/api/collections/posts/records?filter=author~'{{a2}}'&fields=title",
+          "as": "superuser"
+        },
+        {
+          "id": "count_empty",
+          "method": "GET",
+          "path": "/api/collections/posts/records?filter=author:length=0&fields=title",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p3_required_relation_blocks_delete",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_authors",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "authors",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "authors_id": "id"
+          }
+        },
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "author",
+                "type": "relation",
+                "collectionId": "{{authors_id}}",
+                "maxSelect": 1,
+                "cascadeDelete": false,
+                "required": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "author_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ann"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a1": "id"
+          }
+        },
+        {
+          "id": "post_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t1",
+            "author": "{{a1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p1": "id"
+          }
+        },
+        {
+          "id": "delete_author",
+          "method": "DELETE",
+          "path": "/api/collections/authors/records/{{a1}}",
+          "as": "superuser"
+        },
+        {
+          "id": "get_author",
+          "method": "GET",
+          "path": "/api/collections/authors/records/{{a1}}?fields=name",
+          "as": "superuser"
+        },
+        {
+          "id": "list_posts",
+          "method": "GET",
+          "path": "/api/collections/posts/records?fields=title",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p4_self_reference_chain",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_nodes",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "nodes",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldname001",
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "nodes_id": "id"
+          }
+        },
+        {
+          "id": "patch_nodes",
+          "setup": true,
+          "method": "PATCH",
+          "path": "/api/collections/nodes",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldname001",
+                "name": "name",
+                "type": "text"
+              },
+              {
+                "id": "fldparent1",
+                "name": "parent",
+                "type": "relation",
+                "collectionId": "{{nodes_id}}",
+                "maxSelect": 1,
+                "cascadeDelete": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "n1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "root"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n1": "id"
+          }
+        },
+        {
+          "id": "n2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "child",
+            "parent": "{{n1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n2": "id"
+          }
+        },
+        {
+          "id": "n3",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "grandchild",
+            "parent": "{{n2}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n3": "id"
+          }
+        },
+        {
+          "id": "n4",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "other"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n4": "id"
+          }
+        },
+        {
+          "id": "delete_root",
+          "method": "DELETE",
+          "path": "/api/collections/nodes/records/{{n1}}",
+          "as": "superuser"
+        },
+        {
+          "id": "list_nodes",
+          "method": "GET",
+          "path": "/api/collections/nodes/records?sort=name&fields=name",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p5_self_reference_multi_cycle",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_nodes",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "nodes",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldname001",
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "nodes_id": "id"
+          }
+        },
+        {
+          "id": "patch_nodes",
+          "setup": true,
+          "method": "PATCH",
+          "path": "/api/collections/nodes",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldname001",
+                "name": "name",
+                "type": "text"
+              },
+              {
+                "id": "fldparent1",
+                "name": "parent",
+                "type": "relation",
+                "collectionId": "{{nodes_id}}",
+                "maxSelect": 5,
+                "cascadeDelete": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "n1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "a"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n1": "id"
+          }
+        },
+        {
+          "id": "n2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "b",
+            "parent": [
+              "{{n1}}"
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n2": "id"
+          }
+        },
+        {
+          "id": "n3",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/nodes/records",
+          "as": "superuser",
+          "json": {
+            "name": "c",
+            "parent": [
+              "{{n1}}",
+              "{{n2}}"
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "n3": "id"
+          }
+        },
+        {
+          "id": "link_back",
+          "setup": true,
+          "method": "PATCH",
+          "path": "/api/collections/nodes/records/{{n1}}",
+          "as": "superuser",
+          "json": {
+            "parent": [
+              "{{n3}}"
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "delete_b",
+          "method": "DELETE",
+          "path": "/api/collections/nodes/records/{{n2}}",
+          "as": "superuser"
+        },
+        {
+          "id": "list_nodes",
+          "method": "GET",
+          "path": "/api/collections/nodes/records?sort=name&fields=name",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p6_cascade_permissions",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_authors",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "authors",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text"
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "authors_id": "id"
+          }
+        },
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": null,
+            "deleteRule": null,
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "author",
+                "type": "relation",
+                "collectionId": "{{authors_id}}",
+                "maxSelect": 1,
+                "cascadeDelete": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "author_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/authors/records",
+          "as": "superuser",
+          "json": {
+            "name": "ann"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "a1": "id"
+          }
+        },
+        {
+          "id": "post_1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t1",
+            "author": "{{a1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p1": "id"
+          }
+        },
+        {
+          "id": "post_2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "t2",
+            "author": "{{a1}}"
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "p2": "id"
+          }
+        },
+        {
+          "id": "anon_delete_author",
+          "method": "DELETE",
+          "path": "/api/collections/authors/records/{{a1}}",
+          "as": "anon"
+        },
+        {
+          "id": "list_posts",
+          "method": "GET",
+          "path": "/api/collections/posts/records?fields=title",
+          "as": "anon"
+        },
+        {
+          "id": "delete_missing",
+          "method": "DELETE",
+          "path": "/api/collections/authors/records/doesnotexist123",
+          "as": "superuser"
+        }
+      ]
+    }
+  ]
+}

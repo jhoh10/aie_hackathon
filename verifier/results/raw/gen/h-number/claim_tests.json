@@ -1,0 +1,528 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "readings",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "level",
+        "type": "number",
+        "min": 5,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s1b",
+     "method": "GET",
+     "path": "/api/collections/readings",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "ledger",
+      "type": "base",
+      "fields": [
+       {
+        "name": "balance",
+        "type": "number",
+        "min": 0.5,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "status": 400
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "debts",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "amount",
+        "type": "number",
+        "min": -100,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4b",
+     "method": "POST",
+     "path": "/api/collections/debts/records",
+     "as": "superuser",
+     "json": {
+      "amount": 7
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "amount": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s4c",
+     "method": "POST",
+     "path": "/api/collections/debts/records",
+     "as": "superuser",
+     "json": {
+      "amount": 0.25
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "amount": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s4d",
+     "method": "GET",
+     "path": "/api/collections/debts/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "offsets",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "shift",
+        "type": "number",
+        "min": -50,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5b",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/offsets/records",
+     "as": "superuser",
+     "json": {
+      "shift": -12
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "rid": "id"
+     }
+    },
+    {
+     "id": "s5c",
+     "method": "PATCH",
+     "path": "/api/collections/offsets/records/{{rid}}",
+     "as": "superuser",
+     "json": {
+      "shift": 31
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "shift": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s5d",
+     "method": "GET",
+     "path": "/api/collections/offsets/records/{{rid}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "shift": -12
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "temps",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "celsius",
+        "type": "number",
+        "min": -40,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "temps"
+      }
+     }
+    },
+    {
+     "id": "s6b",
+     "method": "POST",
+     "path": "/api/collections/temps/records",
+     "as": "superuser",
+     "json": {
+      "celsius": -17.5
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "celsius": -17.5
+      }
+     }
+    },
+    {
+     "id": "s6c",
+     "method": "POST",
+     "path": "/api/collections/temps/records",
+     "as": "superuser",
+     "json": {
+      "celsius": 0
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "celsius": 0
+      }
+     }
+    },
+    {
+     "id": "s6d",
+     "method": "POST",
+     "path": "/api/collections/temps/records",
+     "as": "superuser",
+     "json": {
+      "celsius": -40
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "celsius": -40
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "penalties",
+      "type": "base",
+      "fields": [
+       {
+        "name": "points",
+        "type": "number",
+        "min": 0,
+        "max": 0
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "penalties"
+      }
+     }
+    },
+    {
+     "id": "s7b",
+     "method": "POST",
+     "path": "/api/collections/penalties/records",
+     "as": "superuser",
+     "json": {
+      "points": 0
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "points": 0
+      }
+     }
+    },
+    {
+     "id": "s7c",
+     "method": "POST",
+     "path": "/api/collections/penalties/records",
+     "as": "superuser",
+     "json": {
+      "points": -3
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "points": {}
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "ratings",
+      "type": "base",
+      "fields": [
+       {
+        "name": "stars",
+        "type": "number",
+        "min": 9,
+        "max": 4
+       }
+      ]
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "status": 400
+      }
+     }
+    },
+    {
+     "id": "s8b",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "ratings",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "stars",
+        "type": "number",
+        "min": 1,
+        "max": 5
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "ratings"
+      }
+     }
+    },
+    {
+     "id": "s8c",
+     "method": "POST",
+     "path": "/api/collections/ratings/records",
+     "as": "superuser",
+     "json": {
+      "stars": 6
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "stars": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s8d",
+     "method": "POST",
+     "path": "/api/collections/ratings/records",
+     "as": "superuser",
+     "json": {
+      "stars": 5
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "stars": 5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s9a",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "weights",
+      "type": "base",
+      "fields": [
+       {
+        "name": "kg",
+        "type": "number",
+        "min": 12,
+        "max": 12
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "weights"
+      }
+     }
+    },
+    {
+     "id": "s9b",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "heights",
+      "type": "base",
+      "fields": [
+       {
+        "name": "cm",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "heights"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

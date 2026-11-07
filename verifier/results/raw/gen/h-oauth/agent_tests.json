@@ -1,0 +1,16 @@
+{"scenarios":[
+{"id":"oauth-add-provider-keeps-existing-secret","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"oauthusers1","type":"auth","oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"gid1","clientSecret":"gsecret1"}]}},"expect":{"status":200}},
+{"id":"patch-add-gitlab","method":"PATCH","path":"/api/collections/oauthusers1","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"gitlab","clientId":"glid1","clientSecret":"glsecret1"},{"name":"google","displayName":"G Existing"}]}},"expect":{"status":200,"json":{"oauth2":{"enabled":true}}}},
+{"id":"get-col","method":"GET","path":"/api/collections/oauthusers1","as":"superuser","expect":{"status":200,"paths":{"oauth2.providers.0.name":"gitlab","oauth2.providers.0.clientId":"glid1","oauth2.providers.1.name":"google","oauth2.providers.1.clientId":"gid1","oauth2.providers.1.displayName":"G Existing"},"absent":["oauth2.providers.0.clientSecret","oauth2.providers.1.clientSecret"]}},
+{"id":"patch-again-without-secrets","method":"PATCH","path":"/api/collections/oauthusers1","as":"superuser","json":{"oauth2":{"providers":[{"name":"gitlab"},{"name":"google"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.clientId":"glid1","oauth2.providers.1.clientId":"gid1"}}}
+]},
+{"id":"oauth-new-provider-without-secret-rejected","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"oauthusers2","type":"auth","oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"gid2","clientSecret":"gsecret2"}]}},"expect":{"status":200}},
+{"id":"patch-new-no-secret","method":"PATCH","path":"/api/collections/oauthusers2","as":"superuser","json":{"oauth2":{"providers":[{"name":"google"},{"name":"gitlab","clientId":"glid2"}]}},"expect":{"status":400}}
+]},
+{"id":"oauth-remove-provider","claim":"c1","kind":"claim","steps":[
+{"id":"create-col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"oauthusers3","type":"auth","oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"gid3","clientSecret":"gsecret3"},{"name":"gitlab","clientId":"glid3","clientSecret":"glsecret3"}]}},"expect":{"status":200}},
+{"id":"patch-keep-only-gitlab","method":"PATCH","path":"/api/collections/oauthusers3","as":"superuser","json":{"oauth2":{"providers":[{"name":"gitlab"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.name":"gitlab","oauth2.providers.0.clientId":"glid3"},"absent":["oauth2.providers.1"]}}
+]}
+]}

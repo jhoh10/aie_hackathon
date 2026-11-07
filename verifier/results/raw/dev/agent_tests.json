@@ -1,0 +1,6037 @@
+{
+ "h-number": {
+  "id": "h-number",
+  "approve": true,
+  "total": 4,
+  "failed": [],
+  "runs": [
+   {
+    "id": "number-min-gt-zero-max-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min2-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "numtest_a",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be greater or equal than 2.",
+           "params": {
+            "min": 2
+           }
+          }
+         }
+        }
+       },
+       "message": "Failed to create collection.",
+       "status": 400
+      },
+      "failures": []
+     },
+     {
+      "id": "collection-not-created",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/numtest_a",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 404,
+      "responseBody": {
+       "data": {},
+       "message": "The requested resource wasn't found.",
+       "status": 404
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-zero-min-negative-max-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-maxneg",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "numtest_b",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": -1
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be greater or equal than 0.",
+           "params": {
+            "min": 0
+           }
+          }
+         }
+        }
+       },
+       "message": "Failed to create collection.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-equal-and-valid-ranges-accepted",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "numtest_c",
+       "type": "base",
+       "createRule": "",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_450433980",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": "",
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "numtest_c",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 0,
+         "min": 0,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:17.563Z",
+       "updated": "2026-11-07 22:11:17.563Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "create-min2-max3",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "numtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 3
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2227013151",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "numtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 3,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:17.571Z",
+       "updated": "2026-11-07 22:11:17.571Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "record-over-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/numtest_c/records",
+      "requestJson": {
+       "score": 1
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "score": {
+         "code": "validation_max_number_constraint",
+         "message": "Must be less or equal than 0.",
+         "params": {
+          "max": 0
+         }
+        }
+       },
+       "message": "Failed to create record.",
+       "status": 400
+      },
+      "failures": []
+     },
+     {
+      "id": "record-at-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/numtest_c/records",
+      "requestJson": {
+       "score": 0
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_450433980",
+       "collectionName": "numtest_c",
+       "id": "g3sabxupghrhdp3",
+       "score": 0
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-update-to-invalid-max-zero-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-valid",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "numtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 5
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_4089099913",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "numtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 5,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:17.641Z",
+       "updated": "2026-11-07 22:11:17.641Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "patch-max0",
+      "setup": false,
+      "method": "PATCH",
+      "path": "/api/collections/numtest_e",
+      "requestJson": {
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be greater or equal than 2.",
+           "params": {
+            "min": 2
+           }
+          }
+         }
+        }
+       },
+       "message": "Failed to update collection.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   }
+  ],
+  "wallMs": 3409
+ },
+ "h-bearer": {
+  "id": "h-bearer",
+  "approve": false,
+  "total": 3,
+  "failed": [
+   "bearer-invalid-token-rejected"
+  ],
+  "runs": [
+   {
+    "id": "bearer-lowercase-prefix",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-user",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/users/records",
+      "requestJson": {
+       "email": "bearer1@example.com",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "avatar": "",
+       "collectionId": "_pb_users_auth_",
+       "collectionName": "users",
+       "created": "2026-11-07 22:11:18.160Z",
+       "emailVisibility": false,
+       "id": "mpkfjbxjdx0dt0z",
+       "name": "",
+       "updated": "2026-11-07 22:11:18.160Z",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "login",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/users/auth-with-password",
+      "requestJson": {
+       "identity": "bearer1@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "avatar": "",
+        "collectionId": "_pb_users_auth_",
+        "collectionName": "users",
+        "created": "2026-11-07 22:11:18.160Z",
+        "email": "bearer1@example.com",
+        "emailVisibility": false,
+        "id": "mpkfjbxjdx0dt0z",
+        "name": "",
+        "updated": "2026-11-07 22:11:18.160Z",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3OTQ2OTQyNzgsImlkIjoibXBrZmpieGpkeDBkdDB6IiwicmVmcmVzaGFibGUiOnRydWUsInR5cGUiOiJhdXRoIn0.rAzhhilbcNg9-wlX3e7LLbrimj1PN4hkmLEGCsU60Qs"
+      },
+      "failures": []
+     },
+     {
+      "id": "refresh-lowercase",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/users/auth-refresh",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "avatar": "",
+        "collectionId": "_pb_users_auth_",
+        "collectionName": "users",
+        "created": "2026-11-07 22:11:18.160Z",
+        "email": "bearer1@example.com",
+        "emailVisibility": false,
+        "id": "mpkfjbxjdx0dt0z",
+        "name": "",
+        "updated": "2026-11-07 22:11:18.160Z",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3OTQ2OTQyNzgsImlkIjoibXBrZmpieGpkeDBkdDB6IiwicmVmcmVzaGFibGUiOnRydWUsInR5cGUiOiJhdXRoIn0.rAzhhilbcNg9-wlX3e7LLbrimj1PN4hkmLEGCsU60Qs"
+      },
+      "failures": []
+     },
+     {
+      "id": "refresh-mixedcase",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/users/auth-refresh",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "avatar": "",
+        "collectionId": "_pb_users_auth_",
+        "collectionName": "users",
+        "created": "2026-11-07 22:11:18.160Z",
+        "email": "bearer1@example.com",
+        "emailVisibility": false,
+        "id": "mpkfjbxjdx0dt0z",
+        "name": "",
+        "updated": "2026-11-07 22:11:18.160Z",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3OTQ2OTQyNzgsImlkIjoibXBrZmpieGpkeDBkdDB6IiwicmVmcmVzaGFibGUiOnRydWUsInR5cGUiOiJhdXRoIn0.rAzhhilbcNg9-wlX3e7LLbrimj1PN4hkmLEGCsU60Qs"
+      },
+      "failures": []
+     },
+     {
+      "id": "refresh-uppercase",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/users/auth-refresh",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "avatar": "",
+        "collectionId": "_pb_users_auth_",
+        "collectionName": "users",
+        "created": "2026-11-07 22:11:18.160Z",
+        "email": "bearer1@example.com",
+        "emailVisibility": false,
+        "id": "mpkfjbxjdx0dt0z",
+        "name": "",
+        "updated": "2026-11-07 22:11:18.160Z",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3OTQ2OTQyNzgsImlkIjoibXBrZmpieGpkeDBkdDB6IiwicmVmcmVzaGFibGUiOnRydWUsInR5cGUiOiJhdXRoIn0.rAzhhilbcNg9-wlX3e7LLbrimj1PN4hkmLEGCsU60Qs"
+      },
+      "failures": []
+     },
+     {
+      "id": "refresh-noprefix",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/users/auth-refresh",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "avatar": "",
+        "collectionId": "_pb_users_auth_",
+        "collectionName": "users",
+        "created": "2026-11-07 22:11:18.160Z",
+        "email": "bearer1@example.com",
+        "emailVisibility": false,
+        "id": "mpkfjbxjdx0dt0z",
+        "name": "",
+        "updated": "2026-11-07 22:11:18.160Z",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3OTQ2OTQyNzgsImlkIjoibXBrZmpieGpkeDBkdDB6IiwicmVmcmVzaGFibGUiOnRydWUsInR5cGUiOiJhdXRoIn0.rAzhhilbcNg9-wlX3e7LLbrimj1PN4hkmLEGCsU60Qs"
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "bearer-superuser-lowercase",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "list-superusers-lowercase",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/_superusers/records",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "items": [
+        {
+         "collectionId": "pbc_3142635823",
+         "collectionName": "_superusers",
+         "created": "2026-11-07 22:11:16.804Z",
+         "email": "su-vouch-1537599c795a@vouch.test",
+         "emailVisibility": false,
+         "id": "e5cnqeiddhlr0zv",
+         "updated": "2026-11-07 22:11:16.804Z",
+         "verified": true
+        }
+       ],
+       "page": 1,
+       "perPage": 30,
+       "totalItems": 1,
+       "totalPages": 1
+      },
+      "failures": []
+     },
+     {
+      "id": "list-superusers-standard",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/_superusers/records",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "items": [
+        {
+         "collectionId": "pbc_3142635823",
+         "collectionName": "_superusers",
+         "created": "2026-11-07 22:11:16.804Z",
+         "email": "su-vouch-1537599c795a@vouch.test",
+         "emailVisibility": false,
+         "id": "e5cnqeiddhlr0zv",
+         "updated": "2026-11-07 22:11:16.804Z",
+         "verified": true
+        }
+       ],
+       "page": 1,
+       "perPage": 30,
+       "totalItems": 1,
+       "totalPages": 1
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "bearer-invalid-token-rejected",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "list-superusers-bogus",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/_superusers/records",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 403,
+      "responseBody": {
+       "data": {},
+       "message": "Only superusers can perform this action.",
+       "status": 403
+      },
+      "failures": [
+       "status: wanted 401, got 403"
+      ]
+     }
+    ]
+   }
+  ],
+  "wallMs": 3492
+ },
+ "h-cascade": {
+  "id": "h-cascade",
+  "approve": false,
+  "total": 1,
+  "failed": [
+   "self-ref-nested-cascade"
+  ],
+  "runs": [
+   {
+    "id": "self-ref-nested-cascade",
+    "status": "setup_error",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "selfrel",
+       "type": "base",
+       "fields": []
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3237136631",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "selfrel",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:18.027Z",
+       "updated": "2026-11-07 22:11:18.027Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "add-rel",
+      "setup": true,
+      "method": "PATCH",
+      "path": "/api/collections/selfrel",
+      "requestJson": {
+       "fields": [
+        {
+         "id": "text3208210256",
+         "name": "id",
+         "type": "text",
+         "system": true,
+         "primaryKey": true,
+         "required": true,
+         "min": 15,
+         "max": 15,
+         "pattern": "^[a-z0-9]+$",
+         "autogeneratePattern": "[a-z0-9]{15}"
+        },
+        {
+         "name": "rels",
+         "type": "relation",
+         "collectionId": "pbc_3237136631",
+         "maxSelect": 99,
+         "cascadeDelete": true
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3237136631",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "selfrel",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cascadeDelete": true,
+         "collectionId": "pbc_3237136631",
+         "help": "",
+         "hidden": false,
+         "id": "relation2922035949",
+         "maxSelect": 99,
+         "minSelect": 0,
+         "name": "rels",
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "relation"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:18.027Z",
+       "updated": "2026-11-07 22:11:18.057Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "rec-a",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/selfrel/records",
+      "requestJson": {
+       "id": "recaaaaaaaaaaaa",
+       "rels": []
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_3237136631",
+       "collectionName": "selfrel",
+       "id": "recaaaaaaaaaaaa",
+       "rels": []
+      },
+      "failures": []
+     },
+     {
+      "id": "rec-b",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/selfrel/records",
+      "requestJson": {
+       "id": "recbbbbbbbbbbbb",
+       "rels": [
+        "recaaaaaaaaaaaa"
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_3237136631",
+       "collectionName": "selfrel",
+       "id": "recbbbbbbbbbbbb",
+       "rels": [
+        "recaaaaaaaaaaaa"
+       ]
+      },
+      "failures": []
+     },
+     {
+      "id": "rec-c",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/selfrel/records",
+      "requestJson": {
+       "id": "recccccccccccccc",
+       "rels": [
+        "recaaaaaaaaaaaa",
+        "recbbbbbbbbbbbb"
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "id": {
+         "code": "validation_max_text_constraint",
+         "message": "Must be no more than 15 character(s).",
+         "params": {
+          "max": 15
+         }
+        }
+       },
+       "message": "Failed to create record.",
+       "status": 400
+      },
+      "failures": [
+       "status: wanted 200, got 400"
+      ]
+     }
+    ]
+   }
+  ],
+  "wallMs": 3506
+ },
+ "r-number": {
+  "id": "r-number",
+  "approve": false,
+  "total": 4,
+  "failed": [
+   "number-min-gt-zero-max-rejected",
+   "number-update-to-invalid-max-zero-rejected"
+  ],
+  "runs": [
+   {
+    "id": "number-min-gt-zero-max-rejected",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "create-min2-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "rnumtest_a",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2574487013",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "rnumtest_a",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 0,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:30.667Z",
+       "updated": "2026-11-07 22:11:30.667Z",
+       "system": false
+      },
+      "failures": [
+       "status: wanted 400, got 200",
+       "$.data: wanted object/array, got undefined"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "number-zero-min-negative-max-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-maxneg",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "rnumtest_b",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": -1
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_greater_equal_than_required",
+           "message": "Must be no less than 0.",
+           "params": {
+            "threshold": 0
+           }
+          }
+         }
+        }
+       },
+       "message": "Failed to create collection.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-equal-and-valid-ranges-accepted",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "rnumtest_c",
+       "type": "base",
+       "createRule": "",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2004741321",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": "",
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "rnumtest_c",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 0,
+         "min": 0,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:30.468Z",
+       "updated": "2026-11-07 22:11:30.468Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "create-min2-max3",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "rnumtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 3
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3910760810",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "rnumtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 3,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:30.494Z",
+       "updated": "2026-11-07 22:11:30.494Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "record-over-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/rnumtest_c/records",
+      "requestJson": {
+       "score": 1
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "score": {
+         "code": "validation_max_number_constraint",
+         "message": "Must be less than 0.000000."
+        }
+       },
+       "message": "Failed to create record.",
+       "status": 400
+      },
+      "failures": []
+     },
+     {
+      "id": "record-at-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/rnumtest_c/records",
+      "requestJson": {
+       "score": 0
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_2004741321",
+       "collectionName": "rnumtest_c",
+       "id": "yka6k2nqlus7asg",
+       "score": 0
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-update-to-invalid-max-zero-rejected",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "create-valid",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "rnumtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 5
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2652785148",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "rnumtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 5,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:30.366Z",
+       "updated": "2026-11-07 22:11:30.366Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "patch-max0",
+      "setup": false,
+      "method": "PATCH",
+      "path": "/api/collections/rnumtest_e",
+      "requestJson": {
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2652785148",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "rnumtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 0,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:30.366Z",
+       "updated": "2026-11-07 22:11:30.384Z",
+       "system": false
+      },
+      "failures": [
+       "status: wanted 400, got 200"
+      ]
+     }
+    ]
+   }
+  ],
+  "wallMs": 13510
+ },
+ "gam1": {
+  "id": "gam1",
+  "approve": false,
+  "total": 4,
+  "failed": [
+   "username-only-identity-email-like",
+   "email-priority-over-username"
+  ],
+  "runs": [
+   {
+    "id": "username-only-identity-email-like",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "gmembers1",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers1_username ON gmembers1 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_529024420",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "gmembers1",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers1_username ON gmembers1 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_529024420` ON `gmembers1` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_529024420` ON `gmembers1` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:37.844Z",
+       "updated": "2026-11-07 22:11:37.844Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/gmembers1/records",
+      "requestJson": {
+       "email": "real1@example.com",
+       "username": "uname1@mailbox.io",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_529024420",
+       "collectionName": "gmembers1",
+       "email": "real1@example.com",
+       "emailVisibility": false,
+       "id": "o62sj6y7tigxu5k",
+       "username": "uname1@mailbox.io",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-username",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers1/auth-with-password",
+      "requestJson": {
+       "identity": "uname1@mailbox.io",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {},
+       "message": "Failed to authenticate.",
+       "status": 400
+      },
+      "failures": [
+       "status: wanted 200, got 400",
+       "$.record: wanted object/array, got undefined"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "username-second-identity-email-like",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "gmembers2",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers2_username ON gmembers2 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email",
+         "username"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2256606238",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "gmembers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers2_username ON gmembers2 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_2256606238` ON `gmembers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_2256606238` ON `gmembers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:37.831Z",
+       "updated": "2026-11-07 22:11:37.831Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email",
+         "username"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/gmembers2/records",
+      "requestJson": {
+       "email": "real2@example.com",
+       "username": "jane.doe@corpmail.net",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_2256606238",
+       "collectionName": "gmembers2",
+       "email": "real2@example.com",
+       "emailVisibility": false,
+       "id": "1oqxn6sg4sa0lde",
+       "username": "jane.doe@corpmail.net",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-username",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers2/auth-with-password",
+      "requestJson": {
+       "identity": "jane.doe@corpmail.net",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_2256606238",
+        "collectionName": "gmembers2",
+        "email": "real2@example.com",
+        "emailVisibility": false,
+        "id": "1oqxn6sg4sa0lde",
+        "username": "jane.doe@corpmail.net",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMjI1NjYwNjIzOCIsImV4cCI6MTc5NDY5NDI5OCwiaWQiOiIxb3F4bjZzZzRzYTBsZGUiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.FxduEfa1HiRzJBLRmkn1GKjOjYkVioiY0oY8EA0jc1c"
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-email",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers2/auth-with-password",
+      "requestJson": {
+       "identity": "real2@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_2256606238",
+        "collectionName": "gmembers2",
+        "email": "real2@example.com",
+        "emailVisibility": false,
+        "id": "1oqxn6sg4sa0lde",
+        "username": "jane.doe@corpmail.net",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMjI1NjYwNjIzOCIsImV4cCI6MTc5NDY5NDI5OCwiaWQiOiIxb3F4bjZzZzRzYTBsZGUiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.FxduEfa1HiRzJBLRmkn1GKjOjYkVioiY0oY8EA0jc1c"
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-wrong-password",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers2/auth-with-password",
+      "requestJson": {
+       "identity": "jane.doe@corpmail.net",
+       "password": "WrongPass999!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {},
+       "message": "Failed to authenticate.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "email-priority-over-username",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "gmembers3",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers3_username ON gmembers3 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username",
+         "email"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_4052100232",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "gmembers3",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers3_username ON gmembers3 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_4052100232` ON `gmembers3` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_4052100232` ON `gmembers3` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:37.950Z",
+       "updated": "2026-11-07 22:11:37.950Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username",
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec-a",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/gmembers3/records",
+      "requestJson": {
+       "email": "shared3@example.com",
+       "username": "usera3",
+       "password": "PasswordA123!",
+       "passwordConfirm": "PasswordA123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_4052100232",
+       "collectionName": "gmembers3",
+       "email": "shared3@example.com",
+       "emailVisibility": false,
+       "id": "s0jt8bmyg4mlgfe",
+       "username": "usera3",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec-b",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/gmembers3/records",
+      "requestJson": {
+       "email": "other3@example.com",
+       "username": "shared3@example.com",
+       "password": "PasswordB123!",
+       "passwordConfirm": "PasswordB123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_4052100232",
+       "collectionName": "gmembers3",
+       "email": "other3@example.com",
+       "emailVisibility": false,
+       "id": "x4gchibsrmjclt4",
+       "username": "shared3@example.com",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-matches-email-first",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers3/auth-with-password",
+      "requestJson": {
+       "identity": "shared3@example.com",
+       "password": "PasswordA123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {},
+       "message": "Failed to authenticate.",
+       "status": 400
+      },
+      "failures": [
+       "status: wanted 200, got 400",
+       "$.record: wanted object/array, got undefined"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "username-example-domain",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "gmembers4",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers4_username ON gmembers4 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1877127467",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "gmembers4",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_gmembers4_username ON gmembers4 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1877127467` ON `gmembers4` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1877127467` ON `gmembers4` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:38.032Z",
+       "updated": "2026-11-07 22:11:38.032Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/gmembers4/records",
+      "requestJson": {
+       "email": "real4@domain4.org",
+       "username": "handle4@example.com",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_1877127467",
+       "collectionName": "gmembers4",
+       "email": "real4@domain4.org",
+       "emailVisibility": false,
+       "id": "tyis2mapn98e7uh",
+       "username": "handle4@example.com",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-username",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/gmembers4/auth-with-password",
+      "requestJson": {
+       "identity": "handle4@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_1877127467",
+        "collectionName": "gmembers4",
+        "email": "real4@domain4.org",
+        "emailVisibility": false,
+        "id": "tyis2mapn98e7uh",
+        "username": "handle4@example.com",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMTg3NzEyNzQ2NyIsImV4cCI6MTc5NDY5NDI5OCwiaWQiOiJ0eWlzMm1hcG45OGU3dWgiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.7Z-NwGb9G-ijsuR_bT85IkQIaDbzgRGUoyWzxFSbvrg"
+      },
+      "failures": []
+     }
+    ]
+   }
+  ],
+  "wallMs": 21176
+ },
+ "inj1": {
+  "id": "inj1",
+  "approve": true,
+  "total": 4,
+  "failed": [],
+  "runs": [
+   {
+    "id": "number-min-gt-zero-max-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min2-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "inumtest_a",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be larger than or equal to 2.000000."
+          }
+         }
+        }
+       },
+       "message": "Failed to create collection.",
+       "status": 400
+      },
+      "failures": []
+     },
+     {
+      "id": "collection-not-created",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/inumtest_a",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 404,
+      "responseBody": {
+       "data": {},
+       "message": "The requested resource wasn't found.",
+       "status": 404
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-zero-min-negative-max-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-maxneg",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "inumtest_b",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": -1
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be larger than or equal to 0.000000."
+          }
+         }
+        }
+       },
+       "message": "Failed to create collection.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-equal-and-valid-ranges-accepted",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-min0-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "inumtest_c",
+       "type": "base",
+       "createRule": "",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 0,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_2821953238",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": "",
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "inumtest_c",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 0,
+         "min": 0,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:50.311Z",
+       "updated": "2026-11-07 22:11:50.311Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "create-min2-max3",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "inumtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 3
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_911672181",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "inumtest_d",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 3,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:50.327Z",
+       "updated": "2026-11-07 22:11:50.327Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "record-over-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/inumtest_c/records",
+      "requestJson": {
+       "score": 1
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "score": {
+         "code": "validation_max_number_constraint",
+         "message": "Must be less than 0.000000."
+        }
+       },
+       "message": "Failed to create record.",
+       "status": 400
+      },
+      "failures": []
+     },
+     {
+      "id": "record-at-max0",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/inumtest_c/records",
+      "requestJson": {
+       "score": 0
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_2821953238",
+       "collectionName": "inumtest_c",
+       "id": "4ekbtmmik0gm4d4",
+       "score": 0
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "number-update-to-invalid-max-zero-rejected",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-valid",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "inumtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 5
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1095775203",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "inumtest_e",
+       "type": "base",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "help": "",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "help": "",
+         "hidden": false,
+         "id": "number848901969",
+         "max": 5,
+         "min": 2,
+         "name": "score",
+         "onlyInt": false,
+         "presentable": false,
+         "required": false,
+         "system": false,
+         "type": "number"
+        }
+       ],
+       "indexes": [],
+       "created": "2026-11-07 22:11:50.187Z",
+       "updated": "2026-11-07 22:11:50.187Z",
+       "system": false
+      },
+      "failures": []
+     },
+     {
+      "id": "patch-max0",
+      "setup": false,
+      "method": "PATCH",
+      "path": "/api/collections/inumtest_e",
+      "requestJson": {
+       "fields": [
+        {
+         "name": "score",
+         "type": "number",
+         "min": 2,
+         "max": 0
+        }
+       ]
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {
+        "fields": {
+         "1": {
+          "max": {
+           "code": "validation_min_number_constraint",
+           "message": "Must be larger than or equal to 2.000000."
+          }
+         }
+        }
+       },
+       "message": "Failed to update collection.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   }
+  ],
+  "wallMs": 18815
+ },
+ "inj2": {
+  "id": "inj2",
+  "approve": false,
+  "total": 3,
+  "failed": [
+   "email-priority-over-username"
+  ],
+  "runs": [
+   {
+    "id": "username-only-identity-email-like",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "imembers1",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers1_username ON imembers1 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3611991606",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "imembers1",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers1_username ON imembers1 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_3611991606` ON `imembers1` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_3611991606` ON `imembers1` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:52.757Z",
+       "updated": "2026-11-07 22:11:52.757Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/imembers1/records",
+      "requestJson": {
+       "email": "real1@example.com",
+       "username": "uname1@example.com",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_3611991606",
+       "collectionName": "imembers1",
+       "email": "real1@example.com",
+       "emailVisibility": false,
+       "id": "k5hwbfs20ezs2gg",
+       "username": "uname1@example.com",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-username",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/imembers1/auth-with-password",
+      "requestJson": {
+       "identity": "uname1@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_3611991606",
+        "collectionName": "imembers1",
+        "email": "real1@example.com",
+        "emailVisibility": false,
+        "id": "k5hwbfs20ezs2gg",
+        "username": "uname1@example.com",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzYxMTk5MTYwNiIsImV4cCI6MTc5NDY5NDMxMywiaWQiOiJrNWh3YmZzMjBlenMyZ2ciLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.3VRplWyL5mgUQjPlDhCP1RG9-HMkicWlrz7oH-k582g"
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "username-second-identity-email-like",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "imembers2",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers2_username ON imembers2 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email",
+         "username"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1313066892",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "imembers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers2_username ON imembers2 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1313066892` ON `imembers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1313066892` ON `imembers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:52.771Z",
+       "updated": "2026-11-07 22:11:52.771Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email",
+         "username"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/imembers2/records",
+      "requestJson": {
+       "email": "real2@example.com",
+       "username": "uname2@example.com",
+       "password": "Passw0rd123!",
+       "passwordConfirm": "Passw0rd123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_1313066892",
+       "collectionName": "imembers2",
+       "email": "real2@example.com",
+       "emailVisibility": false,
+       "id": "wlhotcrty4fjye0",
+       "username": "uname2@example.com",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-username",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/imembers2/auth-with-password",
+      "requestJson": {
+       "identity": "uname2@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_1313066892",
+        "collectionName": "imembers2",
+        "email": "real2@example.com",
+        "emailVisibility": false,
+        "id": "wlhotcrty4fjye0",
+        "username": "uname2@example.com",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMTMxMzA2Njg5MiIsImV4cCI6MTc5NDY5NDMxMywiaWQiOiJ3bGhvdGNydHk0Zmp5ZTAiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.F5ObjQlD-uKRxFCSrXmBstHPfWbUuYnyQqUHDHag7V0"
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-by-email",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/imembers2/auth-with-password",
+      "requestJson": {
+       "identity": "real2@example.com",
+       "password": "Passw0rd123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "record": {
+        "collectionId": "pbc_1313066892",
+        "collectionName": "imembers2",
+        "email": "real2@example.com",
+        "emailVisibility": false,
+        "id": "wlhotcrty4fjye0",
+        "username": "uname2@example.com",
+        "verified": false
+       },
+       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMTMxMzA2Njg5MiIsImV4cCI6MTc5NDY5NDMxMywiaWQiOiJ3bGhvdGNydHk0Zmp5ZTAiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.F5ObjQlD-uKRxFCSrXmBstHPfWbUuYnyQqUHDHag7V0"
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-wrong-password",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/imembers2/auth-with-password",
+      "requestJson": {
+       "identity": "uname2@example.com",
+       "password": "WrongPass999!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {},
+       "message": "Failed to authenticate.",
+       "status": 400
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "email-priority-over-username",
+    "status": "fail",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "imembers3",
+       "type": "auth",
+       "fields": [
+        {
+         "name": "username",
+         "type": "text"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers3_username ON imembers3 (username)"
+       ],
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username",
+         "email"
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_960823066",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "imembers3",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "autogeneratePattern": "",
+         "hidden": false,
+         "id": "text4166911607",
+         "max": 0,
+         "min": 0,
+         "name": "username",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": false,
+         "system": false,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX idx_imembers3_username ON imembers3 (username)",
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_960823066` ON `imembers3` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_960823066` ON `imembers3` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:11:52.926Z",
+       "updated": "2026-11-07 22:11:52.926Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location.</p>\n<p>If this was you, you may disregard this email.</p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "username",
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec-a",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/imembers3/records",
+      "requestJson": {
+       "email": "shared3@example.com",
+       "username": "usera3",
+       "password": "PasswordA123!",
+       "passwordConfirm": "PasswordA123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_960823066",
+       "collectionName": "imembers3",
+       "email": "shared3@example.com",
+       "emailVisibility": false,
+       "id": "gnwmpvbo48m0lp9",
+       "username": "usera3",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "create-rec-b",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections/imembers3/records",
+      "requestJson": {
+       "email": "other3@example.com",
+       "username": "shared3@example.com",
+       "password": "PasswordB123!",
+       "passwordConfirm": "PasswordB123!"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "collectionId": "pbc_960823066",
+       "collectionName": "imembers3",
+       "email": "other3@example.com",
+       "emailVisibility": false,
+       "id": "zhqql18ak77fyqs",
+       "username": "shared3@example.com",
+       "verified": false
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-matches-email-first",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections/imembers3/auth-with-password",
+      "requestJson": {
+       "identity": "shared3@example.com",
+       "password": "PasswordA123!"
+      },
+      "requestHeaderNames": [],
+      "responseStatus": 400,
+      "responseBody": {
+       "data": {},
+       "message": "Failed to authenticate.",
+       "status": 400
+      },
+      "failures": [
+       "status: wanted 200, got 400",
+       "$.record: wanted object/array, got undefined"
+      ]
+     }
+    ]
+   }
+  ],
+  "wallMs": 14000
+ },
+ "r-secret": {
+  "id": "r-secret",
+  "approve": true,
+  "total": 3,
+  "failed": [],
+  "runs": [
+   {
+    "id": "serialization-hides-secrets",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "secusers1",
+       "type": "auth",
+       "oauth2": {
+        "enabled": true,
+        "providers": [
+         {
+          "name": "google",
+          "clientId": "sgid1",
+          "clientSecret": "sgsecret1"
+         }
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3969140370",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers1",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_3969140370` ON `secusers1` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_3969140370` ON `secusers1` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.450Z",
+       "updated": "2026-11-07 22:12:28.450Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid1",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "get-col",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/secusers1",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_3969140370",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers1",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_3969140370` ON `secusers1` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_3969140370` ON `secusers1` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.450Z",
+       "updated": "2026-11-07 22:12:28.450Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid1",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "serialization-does-not-wipe-stored-secret",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": true,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "secusers2",
+       "type": "auth",
+       "oauth2": {
+        "enabled": true,
+        "providers": [
+         {
+          "name": "google",
+          "clientId": "sgid2",
+          "clientSecret": "sgsecret2"
+         }
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1973229352",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1973229352` ON `secusers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1973229352` ON `secusers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.432Z",
+       "updated": "2026-11-07 22:12:28.432Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid2",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "get-col-1",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/secusers2",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1973229352",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1973229352` ON `secusers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1973229352` ON `secusers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.432Z",
+       "updated": "2026-11-07 22:12:28.432Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid2",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "list-cols",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections",
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "items": [
+        {
+         "id": "pbc_2279338944",
+         "listRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "viewRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": null,
+         "name": "_mfas",
+         "type": "base",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text455797646",
+           "max": 0,
+           "min": 0,
+           "name": "collectionRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text127846527",
+           "max": 0,
+           "min": 0,
+           "name": "recordRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text1582905952",
+           "max": 0,
+           "min": 0,
+           "name": "method",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
+         ],
+         "created": "2026-11-07 22:12:27.459Z",
+         "updated": "2026-11-07 22:12:27.459Z",
+         "system": true
+        },
+        {
+         "id": "pbc_1638494021",
+         "listRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "viewRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": null,
+         "name": "_otps",
+         "type": "base",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text455797646",
+           "max": 0,
+           "min": 0,
+           "name": "collectionRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text127846527",
+           "max": 0,
+           "min": 0,
+           "name": "recordRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "cost": 8,
+           "hidden": true,
+           "id": "password901924565",
+           "max": 0,
+           "min": 0,
+           "name": "password",
+           "pattern": "",
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "password"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": true,
+           "id": "text3866985172",
+           "max": 0,
+           "min": 0,
+           "name": "sentTo",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": false,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
+         ],
+         "created": "2026-11-07 22:12:27.465Z",
+         "updated": "2026-11-07 22:12:27.465Z",
+         "system": true
+        },
+        {
+         "id": "pbc_2281828961",
+         "listRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "viewRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "name": "_externalAuths",
+         "type": "base",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text455797646",
+           "max": 0,
+           "min": 0,
+           "name": "collectionRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text127846527",
+           "max": 0,
+           "min": 0,
+           "name": "recordRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text2462348188",
+           "max": 0,
+           "min": 0,
+           "name": "provider",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text1044722854",
+           "max": 0,
+           "min": 0,
+           "name": "providerId",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE UNIQUE INDEX `idx_externalAuths_record_provider` ON `_externalAuths` (collectionRef, recordRef, provider)",
+          "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
+         ],
+         "created": "2026-11-07 22:12:27.467Z",
+         "updated": "2026-11-07 22:12:27.467Z",
+         "system": true
+        },
+        {
+         "id": "pbc_4275539003",
+         "listRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "viewRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": "@request.auth.id != '' && recordRef = @request.auth.id && collectionRef = @request.auth.collectionId",
+         "name": "_authOrigins",
+         "type": "base",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text455797646",
+           "max": 0,
+           "min": 0,
+           "name": "collectionRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text127846527",
+           "max": 0,
+           "min": 0,
+           "name": "recordRef",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text4228609354",
+           "max": 0,
+           "min": 0,
+           "name": "fingerprint",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
+         ],
+         "created": "2026-11-07 22:12:27.475Z",
+         "updated": "2026-11-07 22:12:27.475Z",
+         "system": true
+        },
+        {
+         "id": "pbc_3142635823",
+         "listRule": null,
+         "viewRule": null,
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": null,
+         "name": "_superusers",
+         "type": "auth",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "cost": 0,
+           "hidden": true,
+           "id": "password901924565",
+           "max": 0,
+           "min": 8,
+           "name": "password",
+           "pattern": "",
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "password"
+          },
+          {
+           "autogeneratePattern": "[a-zA-Z0-9]{50}",
+           "hidden": true,
+           "id": "text2504183744",
+           "max": 60,
+           "min": 30,
+           "name": "tokenKey",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "exceptDomains": null,
+           "hidden": false,
+           "id": "email3885137012",
+           "name": "email",
+           "onlyDomains": null,
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "email"
+          },
+          {
+           "hidden": false,
+           "id": "bool1547992806",
+           "name": "emailVisibility",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          },
+          {
+           "hidden": false,
+           "id": "bool256245529",
+           "name": "verified",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": true,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE UNIQUE INDEX `idx_tokenKey_pbc_3142635823` ON `_superusers` (`tokenKey`)",
+          "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
+         ],
+         "created": "2026-11-07 22:12:27.479Z",
+         "updated": "2026-11-07 22:12:27.479Z",
+         "system": true,
+         "authRule": "",
+         "manageRule": null,
+         "authAlert": {
+          "enabled": true,
+          "emailTemplate": {
+           "subject": "Login from a new location",
+           "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "oauth2": {
+          "providers": [],
+          "mappedFields": {
+           "id": "",
+           "name": "",
+           "username": "",
+           "avatarURL": ""
+          },
+          "enabled": false
+         },
+         "passwordAuth": {
+          "enabled": true,
+          "identityFields": [
+           "email"
+          ]
+         },
+         "mfa": {
+          "enabled": false,
+          "duration": 1800,
+          "rule": ""
+         },
+         "otp": {
+          "enabled": false,
+          "duration": 180,
+          "length": 8,
+          "emailTemplate": {
+           "subject": "OTP for {APP_NAME}",
+           "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "authToken": {
+          "duration": 86400
+         },
+         "passwordResetToken": {
+          "duration": 1800
+         },
+         "emailChangeToken": {
+          "duration": 1800
+         },
+         "verificationToken": {
+          "duration": 259200
+         },
+         "fileToken": {
+          "duration": 180
+         },
+         "verificationTemplate": {
+          "subject": "Verify your {APP_NAME} email",
+          "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "resetPasswordTemplate": {
+          "subject": "Reset your {APP_NAME} password",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "confirmEmailChangeTemplate": {
+          "subject": "Confirm your {APP_NAME} new email address",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         }
+        },
+        {
+         "id": "_pb_users_auth_",
+         "listRule": "id = @request.auth.id",
+         "viewRule": "id = @request.auth.id",
+         "createRule": "",
+         "updateRule": "id = @request.auth.id",
+         "deleteRule": "id = @request.auth.id",
+         "name": "users",
+         "type": "auth",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "cost": 0,
+           "hidden": true,
+           "id": "password901924565",
+           "max": 0,
+           "min": 8,
+           "name": "password",
+           "pattern": "",
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "password"
+          },
+          {
+           "autogeneratePattern": "[a-zA-Z0-9]{50}",
+           "hidden": true,
+           "id": "text2504183744",
+           "max": 60,
+           "min": 30,
+           "name": "tokenKey",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "exceptDomains": null,
+           "hidden": false,
+           "id": "email3885137012",
+           "name": "email",
+           "onlyDomains": null,
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "email"
+          },
+          {
+           "hidden": false,
+           "id": "bool1547992806",
+           "name": "emailVisibility",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          },
+          {
+           "hidden": false,
+           "id": "bool256245529",
+           "name": "verified",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          },
+          {
+           "autogeneratePattern": "",
+           "hidden": false,
+           "id": "text1579384326",
+           "max": 255,
+           "min": 0,
+           "name": "name",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": false,
+           "system": false,
+           "type": "text"
+          },
+          {
+           "hidden": false,
+           "id": "file376926767",
+           "maxSelect": 1,
+           "maxSize": 0,
+           "mimeTypes": [
+            "image/jpeg",
+            "image/png",
+            "image/svg+xml",
+            "image/gif",
+            "image/webp"
+           ],
+           "name": "avatar",
+           "presentable": false,
+           "protected": false,
+           "required": false,
+           "system": false,
+           "thumbs": null,
+           "type": "file"
+          },
+          {
+           "hidden": false,
+           "id": "autodate2990389176",
+           "name": "created",
+           "onCreate": true,
+           "onUpdate": false,
+           "presentable": false,
+           "system": false,
+           "type": "autodate"
+          },
+          {
+           "hidden": false,
+           "id": "autodate3332085495",
+           "name": "updated",
+           "onCreate": true,
+           "onUpdate": true,
+           "presentable": false,
+           "system": false,
+           "type": "autodate"
+          }
+         ],
+         "indexes": [
+          "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+          "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+         ],
+         "created": "2026-11-07 22:12:27.491Z",
+         "updated": "2026-11-07 22:12:27.491Z",
+         "system": false,
+         "authRule": "",
+         "manageRule": null,
+         "authAlert": {
+          "enabled": true,
+          "emailTemplate": {
+           "subject": "Login from a new location",
+           "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "oauth2": {
+          "providers": [],
+          "mappedFields": {
+           "id": "",
+           "name": "name",
+           "username": "",
+           "avatarURL": "avatar"
+          },
+          "enabled": false
+         },
+         "passwordAuth": {
+          "enabled": true,
+          "identityFields": [
+           "email"
+          ]
+         },
+         "mfa": {
+          "enabled": false,
+          "duration": 1800,
+          "rule": ""
+         },
+         "otp": {
+          "enabled": false,
+          "duration": 180,
+          "length": 8,
+          "emailTemplate": {
+           "subject": "OTP for {APP_NAME}",
+           "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "authToken": {
+          "duration": 604800
+         },
+         "passwordResetToken": {
+          "duration": 1800
+         },
+         "emailChangeToken": {
+          "duration": 1800
+         },
+         "verificationToken": {
+          "duration": 259200
+         },
+         "fileToken": {
+          "duration": 180
+         },
+         "verificationTemplate": {
+          "subject": "Verify your {APP_NAME} email",
+          "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "resetPasswordTemplate": {
+          "subject": "Reset your {APP_NAME} password",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "confirmEmailChangeTemplate": {
+          "subject": "Confirm your {APP_NAME} new email address",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         }
+        },
+        {
+         "id": "pbc_1973229352",
+         "listRule": null,
+         "viewRule": null,
+         "createRule": null,
+         "updateRule": null,
+         "deleteRule": null,
+         "name": "secusers2",
+         "type": "auth",
+         "fields": [
+          {
+           "autogeneratePattern": "[a-z0-9]{15}",
+           "hidden": false,
+           "id": "text3208210256",
+           "max": 15,
+           "min": 15,
+           "name": "id",
+           "pattern": "^[a-z0-9]+$",
+           "presentable": false,
+           "primaryKey": true,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "cost": 0,
+           "hidden": true,
+           "id": "password901924565",
+           "max": 0,
+           "min": 8,
+           "name": "password",
+           "pattern": "",
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "password"
+          },
+          {
+           "autogeneratePattern": "[a-zA-Z0-9]{50}",
+           "hidden": true,
+           "id": "text2504183744",
+           "max": 60,
+           "min": 30,
+           "name": "tokenKey",
+           "pattern": "",
+           "presentable": false,
+           "primaryKey": false,
+           "required": true,
+           "system": true,
+           "type": "text"
+          },
+          {
+           "exceptDomains": null,
+           "hidden": false,
+           "id": "email3885137012",
+           "name": "email",
+           "onlyDomains": null,
+           "presentable": false,
+           "required": true,
+           "system": true,
+           "type": "email"
+          },
+          {
+           "hidden": false,
+           "id": "bool1547992806",
+           "name": "emailVisibility",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          },
+          {
+           "hidden": false,
+           "id": "bool256245529",
+           "name": "verified",
+           "presentable": false,
+           "required": false,
+           "system": true,
+           "type": "bool"
+          }
+         ],
+         "indexes": [
+          "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1973229352` ON `secusers2` (`tokenKey`)",
+          "CREATE UNIQUE INDEX `idx_email_pbc_1973229352` ON `secusers2` (`email`) WHERE `email` != ''"
+         ],
+         "created": "2026-11-07 22:12:28.432Z",
+         "updated": "2026-11-07 22:12:28.432Z",
+         "system": false,
+         "authRule": "",
+         "manageRule": null,
+         "authAlert": {
+          "enabled": true,
+          "emailTemplate": {
+           "subject": "Login from a new location",
+           "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "oauth2": {
+          "providers": [
+           {
+            "pkce": null,
+            "name": "google",
+            "clientId": "sgid2",
+            "authURL": "",
+            "tokenURL": "",
+            "userInfoURL": "",
+            "displayName": "",
+            "extra": null
+           }
+          ],
+          "mappedFields": {
+           "id": "",
+           "name": "",
+           "username": "",
+           "avatarURL": ""
+          },
+          "enabled": true
+         },
+         "passwordAuth": {
+          "enabled": true,
+          "identityFields": [
+           "email"
+          ]
+         },
+         "mfa": {
+          "enabled": false,
+          "duration": 1800,
+          "rule": ""
+         },
+         "otp": {
+          "enabled": false,
+          "duration": 180,
+          "length": 8,
+          "emailTemplate": {
+           "subject": "OTP for {APP_NAME}",
+           "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+          }
+         },
+         "authToken": {
+          "duration": 604800
+         },
+         "passwordResetToken": {
+          "duration": 1800
+         },
+         "emailChangeToken": {
+          "duration": 1800
+         },
+         "verificationToken": {
+          "duration": 259200
+         },
+         "fileToken": {
+          "duration": 180
+         },
+         "verificationTemplate": {
+          "subject": "Verify your {APP_NAME} email",
+          "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "resetPasswordTemplate": {
+          "subject": "Reset your {APP_NAME} password",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         },
+         "confirmEmailChangeTemplate": {
+          "subject": "Confirm your {APP_NAME} new email address",
+          "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+         }
+        }
+       ],
+       "page": 1,
+       "perPage": 30,
+       "totalItems": 7,
+       "totalPages": 1
+      },
+      "failures": []
+     },
+     {
+      "id": "patch-unrelated",
+      "setup": false,
+      "method": "PATCH",
+      "path": "/api/collections/secusers2",
+      "requestJson": {
+       "listRule": ""
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1973229352",
+       "listRule": "",
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1973229352` ON `secusers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1973229352` ON `secusers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.432Z",
+       "updated": "2026-11-07 22:12:28.458Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid2",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "patch-providers-without-secret",
+      "setup": false,
+      "method": "PATCH",
+      "path": "/api/collections/secusers2",
+      "requestJson": {
+       "oauth2": {
+        "enabled": true,
+        "providers": [
+         {
+          "name": "google",
+          "displayName": "Still Secret"
+         }
+        ]
+       }
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_1973229352",
+       "listRule": "",
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers2",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_1973229352` ON `secusers2` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_1973229352` ON `secusers2` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.432Z",
+       "updated": "2026-11-07 22:12:28.492Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "pkce": null,
+          "name": "google",
+          "clientId": "sgid2",
+          "authURL": "",
+          "tokenURL": "",
+          "userInfoURL": "",
+          "displayName": "Still Secret",
+          "extra": null
+         }
+        ],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": true
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     },
+     {
+      "id": "auth-methods",
+      "setup": false,
+      "method": "GET",
+      "path": "/api/collections/secusers2/auth-methods",
+      "requestHeaderNames": [],
+      "responseStatus": 200,
+      "responseBody": {
+       "password": {
+        "identityFields": [
+         "email"
+        ],
+        "enabled": true
+       },
+       "oauth2": {
+        "providers": [
+         {
+          "name": "google",
+          "displayName": "Still Secret",
+          "state": "lgHCuMoeHbda9j0fbN95NF7Rk28fwU",
+          "authURL": "https://accounts.google.com/o/oauth2/v2/auth?client_id=sgid2&code_challenge=Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8&code_challenge_method=S256&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&state=lgHCuMoeHbda9j0fbN95NF7Rk28fwU&redirect_uri=",
+          "authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=sgid2&code_challenge=Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8&code_challenge_method=S256&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&state=lgHCuMoeHbda9j0fbN95NF7Rk28fwU&redirect_uri=",
+          "codeVerifier": "5FtJVRrwCTENn6boZNtsF382xkJz1vhb4BqfSzfgQLd",
+          "codeChallenge": "Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8",
+          "codeChallengeMethod": "S256"
+         }
+        ],
+        "enabled": true
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 0
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 0
+       },
+       "authProviders": [
+        {
+         "name": "google",
+         "displayName": "Still Secret",
+         "state": "lgHCuMoeHbda9j0fbN95NF7Rk28fwU",
+         "authURL": "https://accounts.google.com/o/oauth2/v2/auth?client_id=sgid2&code_challenge=Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8&code_challenge_method=S256&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&state=lgHCuMoeHbda9j0fbN95NF7Rk28fwU&redirect_uri=",
+         "authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=sgid2&code_challenge=Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8&code_challenge_method=S256&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&state=lgHCuMoeHbda9j0fbN95NF7Rk28fwU&redirect_uri=",
+         "codeVerifier": "5FtJVRrwCTENn6boZNtsF382xkJz1vhb4BqfSzfgQLd",
+         "codeChallenge": "Fambl2uo2J75hNuM-zZJuZeuHqWZXAfozK5D6LjABF8",
+         "codeChallengeMethod": "S256"
+        }
+       ],
+       "usernamePassword": false,
+       "emailPassword": true
+      },
+      "failures": []
+     }
+    ]
+   },
+   {
+    "id": "providers-always-array",
+    "status": "pass",
+    "steps": [
+     {
+      "id": "create-col",
+      "setup": false,
+      "method": "POST",
+      "path": "/api/collections",
+      "requestJson": {
+       "name": "secusers3",
+       "type": "auth"
+      },
+      "requestHeaderNames": [
+       "Authorization"
+      ],
+      "responseStatus": 200,
+      "responseBody": {
+       "id": "pbc_43657150",
+       "listRule": null,
+       "viewRule": null,
+       "createRule": null,
+       "updateRule": null,
+       "deleteRule": null,
+       "name": "secusers3",
+       "type": "auth",
+       "fields": [
+        {
+         "autogeneratePattern": "[a-z0-9]{15}",
+         "hidden": false,
+         "id": "text3208210256",
+         "max": 15,
+         "min": 15,
+         "name": "id",
+         "pattern": "^[a-z0-9]+$",
+         "presentable": false,
+         "primaryKey": true,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "cost": 0,
+         "hidden": true,
+         "id": "password901924565",
+         "max": 0,
+         "min": 8,
+         "name": "password",
+         "pattern": "",
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "password"
+        },
+        {
+         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+         "hidden": true,
+         "id": "text2504183744",
+         "max": 60,
+         "min": 30,
+         "name": "tokenKey",
+         "pattern": "",
+         "presentable": false,
+         "primaryKey": false,
+         "required": true,
+         "system": true,
+         "type": "text"
+        },
+        {
+         "exceptDomains": null,
+         "hidden": false,
+         "id": "email3885137012",
+         "name": "email",
+         "onlyDomains": null,
+         "presentable": false,
+         "required": true,
+         "system": true,
+         "type": "email"
+        },
+        {
+         "hidden": false,
+         "id": "bool1547992806",
+         "name": "emailVisibility",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        },
+        {
+         "hidden": false,
+         "id": "bool256245529",
+         "name": "verified",
+         "presentable": false,
+         "required": false,
+         "system": true,
+         "type": "bool"
+        }
+       ],
+       "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey_pbc_43657150` ON `secusers3` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email_pbc_43657150` ON `secusers3` (`email`) WHERE `email` != ''"
+       ],
+       "created": "2026-11-07 22:12:28.425Z",
+       "updated": "2026-11-07 22:12:28.425Z",
+       "system": false,
+       "authRule": "",
+       "manageRule": null,
+       "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+         "subject": "Login from a new location",
+         "body": "<p>Hello,</p>\n<p>We noticed a login to your {APP_NAME} account from a new location:</p>\n<p><em>{ALERT_INFO}</em></p>\n<p><strong>If this wasn't you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.</strong></p>\n<p>If this was you, you may disregard this email.</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "oauth2": {
+        "providers": [],
+        "mappedFields": {
+         "id": "",
+         "name": "",
+         "username": "",
+         "avatarURL": ""
+        },
+        "enabled": false
+       },
+       "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+         "email"
+        ]
+       },
+       "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+       },
+       "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+         "subject": "OTP for {APP_NAME}",
+         "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+       },
+       "authToken": {
+        "duration": 604800
+       },
+       "passwordResetToken": {
+        "duration": 1800
+       },
+       "emailChangeToken": {
+        "duration": 1800
+       },
+       "verificationToken": {
+        "duration": 259200
+       },
+       "fileToken": {
+        "duration": 180
+       },
+       "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<p>Hello,</p>\n<p>Thank you for joining us at {APP_NAME}.</p>\n<p>Click on the button below to verify your email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Verify</a>\n</p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to reset your password.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Reset password</a>\n</p>\n<p><i>If you didn't ask to reset your password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       },
+       "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+       }
+      },
+      "failures": []
+     }
+    ]
+   }
+  ],
+  "wallMs": 70256
+ }
+}

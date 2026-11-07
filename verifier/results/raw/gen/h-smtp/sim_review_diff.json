@@ -1,0 +1,1 @@
+{"decision": "merge", "effort": 4, "confidence": 0.75, "why": "The password is omitted only in API serialization and still serialized (even empty) for persistence, so clearing it now persists."}

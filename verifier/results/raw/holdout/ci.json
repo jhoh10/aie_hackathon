@@ -1,0 +1,111 @@
+{
+ "h-identity": {
+  "id": "h-identity",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t16.617s\n",
+  "wallMs": 26372
+ },
+ "h-oauth": {
+  "id": "h-oauth",
+  "pkgs": [
+   "./apis",
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t26.137s\nok  \tgithub.com/pocketbase/pocketbase/core\t14.405s\n",
+  "wallMs": 40718
+ },
+ "h-smtp": {
+  "id": "h-smtp",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "go: downloading modernc.org/sqlite v1.48.0\ngo: downloading golang.org/x/image v0.38.0\nok  \tgithub.com/pocketbase/pocketbase/core\t17.590s\n",
+  "wallMs": 63297
+ },
+ "h-view": {
+  "id": "h-view",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": false,
+  "tail": "274696d656f7574223a332c226d6178426f647953697a65223a307d2c226c6f6773223a7b226d617844617973223a352c226d696e4c6576656c223a302c226c6f674950223a747275652c226c6f67417574684964223a66616c73657d7d)\n[0.00ms] SELECT `_params`.* FROM `_params` WHERE `id`='settings'\n[0.00ms] SELECT `_collections`.* FROM `_collections` ORDER BY `rowid` ASC\n2026/11/07 22:18:35 demo4(rel_one_no_cascade_required) expand format is deprecated and will be removed in the future. Consider replacing it with demo4_via_rel_one_no_cascade_required.\n2026/11/07 22:18:35 demo4(rel_one_no_cascade_required) expand format is deprecated and will be removed in the future. Consider replacing it with demo4_via_rel_one_no_cascade_required.\n2026/11/07 22:18:35 demo4(rel_one_no_cascade_required) expand format is deprecated and will be removed in the future. Consider replacing it with demo4_via_rel_one_no_cascade_required.\n--- FAIL: TestNotifyWatcher_CollectionsUpdate (1.34s)\n    notify_watcher_test.go:183: Expected 1 concurrent query, got 2 ([SELECT {{_collections}}.* FROM `_collections` ORDER BY `rowid` ASC SELECT {{_collections}}.* FROM `_collections` ORDER BY `rowid` ASC])\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/core\t25.720s\nFAIL\n",
+  "wallMs": 82929
+ },
+ "h-index": {
+  "id": "h-index",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t27.657s\n",
+  "wallMs": 52032
+ },
+ "r-smtp": {
+  "id": "r-smtp",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t26.696s\n",
+  "wallMs": 55403
+ },
+ "r-identity": {
+  "id": "r-identity",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t35.732s\n",
+  "wallMs": 57541
+ },
+ "gam2": {
+  "id": "gam2",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t19.405s\n",
+  "wallMs": 41182
+ },
+ "gam3": {
+  "id": "gam3",
+  "pkgs": [
+   "./apis"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t39.361s\n",
+  "wallMs": 60464
+ },
+ "inj3": {
+  "id": "inj3",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t37.507s\n",
+  "wallMs": 72520
+ },
+ "inj4": {
+  "id": "inj4",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t23.057s\n",
+  "wallMs": 53767
+ },
+ "inj5": {
+  "id": "inj5",
+  "pkgs": [
+   "./core"
+  ],
+  "pass": true,
+  "tail": "ok  \tgithub.com/pocketbase/pocketbase/core\t15.630s\n",
+  "wallMs": 40545
+ }
+}

@@ -1,0 +1,5 @@
+{"verdict":"approve","comments":[
+{"file":"apis/record_auth_with_password.go","text":"Fixes the real bug: before, when the identity was email-formatted but `email` was not an identity field (or the email lookup path was skipped), foundErr stayed nil and no other identity field was queried, so email-looking usernames could never authenticate. The new single loop with email stably sorted first preserves the legacy email priority and still skips the email query for non-email values. slices.Clone avoids mutating the collection's config."},
+{"file":"apis/record_auth_with_password.go","text":"Please double-check the imports: the hunk adds slices.Clone/slices.SortStableFunc and drops the only visible list.ExistInSlice use, but no import changes are in the diff. If `slices` is not already imported or `list` becomes unused, this won't compile. Nit: the comparator uses the literal \"email\" while the rest uses core.FieldNameEmail."},
+{"file":"apis/record_auth_with_password_test.go","text":"Regression test covers the reported case. Consider also a case where `email` is not among identityFields at all."}
+]}

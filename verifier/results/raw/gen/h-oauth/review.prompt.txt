@@ -1,0 +1,214 @@
+Review this pull request for merge.
+Issue: Fixed OAuth2 providers config merge incorrectly replacing the entire slice. Adding an OAuth2 provider removes the client secret of the other already configured providers.
+Title: Fixed OAuth2 providers config merge incorrectly replacing the entire slice
+Description: Fixed OAuth2 providers config merge incorrectly replacing the entire slice. Adding an OAuth2 provider removes the client secret of the other already configured providers.
+Diff:
+diff --git a/apis/collection_test.go b/apis/collection_test.go
+index ff9a59ac..40b0581e 100644
+--- a/apis/collection_test.go
++++ b/apis/collection_test.go
+@@ -1225,6 +1225,71 @@ func TestCollectionUpdate(t *testing.T) {
+ 				"OnModelValidate":              1,
+ 			},
+ 		},
++		{
++			Name:   "add another OAuth2 provider to an auth collection",
++			Method: http.MethodPatch,
++			URL:    "/api/collections/users",
++			Body: strings.NewReader(`{
++				"oauth2": {
++					"providers": [
++						{"name": "apple", "clientId": "a", "clientSecret": "b"},
++						{
++							"pkce": null,
++							"name": "google",
++							"authURL": "",
++							"displayName": "existing",
++							"extra": {}
++						}
++					]
++				}
++			}`),
++			Headers: map[string]string{
++				"Authorization": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InN5d2JoZWNuaDQ2cmhtMCIsInR5cGUiOiJhdXRoIiwiY29sbGVjdGlvbklkIjoicGJjXzMxNDI2MzU4MjMiLCJleHAiOjI1MjQ2MDQ0NjEsInJlZnJlc2hhYmxlIjp0cnVlfQ.UXgO3j-0BumcugrFjbd7j0M4MQvbrLggLlcu_YNGjoY",
++			},
++			BeforeTestFunc: func(t testing.TB, app *tests.TestApp, e *core.ServeEvent) {
++				// verify that the collection has google and gitlab as OAuth2 providers
++				users, err := app.FindCollectionByNameOrId("users")
++				if err != nil {
++					t.Fatal(err)
++				}
++
++				if v := len(users.OAuth2.Providers); v != 2 {
++					t.Fatalf("Expected 2 OAuth2 providers, got %d", v)
++				}
++
++				if v := users.OAuth2.Providers[0].Name; v != "gitlab" {
++					t.Fatalf("Expected provider 0 to be %s, got %s", "gitlab", v)
++				}
++
++				if v := users.OAuth2.Providers[1].Name; v != "google" {
++					t.Fatalf("Expected provider 1 to be %s, got %s", "google", v)
++				}
++			},
++			ExpectedStatus: 200,
++			ExpectedContent: []string{
++				`"name":"google"`,
++				`"name":"apple"`,
++				`"displayName":"existing"`,
++				`"clientId":"test"`,
++				`"clientId":"a"`,
++			},
++			NotExpectedContent: []string{
++				`"name":"gitlab"`,
++				`clientSecret`,
++			},
++			ExpectedEvents: map[string]int{
++				"*":                              0,
++				"OnCollectionUpdateRequest":      1,
++				"OnCollectionUpdate":             1,
++				"OnCollectionUpdateExecute":      1,
++				"OnCollectionAfterUpdateSuccess": 1,
++				"OnCollectionValidate":           1,
++				"OnModelUpdate":                  1,
++				"OnModelUpdateExecute":           1,
++				"OnModelAfterUpdateSuccess":      1,
++				"OnModelValidate":                1,
++			},
++		},
+ 
+ 		// view
+ 		// -----------------------------------------------------------
+diff --git a/core/collection_model_auth_options.go b/core/collection_model_auth_options.go
+index e5eb6bab..a39f7ab1 100644
+--- a/core/collection_model_auth_options.go
++++ b/core/collection_model_auth_options.go
+@@ -1,6 +1,9 @@
+ package core
+ 
+ import (
++	"encoding/json/v2"
++	"errors"
++	"slices"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+@@ -409,6 +412,66 @@ type OAuth2Config struct {
+ 	Enabled bool `form:"enabled" json:"enabled"`
+ }
+ 
++// UnmarshalJSON implements the [json.Unmarshaler] interface.
++//
++// The main difference from the standrad unmarshalization is that
++// instead of replacing the entire providers config slice, we ensure
++// that parially submitted provider data (e.g. without clientSecret)
++// is merged on per config level based on the provider name
++// (https://github.com/pocketbase/pocketbase/issues/7815).
++func (c *OAuth2Config) UnmarshalJSON(b []byte) error {
++	originalProviders := slices.Clone(c.Providers)
++
++	type alias OAuth2Config
++	err := json.Unmarshal(b, (*alias)(c))
++	if err != nil {
++		return err
++	}
++
++	if len(c.Providers) == 0 {
++		return nil
++	}
++
++	// unmarshal again but this time into a plain array of objects
++	// so that we have only the submitted fields and no zero defaults
++	plain := struct {
++		Providers []map[string]any `json:"providers"`
++	}{}
++	err = json.Unmarshal(b, &plain)
++	if err != nil {
++		return err
++	}
++
++	if len(c.Providers) != len(plain.Providers) {
++		return errors.New("the length of the plain unmarshalized providers and the ones from the config doesn't match")
++	}
++
++ProvidersMergeLoop:
++	for i, plain := range plain.Providers {
++		for _, original := range originalProviders {
++			if original.Name == plain["name"] {
++				raw, err := json.Marshal(plain)
++				if err != nil {
++					return err
++				}
++
++				// unmarshal the new plain data on top of the original one
++				err = json.Unmarshal(raw, &original)
++				if err != nil {
++					return err
++				}
++
++				// reassigne to the updated original
++				c.Providers[i] = original
++
++				continue ProvidersMergeLoop
++			}
++		}
++	}
++
++	return nil
++}
++
+ // GetProviderConfig returns the first OAuth2ProviderConfig that matches the specified name.
+ //
+ // Returns false and zero config if no such provider is available in c.Providers.
+diff --git a/core/collection_model_auth_options_test.go b/core/collection_model_auth_options_test.go
+index 45a00d03..aef0f969 100644
+--- a/core/collection_model_auth_options_test.go
++++ b/core/collection_model_auth_options_test.go
+@@ -712,6 +712,45 @@ func TestPasswordAuthConfigValidate(t *testing.T) {
+ 	}
+ }
+ 
++func TestOAuth2ConfigUnmarshalJSON(t *testing.T) {
++	config := core.OAuth2Config{
++		Enabled: false,
++		MappedFields: core.OAuth2KnownFields{
++			Name: "name_test",
++		},
++		Providers: []core.OAuth2ProviderConfig{
++			{Name: "a", ClientId: "a_clientId", ClientSecret: "a_clientSecret"},
++			{Name: "b", ClientId: "b_clientId", ClientSecret: "b_clientSecret"},
++		},
++	}
++
++	newRaw := []byte(`{
++		"enabled": true,
++		"mappedFields": {"username": "username_test"},
++		"providers": [
++			{"name": "c", "clientId": "c_clientId", "clientSecret": "c_clientSecret"},
++			{"name": "a", "displayName": "a_displayName"}
++		]
++	}`)
++
++	err := json.Unmarshal(newRaw, &config)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	raw, err := json.Marshal(config, json.Deterministic(true))
++	if err != nil {
++		t.Fatal(err)
++	}
++	rawStr := string(raw)
++
++	expected := `{"providers":[{"pkce":null,"name":"c","clientId":"c_clientId","clientSecret":"c_clientSecret","authURL":"","tokenURL":"","userInfoURL":"","displayName":"","extra":{}},{"pkce":null,"name":"a","clientId":"a_clientId","clientSecret":"a_clientSecret","authURL":"","tokenURL":"","userInfoURL":"","displayName":"a_displayName","extra":{}}],"mappedFields":{"id":"","name":"name_test","username":"username_test","avatarURL":""},"enabled":true}`
++
++	if rawStr != expected {
++		t.Fatalf("Expected OAuth2ProviderConfig\n%s\ngot\n%s", expected, rawStr)
++	}
++}
++
+ func TestOAuth2ConfigGetProviderConfig(t *testing.T) {
+ 	scenarios := []struct {
+ 		name           string
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

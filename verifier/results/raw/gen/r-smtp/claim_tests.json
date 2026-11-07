@@ -1,0 +1,36 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.birchway.net","port":587,"username":"courier","password":"Fennel-road-62"}},"expect":{"status":200}},
+ {"id":"s1b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Birchway Rentals"}},"expect":{"status":200,"paths":{"meta.appName":"Birchway Rentals","smtp.enabled":true,"smtp.host":"smtp.birchway.net","smtp.port":587,"smtp.username":"courier"}}},
+ {"id":"s1c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"meta.appName":"Birchway Rentals","smtp.host":"smtp.birchway.net","smtp.username":"courier"}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Cobalt Clinic","appURL":"https://cobaltclinic.org"}},"expect":{"status":200}},
+ {"id":"s2b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"mail.cobaltclinic.org","port":465,"username":"frontdesk"}},"expect":{"status":200,"paths":{"smtp.host":"mail.cobaltclinic.org","meta.appName":"Cobalt Clinic","meta.appURL":"https://cobaltclinic.org"}}},
+ {"id":"s2c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"meta.appName":"Cobalt Clinic","meta.appURL":"https://cobaltclinic.org","smtp.port":465}}}
+]},
+{"id":"s3","claim":"c2","kind":"claim","steps":[
+ {"id":"s3a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"relay.saltmarsh.io","port":2525,"username":"bulletin","password":"Heron_tide_19"}},"expect":{"status":200}},
+ {"id":"s3b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"host":"relay2.saltmarsh.io"}},"expect":{"status":200,"paths":{"smtp.host":"relay2.saltmarsh.io","smtp.enabled":true,"smtp.port":2525,"smtp.username":"bulletin"}}},
+ {"id":"s3c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.host":"relay2.saltmarsh.io","smtp.port":2525,"smtp.username":"bulletin"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Juniper Books","appURL":"https://juniperbooks.shop","senderName":"Juniper Support","senderAddress":"support@juniperbooks.shop"}},"expect":{"status":200}},
+ {"id":"s4b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Juniper Bookhouse"}},"expect":{"status":200,"paths":{"meta.appName":"Juniper Bookhouse","meta.appURL":"https://juniperbooks.shop","meta.senderName":"Juniper Support","meta.senderAddress":"support@juniperbooks.shop"}}}
+]},
+{"id":"s5","claim":"c3","kind":"claim","steps":[
+ {"id":"s5a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Ridgeline Ops"}},"expect":{"status":200}},
+ {"id":"s5b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Ridgeline Field"},"smtp":{"enabled":true,"host":"","port":0}},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s5c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"meta.appName":"Ridgeline Ops","smtp.enabled":false}}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6a","setup":true,"method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Harbor Lights","appURL":"https://harborlights.app"}},"expect":{"status":200}},
+ {"id":"s6b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"","appURL":"https://elsewhere.app"}},"expect":{"status":400,"json":{"status":400}}},
+ {"id":"s6c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"meta.appName":"Harbor Lights","meta.appURL":"https://harborlights.app"}}}
+]},
+{"id":"s7","claim":"c4","kind":"claim","steps":[
+ {"id":"s7a","method":"PATCH","path":"/api/settings","as":"superuser","json":{"smtp":{"enabled":true,"host":"smtp.ivorygate.com","port":587,"username":"gatekeeper","password":"Opal&lantern-48"}},"expect":{"status":200,"paths":{"smtp.username":"gatekeeper"},"absent":["smtp.password"]}},
+ {"id":"s7b","method":"PATCH","path":"/api/settings","as":"superuser","json":{"meta":{"appName":"Ivory Gate"}},"expect":{"status":200,"paths":{"meta.appName":"Ivory Gate"},"absent":["smtp.password"]}},
+ {"id":"s7c","method":"GET","path":"/api/settings","as":"superuser","expect":{"status":200,"paths":{"smtp.host":"smtp.ivorygate.com"},"absent":["smtp.password"]}}
+]}
+]}

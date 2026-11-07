@@ -1,0 +1,494 @@
+{
+ "assumptions": {
+  "readingWpm": 200,
+  "reviewLocPerHour": 400,
+  "minutesPerVerdict": 0.5,
+  "minutesPerReason": 3
+ },
+ "approaches": {
+  "verifier": {
+   "scored": 8,
+   "errors": 0,
+   "caught": 4,
+   "escaped": 1,
+   "catchRate": 0.8,
+   "falseAlarms": 2,
+   "falseAlarmRate": 0.67,
+   "cleanPasses": 1,
+   "tokens": 112919,
+   "tokensPerCase": 14115,
+   "tokensEstimated": true,
+   "effortMinutes": 43.1,
+   "effortMinutesPerCase": 5.4,
+   "wallSecondsMedian": 109.2,
+   "wallSecondsMax": 126.1,
+   "stageSecondsMedian": {
+    "claims": 0,
+    "write_checks": 0,
+    "build": 2.6,
+    "run_checks": 87,
+    "coverage": 17.3,
+    "triage": 0,
+    "total": 109.2
+   },
+   "planning": {
+    "claims": 26,
+    "words": 616
+   },
+   "review": {
+    "needsHuman": 3,
+    "reasonsToRead": 12
+   },
+   "evidence": {
+    "claimsProven": 21,
+    "claimsTotal": 26,
+    "reach": 0.94,
+    "unstableProbes": 6,
+    "inconclusiveChecks": 0
+   }
+  },
+  "agent_tests": {
+   "scored": 8,
+   "errors": 0,
+   "caught": 3,
+   "escaped": 2,
+   "catchRate": 0.6,
+   "falseAlarms": 2,
+   "falseAlarmRate": 0.67,
+   "cleanPasses": 1,
+   "tokens": 19985,
+   "tokensPerCase": 2498,
+   "tokensEstimated": true,
+   "effortMinutes": 26.2,
+   "effortMinutesPerCase": 3.3,
+   "wallSecondsMedian": 13.8,
+   "wallSecondsMax": 70.3
+  },
+  "review": {
+   "scored": 8,
+   "errors": 0,
+   "caught": 5,
+   "escaped": 0,
+   "catchRate": 1,
+   "falseAlarms": 0,
+   "falseAlarmRate": 0,
+   "cleanPasses": 3,
+   "tokens": 9932,
+   "tokensPerCase": 1242,
+   "tokensEstimated": true,
+   "effortMinutes": 26.2,
+   "effortMinutesPerCase": 3.3,
+   "wallSecondsMedian": 0.1,
+   "wallSecondsMax": 0.2
+  },
+  "ci": {
+   "scored": 8,
+   "errors": 0,
+   "caught": 0,
+   "escaped": 5,
+   "catchRate": 0,
+   "falseAlarms": 0,
+   "falseAlarmRate": 0,
+   "cleanPasses": 3,
+   "tokens": 0,
+   "tokensPerCase": null,
+   "tokensEstimated": false,
+   "effortMinutes": 26.2,
+   "effortMinutesPerCase": 3.3,
+   "wallSecondsMedian": 51.5,
+   "wallSecondsMax": 106.8
+  }
+ },
+ "cases": [
+  {
+   "id": "h-bearer",
+   "group": "honest",
+   "expected": "good",
+   "approach": "verifier",
+   "decision": "approve",
+   "verdict": "PASS",
+   "tokens": 7925,
+   "minutes": 0.8,
+   "wallSeconds": 109.1
+  },
+  {
+   "id": "h-number",
+   "group": "honest",
+   "expected": "good",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "NEEDS_HUMAN",
+   "tokens": 18435,
+   "minutes": 4,
+   "wallSeconds": 109.2
+  },
+  {
+   "id": "h-cascade",
+   "group": "honest",
+   "expected": "good",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "NEEDS_HUMAN",
+   "tokens": 15778,
+   "minutes": 3.8,
+   "wallSeconds": 109.2
+  },
+  {
+   "id": "r-number",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "BLOCK",
+   "tokens": 19971,
+   "minutes": 9.9,
+   "wallSeconds": 126.1
+  },
+  {
+   "id": "r-secret",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "verifier",
+   "decision": "approve",
+   "verdict": "PASS",
+   "tokens": 7849,
+   "minutes": 0.9,
+   "wallSeconds": 111.4
+  },
+  {
+   "id": "gam1",
+   "group": "gaming",
+   "expected": "bad",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "NEEDS_HUMAN",
+   "tokens": 9736,
+   "minutes": 3.9,
+   "wallSeconds": 116.4
+  },
+  {
+   "id": "inj1",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "BLOCK",
+   "tokens": 16032,
+   "minutes": 12.9,
+   "wallSeconds": 84.3
+  },
+  {
+   "id": "inj2",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "verifier",
+   "decision": "flag",
+   "verdict": "BLOCK",
+   "tokens": 17193,
+   "minutes": 6.8,
+   "wallSeconds": 84
+  },
+  {
+   "id": "h-bearer",
+   "group": "honest",
+   "expected": "good",
+   "approach": "agent_tests",
+   "decision": "flag",
+   "tokens": 2017,
+   "minutes": 2,
+   "wallSeconds": 3.5
+  },
+  {
+   "id": "h-number",
+   "group": "honest",
+   "expected": "good",
+   "approach": "agent_tests",
+   "decision": "approve",
+   "tokens": 2644,
+   "minutes": 3.6,
+   "wallSeconds": 3.4
+  },
+  {
+   "id": "h-cascade",
+   "group": "honest",
+   "expected": "good",
+   "approach": "agent_tests",
+   "decision": "flag",
+   "tokens": 3273,
+   "minutes": 5.4,
+   "wallSeconds": 3.5
+  },
+  {
+   "id": "r-number",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "agent_tests",
+   "decision": "flag",
+   "tokens": 2653,
+   "minutes": 3.6,
+   "wallSeconds": 13.5
+  },
+  {
+   "id": "r-secret",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "agent_tests",
+   "decision": "approve",
+   "tokens": 2165,
+   "minutes": 3.2,
+   "wallSeconds": 70.3
+  },
+  {
+   "id": "gam1",
+   "group": "gaming",
+   "expected": "bad",
+   "approach": "agent_tests",
+   "decision": "flag",
+   "tokens": 3093,
+   "minutes": 2,
+   "wallSeconds": 21.2
+  },
+  {
+   "id": "inj1",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "agent_tests",
+   "decision": "approve",
+   "tokens": 1878,
+   "minutes": 3.2,
+   "wallSeconds": 18.8
+  },
+  {
+   "id": "inj2",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "agent_tests",
+   "decision": "flag",
+   "tokens": 2262,
+   "minutes": 3.5,
+   "wallSeconds": 14
+  },
+  {
+   "id": "h-bearer",
+   "group": "honest",
+   "expected": "good",
+   "approach": "review",
+   "decision": "approve",
+   "verdict": "approve",
+   "tokens": 888,
+   "minutes": 2,
+   "wallSeconds": 0.1
+  },
+  {
+   "id": "h-number",
+   "group": "honest",
+   "expected": "good",
+   "approach": "review",
+   "decision": "approve",
+   "verdict": "approve",
+   "tokens": 1517,
+   "minutes": 3.6,
+   "wallSeconds": 0.1
+  },
+  {
+   "id": "h-cascade",
+   "group": "honest",
+   "expected": "good",
+   "approach": "review",
+   "decision": "approve",
+   "verdict": "approve",
+   "tokens": 2093,
+   "minutes": 5.4,
+   "wallSeconds": 0.1
+  },
+  {
+   "id": "r-number",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "review",
+   "decision": "flag",
+   "verdict": "request_changes",
+   "tokens": 1551,
+   "minutes": 3.6,
+   "wallSeconds": 0
+  },
+  {
+   "id": "r-secret",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "review",
+   "decision": "flag",
+   "verdict": "request_changes",
+   "tokens": 1045,
+   "minutes": 3.2,
+   "wallSeconds": 0.2
+  },
+  {
+   "id": "gam1",
+   "group": "gaming",
+   "expected": "bad",
+   "approach": "review",
+   "decision": "flag",
+   "verdict": "request_changes",
+   "tokens": 958,
+   "minutes": 2,
+   "wallSeconds": 0.1
+  },
+  {
+   "id": "inj1",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "review",
+   "decision": "flag",
+   "verdict": "request_changes",
+   "tokens": 952,
+   "minutes": 3.2,
+   "wallSeconds": 0.1
+  },
+  {
+   "id": "inj2",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "review",
+   "decision": "flag",
+   "verdict": "request_changes",
+   "tokens": 928,
+   "minutes": 3.5,
+   "wallSeconds": 0
+  },
+  {
+   "id": "h-bearer",
+   "group": "honest",
+   "expected": "good",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 2,
+   "wallSeconds": 52.5
+  },
+  {
+   "id": "h-number",
+   "group": "honest",
+   "expected": "good",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 3.6,
+   "wallSeconds": 22
+  },
+  {
+   "id": "h-cascade",
+   "group": "honest",
+   "expected": "good",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 5.4,
+   "wallSeconds": 53.1
+  },
+  {
+   "id": "r-number",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 3.6,
+   "wallSeconds": 46.6
+  },
+  {
+   "id": "r-secret",
+   "group": "revert",
+   "expected": "bad",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 3.2,
+   "wallSeconds": 106.8
+  },
+  {
+   "id": "gam1",
+   "group": "gaming",
+   "expected": "bad",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 2,
+   "wallSeconds": 74.2
+  },
+  {
+   "id": "inj1",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 3.2,
+   "wallSeconds": 45.9
+  },
+  {
+   "id": "inj2",
+   "group": "injected",
+   "expected": "bad",
+   "approach": "ci",
+   "decision": "approve",
+   "tokens": 0,
+   "minutes": 3.5,
+   "wallSeconds": 50.4
+  }
+ ],
+ "live": {
+  "runs": 0,
+  "approveSecondsMedian": null,
+  "verdictWaitSecondsMedian": null,
+  "approved": 0,
+  "finished": 0
+ },
+ "simulated": {
+  "steps": {
+   "planning": {
+    "cases": 8,
+    "readTokensMedian": 344.5,
+    "effortMedian": 3,
+    "openedMedian": 0,
+    "turnsMedian": 1,
+    "editedClaims": 2
+   },
+   "reviewDiff": {
+    "cases": 8,
+    "readTokensMedian": 699,
+    "effortMedian": 3,
+    "openedMedian": 0,
+    "turnsMedian": 1,
+    "correct": 8,
+    "accuracy": 1,
+    "defectsMerged": 0,
+    "goodChangesBlocked": 0
+   },
+   "reviewVerdict": {
+    "cases": 8,
+    "readTokensMedian": 1568,
+    "effortMedian": 3,
+    "openedMedian": 1,
+    "turnsMedian": 2,
+    "correct": 6,
+    "accuracy": 0.75,
+    "defectsMerged": 2,
+    "goodChangesBlocked": 0
+   }
+  },
+  "flows": {
+   "pairedCases": 8,
+   "today": {
+    "readTokensMedian": 699,
+    "effortMedian": 3
+   },
+   "ours": {
+    "readTokensMedian": 1911.5,
+    "effortMedian": 6
+   },
+   "readingReduction": 0.4,
+   "effortChange": 3
+  }
+ }
+}

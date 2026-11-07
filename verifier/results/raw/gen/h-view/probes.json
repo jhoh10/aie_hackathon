@@ -1,0 +1,626 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_wildcard_queries",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "star",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v1",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT * FROM posts"
+          }
+        },
+        {
+          "id": "table_star",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v2",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT posts.* FROM posts"
+          }
+        },
+        {
+          "id": "alias_star",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v3",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT p.* FROM posts p"
+          }
+        },
+        {
+          "id": "star_plus_id",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v4",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, * FROM posts"
+          }
+        },
+        {
+          "id": "count_star",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v5",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, count(*) as total FROM posts GROUP BY id"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p2_dependent_views_after_change",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "v_title",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v_title",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, title FROM posts"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "v_score",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v_score",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, score FROM posts"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_posts",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "heading",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 20
+              }
+            ]
+          }
+        },
+        {
+          "id": "get_v_title",
+          "method": "GET",
+          "path": "/api/collections/v_title?fields=name,fields,viewQuery",
+          "as": "superuser"
+        },
+        {
+          "id": "get_v_score",
+          "method": "GET",
+          "path": "/api/collections/v_score?fields=name,fields,viewQuery",
+          "as": "superuser"
+        },
+        {
+          "id": "list_v_title",
+          "method": "GET",
+          "path": "/api/collections/v_title/records",
+          "as": "superuser"
+        },
+        {
+          "id": "list_v_score",
+          "method": "GET",
+          "path": "/api/collections/v_score/records",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p3_dependent_view_order_reversed",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "a_score",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "a_score",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, score FROM posts"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "z_title",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "z_title",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, title FROM posts"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_posts",
+          "method": "PATCH",
+          "path": "/api/collections/posts",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 5
+              }
+            ]
+          }
+        },
+        {
+          "id": "get_a",
+          "method": "GET",
+          "path": "/api/collections/a_score?fields=fields",
+          "as": "superuser"
+        },
+        {
+          "id": "get_z",
+          "method": "GET",
+          "path": "/api/collections/z_title?fields=fields",
+          "as": "superuser"
+        },
+        {
+          "id": "get_posts",
+          "method": "GET",
+          "path": "/api/collections/posts?fields=fields",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p4_non_text_id_view_records",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "rec1",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "one",
+            "score": 1
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "rec2",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/posts/records",
+          "as": "superuser",
+          "json": {
+            "title": "two",
+            "score": 2
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "numeric_id",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v_num",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT (ROW_NUMBER() OVER()) as id, title FROM posts"
+          }
+        },
+        {
+          "id": "list_num",
+          "method": "GET",
+          "path": "/api/collections/v_num/records?sort=title&fields=title",
+          "as": "superuser"
+        },
+        {
+          "id": "int_literal_id",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v_lit",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT 1 as id, count(*) as total FROM posts"
+          }
+        },
+        {
+          "id": "list_lit",
+          "method": "GET",
+          "path": "/api/collections/v_lit/records",
+          "as": "superuser"
+        }
+      ]
+    },
+    {
+      "id": "p5_update_view_and_permissions",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_posts",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "posts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldid00001",
+                "name": "id",
+                "type": "text",
+                "system": true,
+                "primaryKey": true,
+                "required": true,
+                "min": 15,
+                "max": 15,
+                "pattern": "^[a-z0-9]+$",
+                "autogeneratePattern": "[a-z0-9]{15}"
+              },
+              {
+                "id": "fldtitle01",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "v",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "v",
+            "type": "view",
+            "listRule": "",
+            "viewRule": "",
+            "viewQuery": "SELECT id, title FROM posts"
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_to_star",
+          "method": "PATCH",
+          "path": "/api/collections/v",
+          "as": "superuser",
+          "json": {
+            "viewQuery": "SELECT * FROM posts"
+          }
+        },
+        {
+          "id": "patch_to_score",
+          "method": "PATCH",
+          "path": "/api/collections/v",
+          "as": "superuser",
+          "json": {
+            "viewQuery": "SELECT id, score FROM posts"
+          }
+        },
+        {
+          "id": "anon_create_view",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "anon",
+          "json": {
+            "name": "vx",
+            "type": "view",
+            "viewQuery": "SELECT id FROM posts"
+          }
+        },
+        {
+          "id": "delete_posts",
+          "method": "DELETE",
+          "path": "/api/collections/posts",
+          "as": "superuser"
+        },
+        {
+          "id": "get_v",
+          "method": "GET",
+          "path": "/api/collections/v?fields=fields,viewQuery",
+          "as": "superuser"
+        }
+      ]
+    }
+  ]
+}

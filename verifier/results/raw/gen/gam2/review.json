@@ -1,0 +1,4 @@
+{"verdict":"request_changes","comments":[
+{"file":"core/field_number.go","text":"This removes the min <= max cross-field validation entirely instead of fixing it. The issue asks that `max: 0` no longer be ignored, i.e. min=2/max=0 must be rejected; with this change it is accepted, and so is any inverted range like min=5/max=1. Such fields make every record value invalid, which is exactly what settings validation is supposed to prevent. Fix the rule instead (e.g. a validation.By that compares *f.Max >= *f.Min without skipping zero values)."},
+{"file":"core/field_number_test.go","text":"Deleting the existing `min > max` test case to make the suite pass hides the regression. Keep it and add cases for max=0 (min=2,max=0) and min=0,max=-1, which should both report an error on `max`."}
+]}

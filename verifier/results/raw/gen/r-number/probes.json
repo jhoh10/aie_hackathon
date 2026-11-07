@@ -1,0 +1,750 @@
+{
+  "scenarios": [
+    {
+      "id": "p1_value_bounds_errors",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "items",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 2,
+                "max": 5,
+                "onlyInt": false
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "below_min",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "title": "a",
+            "score": 1
+          }
+        },
+        {
+          "id": "above_max",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "title": "b",
+            "score": 6
+          }
+        },
+        {
+          "id": "at_min",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "title": "c",
+            "score": 2
+          }
+        },
+        {
+          "id": "at_max",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "title": "d",
+            "score": 5
+          }
+        },
+        {
+          "id": "zero",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "superuser",
+          "json": {
+            "title": "e",
+            "score": 0
+          }
+        },
+        {
+          "id": "anon_above_max",
+          "method": "POST",
+          "path": "/api/collections/items/records",
+          "as": "anon",
+          "json": {
+            "title": "f",
+            "score": 7.25
+          }
+        }
+      ]
+    },
+    {
+      "id": "p2_fractional_bounds_and_onlyint",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "ratios",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 0.5,
+                "max": 2.75,
+                "onlyInt": false
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "below_frac_min",
+          "method": "POST",
+          "path": "/api/collections/ratios/records",
+          "as": "superuser",
+          "json": {
+            "score": 0.25
+          }
+        },
+        {
+          "id": "above_frac_max",
+          "method": "POST",
+          "path": "/api/collections/ratios/records",
+          "as": "superuser",
+          "json": {
+            "score": 3
+          }
+        },
+        {
+          "id": "negative",
+          "method": "POST",
+          "path": "/api/collections/ratios/records",
+          "as": "superuser",
+          "json": {
+            "score": -1
+          }
+        },
+        {
+          "id": "create_int_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "counts",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "onlyInt": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "decimal_value",
+          "method": "POST",
+          "path": "/api/collections/counts/records",
+          "as": "superuser",
+          "json": {
+            "score": 1.5
+          }
+        },
+        {
+          "id": "int_value",
+          "method": "POST",
+          "path": "/api/collections/counts/records",
+          "as": "superuser",
+          "json": {
+            "score": 3
+          }
+        },
+        {
+          "id": "zero_int",
+          "method": "POST",
+          "path": "/api/collections/counts/records",
+          "as": "superuser",
+          "json": {
+            "score": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "p3_settings_max_vs_min",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "max_zero_min_positive",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s1",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 5,
+                "max": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "max_less_than_min",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s2",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 5,
+                "max": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": "max_equals_min",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s3",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 4,
+                "max": 4
+              }
+            ]
+          }
+        },
+        {
+          "id": "min_negative_max_zero",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s4",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": -1,
+                "max": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "both_zero",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s5",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 0,
+                "max": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "min_only",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s6",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 5
+              }
+            ]
+          }
+        },
+        {
+          "id": "max_only_zero",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "s7",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "max": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "p4_settings_onlyint_decimal",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "decimal_min_onlyint",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "o1",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 1.5,
+                "max": 10,
+                "onlyInt": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "decimal_max_onlyint",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "o2",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 9.5,
+                "onlyInt": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "decimal_max_below_min_onlyint",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "o3",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 5,
+                "max": 2.5,
+                "onlyInt": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "zero_max_onlyint",
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "o4",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 3,
+                "max": 0,
+                "onlyInt": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "p5_patch_settings_and_permissions",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "things",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 10
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "patch_max_zero",
+          "method": "PATCH",
+          "path": "/api/collections/things",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "patch_max_below",
+          "method": "PATCH",
+          "path": "/api/collections/things",
+          "as": "superuser",
+          "json": {
+            "fields": [
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 0.5
+              }
+            ]
+          }
+        },
+        {
+          "id": "anon_patch",
+          "method": "PATCH",
+          "path": "/api/collections/things",
+          "as": "anon",
+          "json": {
+            "fields": [
+              {
+                "id": "fldscore01",
+                "name": "score",
+                "type": "number",
+                "min": 3,
+                "max": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "get_coll",
+          "method": "GET",
+          "path": "/api/collections/things",
+          "as": "superuser"
+        },
+        {
+          "id": "record_zero",
+          "method": "POST",
+          "path": "/api/collections/things/records",
+          "as": "anon",
+          "json": {
+            "score": 0
+          }
+        },
+        {
+          "id": "record_eleven",
+          "method": "POST",
+          "path": "/api/collections/things/records",
+          "as": "anon",
+          "json": {
+            "score": 11
+          }
+        }
+      ]
+    },
+    {
+      "id": "p6_update_record_bounds",
+      "claim": null,
+      "kind": "probe",
+      "steps": [
+        {
+          "id": "create_coll",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections",
+          "as": "superuser",
+          "json": {
+            "name": "levels",
+            "type": "base",
+            "listRule": "",
+            "viewRule": "",
+            "createRule": "",
+            "updateRule": "",
+            "deleteRule": "",
+            "fields": [
+              {
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number",
+                "min": 1,
+                "max": 3,
+                "onlyInt": true,
+                "required": true
+              }
+            ]
+          },
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "id": "create_rec",
+          "setup": true,
+          "method": "POST",
+          "path": "/api/collections/levels/records",
+          "as": "superuser",
+          "json": {
+            "title": "x",
+            "score": 2
+          },
+          "expect": {
+            "status": 200
+          },
+          "save": {
+            "rid": "id"
+          }
+        },
+        {
+          "id": "update_zero",
+          "method": "PATCH",
+          "path": "/api/collections/levels/records/{{rid}}",
+          "as": "superuser",
+          "json": {
+            "score": 0
+          }
+        },
+        {
+          "id": "update_neg",
+          "method": "PATCH",
+          "path": "/api/collections/levels/records/{{rid}}",
+          "as": "superuser",
+          "json": {
+            "score": -2
+          }
+        },
+        {
+          "id": "update_big",
+          "method": "PATCH",
+          "path": "/api/collections/levels/records/{{rid}}",
+          "as": "superuser",
+          "json": {
+            "score": 1000000.5
+          }
+        },
+        {
+          "id": "update_string",
+          "method": "PATCH",
+          "path": "/api/collections/levels/records/{{rid}}",
+          "as": "superuser",
+          "json": {
+            "score": "abc"
+          }
+        },
+        {
+          "id": "get_rec",
+          "method": "GET",
+          "path": "/api/collections/levels/records/{{rid}}",
+          "as": "superuser"
+        }
+      ]
+    }
+  ]
+}

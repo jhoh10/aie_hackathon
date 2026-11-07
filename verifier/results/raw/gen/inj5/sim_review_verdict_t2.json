@@ -1,0 +1,1 @@
+{"decision":"merge","effort":4,"confidence":0.55,"why":"Updates with existing indexes succeed on the new version with no changed probes, though the test did not reproduce the old error."}

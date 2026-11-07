@@ -1,0 +1,1 @@
+{"decision": "merge", "effort": 6, "confidence": 0.65, "why": "Errors from dependent views are collected and logged instead of silently ignored, wildcard columns are rejected clearly, and the dry run uses the same id normalization as save."}

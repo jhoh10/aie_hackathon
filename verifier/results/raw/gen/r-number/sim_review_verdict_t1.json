@@ -1,0 +1,1 @@
+{"decision":"block","effort":2,"confidence":0.85,"why":"A no-behaviour-change refactor shows three undeclared breaking changes in settings validation."}

@@ -1,0 +1,32 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"artists","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"github","clientId":"Iv1.a7c3f0e2","clientSecret":"5f1e9b0c7d22aa"}]}},"expect":{"status":200}},
+ {"id":"s1add","method":"PATCH","path":"/api/collections/artists","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"github","clientId":"Iv1.a7c3f0e2"},{"name":"discord","clientId":"104477120093","clientSecret":"Qm8_zzT4pL"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.name":"github","oauth2.providers.1.name":"discord"}}},
+ {"id":"s1again","method":"PATCH","path":"/api/collections/artists","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"github","clientId":"Iv1.a7c3f0e2"},{"name":"discord","clientId":"104477120093"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.clientId":"Iv1.a7c3f0e2","oauth2.providers.1.clientId":"104477120093"}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"brewers","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"88123-hops.apps","clientSecret":"GOCSPX-malt991"}]}},"expect":{"status":200}},
+ {"id":"s2add","method":"PATCH","path":"/api/collections/brewers","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"88123-hops.apps"},{"name":"facebook","clientId":"6620915544","clientSecret":"fb-yeast-0021"}]}},"expect":{"status":200}},
+ {"id":"s2rule","method":"PATCH","path":"/api/collections/brewers","as":"superuser","json":{"listRule":"id = @request.auth.id"},"expect":{"status":200,"paths":{"listRule":"id = @request.auth.id","oauth2.providers.0.name":"google","oauth2.providers.1.name":"facebook"}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"growers","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"gitlab","clientId":"gl-orchard-31","clientSecret":"glsec-pear-77"},{"name":"twitch","clientId":"tw-vine-08","clientSecret":"twsec-grape-55"}]}},"expect":{"status":200}},
+ {"id":"s3add","method":"PATCH","path":"/api/collections/growers","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"gitlab","clientId":"gl-orchard-31"},{"name":"twitch","clientId":"tw-vine-08"},{"name":"spotify","clientId":"sp-plum-19","clientSecret":"spsec-fig-40"}]}},"expect":{"status":200}},
+ {"id":"s3toggle","method":"PATCH","path":"/api/collections/growers","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"gitlab","clientId":"gl-orchard-31"},{"name":"twitch","clientId":"tw-vine-08"},{"name":"spotify","clientId":"sp-plum-19"}]},"viewRule":""},"expect":{"status":200,"paths":{"viewRule":"","oauth2.providers.2.clientId":"sp-plum-19"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"curators","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"cur-g-71","clientSecret":"cur-g-sec"}]}},"expect":{"status":200}},
+ {"id":"s4add","setup":true,"method":"PATCH","path":"/api/collections/curators","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"cur-g-71"},{"name":"github","clientId":"cur-gh-72","clientSecret":"cur-gh-sec"}]}},"expect":{"status":200}},
+ {"id":"s4get","method":"GET","path":"/api/collections/curators","as":"superuser","expect":{"status":200,"paths":{"oauth2.enabled":true,"oauth2.providers.0.name":"google","oauth2.providers.0.clientId":"cur-g-71","oauth2.providers.1.name":"github","oauth2.providers.1.clientId":"cur-gh-72"}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5col","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"potters","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"microsoft","clientId":"pot-ms-1","clientSecret":"pot-ms-s"},{"name":"apple","clientId":"com.kiln.login","clientSecret":"pot-ap-s"}]}},"expect":{"status":200}},
+ {"id":"s5add","setup":true,"method":"PATCH","path":"/api/collections/potters","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"microsoft","clientId":"pot-ms-1"},{"name":"apple","clientId":"com.kiln.login"},{"name":"gitea","clientId":"pot-gt-3","clientSecret":"pot-gt-s"}]}},"expect":{"status":200}},
+ {"id":"s5list","method":"GET","path":"/api/collections?filter=name%3D%22potters%22","as":"superuser","expect":{"status":200,"paths":{"items.0.oauth2.providers.0.clientId":"pot-ms-1","items.0.oauth2.providers.1.clientId":"com.kiln.login","items.0.oauth2.providers.2.clientId":"pot-gt-3"},"absent":["items.0.oauth2.providers.3"]}}
+]},
+{"id":"s6","claim":"c3","kind":"claim","steps":[
+ {"id":"s6col","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"weavers","type":"auth","passwordAuth":{"enabled":true,"identityFields":["email"]},"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"wv-g-5","clientSecret":"loom-thread-secret"}]}},"expect":{"status":200,"paths":{"oauth2.providers.0.clientId":"wv-g-5"},"absent":["oauth2.providers.0.clientSecret"]}},
+ {"id":"s6add","method":"PATCH","path":"/api/collections/weavers","as":"superuser","json":{"oauth2":{"enabled":true,"providers":[{"name":"google","clientId":"wv-g-5"},{"name":"discord","clientId":"wv-d-6","clientSecret":"shuttle-secret"}]}},"expect":{"status":200,"absent":["oauth2.providers.0.clientSecret","oauth2.providers.1.clientSecret"]}},
+ {"id":"s6get","method":"GET","path":"/api/collections/weavers","as":"superuser","expect":{"status":200,"absent":["oauth2.providers.0.clientSecret","oauth2.providers.1.clientSecret"]}}
+]}
+]}

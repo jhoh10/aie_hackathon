@@ -1,0 +1,26 @@
+Review this pull request for merge.
+Issue: Fixed indexes collection update error: updating a collection fails with 'index already exists'.
+Title: Fix "index already exists" error on collection update
+Description: Some collections have indexes persisted without a table name (e.g. ``CREATE INDEX `idx` ON `` (`title`)``). `dropCollectionIndexes` skips such definitions because `dbutils.ParseIndex(...).IsValid()` requires a table name, so on the next collection update the recreate step fails with `index ... already exists`.
+
+`createCollectionIndexes` now builds the statements as `CREATE INDEX IF NOT EXISTS`, which makes the index sync tolerant to such leftover definitions.
+
+`go test ./apis/ ./core/` passes.
+Diff:
+diff --git a/core/collection_record_table_sync.go b/core/collection_record_table_sync.go
+index 35eda70f..d59e2021 100644
+--- a/core/collection_record_table_sync.go
++++ b/core/collection_record_table_sync.go
+@@ -338,6 +338,10 @@ func createCollectionIndexes(app App, collection *Collection) error {
+ 			// ensure that the index is always for the current collection
+ 			parsed.TableName = collection.Name
+ 
++			// the existing collection indexes may have been persisted without
++			// table name and therefore not removed by dropCollectionIndexes
++			parsed.Optional = true
++
+ 			if !parsed.IsValid() {
+ 				errs[strconv.Itoa(i)] = validation.NewError(
+ 					"validation_invalid_index_expression",
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

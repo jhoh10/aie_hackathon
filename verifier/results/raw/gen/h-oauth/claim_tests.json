@@ -1,0 +1,793 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "g-client-4417",
+         "clientSecret": "g-secret-8823"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1p1",
+     "method": "PATCH",
+     "path": "/api/collections/members",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "g-client-4417"
+        },
+        {
+         "name": "github",
+         "clientId": "gh-client-5501",
+         "clientSecret": "gh-secret-1290"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.name": "google",
+       "oauth2.providers.1.name": "github"
+      }
+     }
+    },
+    {
+     "id": "s1p2",
+     "method": "PATCH",
+     "path": "/api/collections/members",
+     "as": "superuser",
+     "json": {
+      "listRule": "@request.auth.id != \"\""
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "listRule": "@request.auth.id != \"\"",
+       "oauth2.providers.0.clientId": "g-client-4417"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "shoppers",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "9931-web.apps",
+         "clientSecret": "Gx7-kq2LmP0"
+        },
+        {
+         "name": "discord",
+         "clientId": "118822004",
+         "clientSecret": "dsc-Hh29fQ"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2p1",
+     "method": "PATCH",
+     "path": "/api/collections/shoppers",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "9931-web.apps"
+        },
+        {
+         "name": "discord",
+         "clientId": "118822004"
+        },
+        {
+         "name": "gitlab",
+         "clientId": "gl-77310",
+         "clientSecret": "glpat-Vv81"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.2.name": "gitlab"
+      }
+     }
+    },
+    {
+     "id": "s2p2",
+     "method": "PATCH",
+     "path": "/api/collections/shoppers",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "9931-web.apps"
+        },
+        {
+         "name": "discord",
+         "clientId": "118822004"
+        },
+        {
+         "name": "gitlab",
+         "clientId": "gl-77310"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.clientId": "9931-web.apps",
+       "oauth2.providers.1.clientId": "118822004",
+       "oauth2.providers.2.clientId": "gl-77310"
+      }
+     }
+    },
+    {
+     "id": "s2p3",
+     "method": "PATCH",
+     "path": "/api/collections/shoppers",
+     "as": "superuser",
+     "json": {
+      "viewRule": ""
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "viewRule": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "drivers",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "microsoft",
+         "clientId": "ms-app-6620",
+         "clientSecret": "ms-sec-4471"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3p1",
+     "method": "PATCH",
+     "path": "/api/collections/drivers",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "microsoft",
+         "clientId": "ms-app-6620"
+        },
+        {
+         "name": "apple",
+         "clientId": "com.fleet.signin",
+         "clientSecret": "apl-key-3301"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3p2",
+     "method": "PATCH",
+     "path": "/api/collections/drivers",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "microsoft",
+         "clientId": "ms-app-6620"
+        },
+        {
+         "name": "apple",
+         "clientId": "com.fleet.signin"
+        },
+        {
+         "name": "google",
+         "clientId": "g-55120",
+         "clientSecret": "g-sec-0092"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.name": "microsoft",
+       "oauth2.providers.1.name": "apple",
+       "oauth2.providers.2.name": "google"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "readers",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "r-g-100",
+         "clientSecret": "r-g-sec"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4p1",
+     "method": "PATCH",
+     "path": "/api/collections/readers",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "r-g-200",
+         "clientSecret": "r-g-sec-rotated"
+        },
+        {
+         "name": "github",
+         "clientId": "r-gh-300",
+         "clientSecret": "r-gh-sec"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4g",
+     "method": "GET",
+     "path": "/api/collections/readers",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.enabled": true,
+       "oauth2.providers.0.name": "google",
+       "oauth2.providers.0.clientId": "r-g-200",
+       "oauth2.providers.1.name": "github",
+       "oauth2.providers.1.clientId": "r-gh-300"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "tenants",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "gitlab",
+         "clientId": "tn-gl-1",
+         "clientSecret": "tn-gl-s"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5p1",
+     "method": "PATCH",
+     "path": "/api/collections/tenants",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "gitlab",
+         "clientId": "tn-gl-1"
+        },
+        {
+         "name": "twitch",
+         "clientId": "tn-tw-2",
+         "clientSecret": "tn-tw-s"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s5g",
+     "method": "GET",
+     "path": "/api/collections/tenants",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.clientId": "tn-gl-1",
+       "oauth2.providers.1.clientId": "tn-tw-2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "members",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "g-client-4417",
+         "clientSecret": "g-secret-8823"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s6g",
+     "method": "GET",
+     "path": "/api/collections/members",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.clientId": "g-client-4417"
+      },
+      "absent": [
+       "oauth2.providers.0.clientSecret"
+      ]
+     }
+    },
+    {
+     "id": "s6p",
+     "method": "PATCH",
+     "path": "/api/collections/members",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "g-client-4417"
+        },
+        {
+         "name": "github",
+         "clientId": "gh-2",
+         "clientSecret": "gh-secret-77"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200,
+      "absent": [
+       "oauth2.providers.0.clientSecret",
+       "oauth2.providers.1.clientSecret"
+      ]
+     }
+    },
+    {
+     "id": "s6g2",
+     "method": "GET",
+     "path": "/api/collections/members",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "absent": [
+       "oauth2.providers.0.clientSecret",
+       "oauth2.providers.1.clientSecret"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "guests",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "discord",
+         "clientId": "dc-901",
+         "clientSecret": "dc-hidden-55"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7l",
+     "method": "GET",
+     "path": "/api/collections?filter=name%3D%22guests%22",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "items.0.name": "guests",
+       "items.0.oauth2.providers.0.clientId": "dc-901"
+      },
+      "absent": [
+       "items.0.oauth2.providers.0.clientSecret"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "agents",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "ag-g",
+         "clientSecret": "ag-gs"
+        },
+        {
+         "name": "github",
+         "clientId": "ag-gh",
+         "clientSecret": "ag-ghs"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8p",
+     "method": "PATCH",
+     "path": "/api/collections/agents",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "github",
+         "clientId": "ag-gh"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8g",
+     "method": "GET",
+     "path": "/api/collections/agents",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.name": "github",
+       "oauth2.providers.0.clientId": "ag-gh"
+      },
+      "absent": [
+       "oauth2.providers.1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "s9",
+   "claim": "c4",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s9col",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "vendors",
+      "type": "auth",
+      "listRule": "",
+      "viewRule": "",
+      "fields": [],
+      "passwordAuth": {
+       "enabled": true,
+       "identityFields": [
+        "email"
+       ]
+      },
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "vd-g",
+         "clientSecret": "vd-gs"
+        },
+        {
+         "name": "gitlab",
+         "clientId": "vd-gl",
+         "clientSecret": "vd-gls"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s9p",
+     "method": "PATCH",
+     "path": "/api/collections/vendors",
+     "as": "superuser",
+     "json": {
+      "oauth2": {
+       "enabled": true,
+       "providers": [
+        {
+         "name": "google",
+         "clientId": "vd-g"
+        },
+        {
+         "name": "twitch",
+         "clientId": "vd-tw",
+         "clientSecret": "vd-tws"
+        }
+       ]
+      }
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s9g",
+     "method": "GET",
+     "path": "/api/collections/vendors",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "oauth2.providers.0.name": "google",
+       "oauth2.providers.1.name": "twitch"
+      },
+      "absent": [
+       "oauth2.providers.2"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

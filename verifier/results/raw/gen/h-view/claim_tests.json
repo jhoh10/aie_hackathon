@@ -1,0 +1,868 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "products",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "category",
+        "type": "text"
+       },
+       {
+        "name": "price",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1cid": "id"
+     }
+    },
+    {
+     "id": "s1r1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/products/records",
+     "as": "superuser",
+     "json": {
+      "category": "garden",
+      "price": 12
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1r2",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/products/records",
+     "as": "superuser",
+     "json": {
+      "category": "garden",
+      "price": 30
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1r3",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/products/records",
+     "as": "superuser",
+     "json": {
+      "category": "kitchen",
+      "price": 8
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s1v4",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "category_totals",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT category as id, COUNT(*) as total FROM products GROUP BY category"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "category_totals",
+       "type": "view"
+      }
+     }
+    },
+    {
+     "id": "s1l5",
+     "method": "GET",
+     "path": "/api/collections/category_totals/records?filter=id%3D%22garden%22",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.total": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "orderlines",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "qty",
+        "type": "number"
+       },
+       {
+        "name": "unit_price",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2cid": "id"
+     }
+    },
+    {
+     "id": "s2r6",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/orderlines/records",
+     "as": "superuser",
+     "json": {
+      "qty": 3,
+      "unit_price": 4
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s2v7",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "line_amounts",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT id, qty * unit_price as amount FROM orderlines"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "line_amounts"
+      }
+     }
+    },
+    {
+     "id": "s2l8",
+     "method": "GET",
+     "path": "/api/collections/line_amounts/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.amount": 12
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "articles",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "headline",
+        "type": "text"
+       },
+       {
+        "name": "words",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3cid": "id"
+     }
+    },
+    {
+     "id": "s3r9",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/articles/records",
+     "as": "superuser",
+     "json": {
+      "headline": "Harbour reopens",
+      "words": 640
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3r10",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/articles/records",
+     "as": "superuser",
+     "json": {
+      "headline": "Rail strike ends",
+      "words": 410
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s3v11",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "long_reads",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT a.id, a.headline FROM (SELECT * FROM articles) a WHERE a.words > 500"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "long_reads"
+      }
+     }
+    },
+    {
+     "id": "s3l12",
+     "method": "GET",
+     "path": "/api/collections/long_reads/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.headline": "Harbour reopens"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "authors",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "fullname",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4cid": "id"
+     }
+    },
+    {
+     "id": "s4bbase",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "books",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       },
+       {
+        "name": "pages",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4bcid": "id"
+     }
+    },
+    {
+     "id": "s4r13",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/authors/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Mira Castell"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4r14",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/books/records",
+     "as": "superuser",
+     "json": {
+      "title": "Salt Roads",
+      "pages": 212
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4r15",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/books/records",
+     "as": "superuser",
+     "json": {
+      "title": "Iron Bells",
+      "pages": 388
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s4v16",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "author_stats",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT (ROW_NUMBER() OVER()) as id, (SELECT COUNT(*) FROM books) as book_count, (SELECT SUM(pages) * 2 FROM books) as doubled_pages, fullname FROM authors"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "author_stats"
+      }
+     }
+    },
+    {
+     "id": "s4l17",
+     "method": "GET",
+     "path": "/api/collections/author_stats/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.book_count": 2,
+       "items.0.doubled_pages": 1200,
+       "items.0.fullname": "Mira Castell"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "tickets",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "subject",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5cid": "id"
+     }
+    },
+    {
+     "id": "s5v18",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "broken_view",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT id, subject FROM tickets_missing_table"
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "viewQuery": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s5chk",
+     "method": "GET",
+     "path": "/api/collections/broken_view",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s6base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "invoices",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "total",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s6cid": "id"
+     }
+    },
+    {
+     "id": "s6v19",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "no_id_view",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT total FROM invoices"
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "viewQuery": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s6v20",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "bad_syntax_view",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELEC id total FRM invoices"
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "viewQuery": {}
+       }
+      }
+     }
+    },
+    {
+     "id": "s6v21",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "delete_view",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "DELETE FROM invoices"
+     },
+     "expect": {
+      "status": 400,
+      "json": {
+       "data": {
+        "viewQuery": {}
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s7base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "employees",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "fullname",
+        "type": "text"
+       },
+       {
+        "name": "team",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s7cid": "id"
+     }
+    },
+    {
+     "id": "s7r22",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/employees/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Jonas Weber",
+      "team": "billing"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7r23",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/employees/records",
+     "as": "superuser",
+     "json": {
+      "fullname": "Priya Raman",
+      "team": "support"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s7v24",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "billing_staff",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT id, fullname FROM employees WHERE team = 'billing'"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "billing_staff",
+       "type": "view"
+      }
+     }
+    },
+    {
+     "id": "s7l25",
+     "method": "GET",
+     "path": "/api/collections/billing_staff/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.fullname": "Jonas Weber"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "claim": "c3",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s8base",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "owners",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "nickname",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s8cid": "id"
+     }
+    },
+    {
+     "id": "s8r26",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/owners/records",
+     "as": "superuser",
+     "json": {
+      "nickname": "bramble"
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8own",
+     "setup": true,
+     "method": "GET",
+     "path": "/api/collections/owners/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "oid": "items.0.id"
+     }
+    },
+    {
+     "id": "s8pbase",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "pets",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "petname",
+        "type": "text"
+       },
+       {
+        "name": "owner_ref",
+        "type": "text"
+       },
+       {
+        "name": "age",
+        "type": "number"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s8pcid": "id"
+     }
+    },
+    {
+     "id": "s8r27",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/pets/records",
+     "as": "superuser",
+     "json": {
+      "petname": "Pip",
+      "owner_ref": "{{oid}}",
+      "age": 3
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8r28",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/pets/records",
+     "as": "superuser",
+     "json": {
+      "petname": "Nutmeg",
+      "owner_ref": "{{oid}}",
+      "age": 7
+     },
+     "expect": {
+      "status": 200
+     }
+    },
+    {
+     "id": "s8v29",
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "owner_pets",
+      "type": "view",
+      "listRule": "",
+      "viewRule": "",
+      "viewQuery": "SELECT o.id, o.nickname, COUNT(p.id) as pet_count, MAX(p.age) as oldest FROM owners o LEFT JOIN pets p ON p.owner_ref = o.id GROUP BY o.id"
+     },
+     "expect": {
+      "status": 200,
+      "json": {
+       "name": "owner_pets"
+      }
+     }
+    },
+    {
+     "id": "s8l30",
+     "method": "GET",
+     "path": "/api/collections/owner_pets/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1,
+       "items.0.nickname": "bramble",
+       "items.0.pet_count": 2,
+       "items.0.oldest": 7
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

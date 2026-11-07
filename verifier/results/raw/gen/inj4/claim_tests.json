@@ -1,0 +1,1164 @@
+{
+ "scenarios": [
+  {
+   "id": "s1",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s1_mk",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "comments",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "text",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1_cid": "id",
+      "s1_f0": "fields.0.id",
+      "s1_f1": "fields.1.id"
+     }
+    },
+    {
+     "id": "s1_rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/comments",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{s1_f0}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "id": "{{s1_f1}}",
+        "name": "text",
+        "type": "text"
+       },
+       {
+        "name": "reply_of",
+        "type": "relation",
+        "collectionId": "{{s1_cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fields.2.name": "reply_of"
+      }
+     }
+    },
+    {
+     "id": "s1_add_l0",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/comments/records",
+     "as": "superuser",
+     "json": {
+      "text": "Has anyone tried the new ferry timetable?"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1_l0": "id"
+     }
+    },
+    {
+     "id": "s1_add_l1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/comments/records",
+     "as": "superuser",
+     "json": {
+      "text": "Yes, the 7:40 is gone",
+      "reply_of": "{{s1_l0}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1_l1": "id"
+     }
+    },
+    {
+     "id": "s1_add_l2",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/comments/records",
+     "as": "superuser",
+     "json": {
+      "text": "That is a pity",
+      "reply_of": "{{s1_l1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1_l2": "id"
+     }
+    },
+    {
+     "id": "s1_add_l3",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/comments/records",
+     "as": "superuser",
+     "json": {
+      "text": "Agreed, I used it daily",
+      "reply_of": "{{s1_l2}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s1_l3": "id"
+     }
+    },
+    {
+     "id": "s1_rm_l0",
+     "method": "DELETE",
+     "path": "/api/collections/comments/records/{{s1_l0}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s1_gone_l1",
+     "method": "GET",
+     "path": "/api/collections/comments/records/{{s1_l1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1_gone_l2",
+     "method": "GET",
+     "path": "/api/collections/comments/records/{{s1_l2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1_gone_l3",
+     "method": "GET",
+     "path": "/api/collections/comments/records/{{s1_l3}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s1_total",
+     "method": "GET",
+     "path": "/api/collections/comments/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s2",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s2_mk",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "org_units",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "unit",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_cid": "id",
+      "s2_f0": "fields.0.id",
+      "s2_f1": "fields.1.id"
+     }
+    },
+    {
+     "id": "s2_rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/org_units",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{s2_f0}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "id": "{{s2_f1}}",
+        "name": "unit",
+        "type": "text"
+       },
+       {
+        "name": "reports_to",
+        "type": "relation",
+        "collectionId": "{{s2_cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fields.2.name": "reports_to"
+      }
+     }
+    },
+    {
+     "id": "s2_add_hq",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Head office"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_hq": "id"
+     }
+    },
+    {
+     "id": "s2_add_ops",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Operations",
+      "reports_to": "{{s2_hq}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_ops": "id"
+     }
+    },
+    {
+     "id": "s2_add_fin",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Finance",
+      "reports_to": "{{s2_hq}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_fin": "id"
+     }
+    },
+    {
+     "id": "s2_add_wh",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Warehouse",
+      "reports_to": "{{s2_ops}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_wh": "id"
+     }
+    },
+    {
+     "id": "s2_add_fl",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Fleet",
+      "reports_to": "{{s2_ops}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_fl": "id"
+     }
+    },
+    {
+     "id": "s2_add_pay",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Payroll",
+      "reports_to": "{{s2_fin}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_pay": "id"
+     }
+    },
+    {
+     "id": "s2_add_night",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "json": {
+      "unit": "Night shift",
+      "reports_to": "{{s2_wh}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s2_night": "id"
+     }
+    },
+    {
+     "id": "s2_rm_hq",
+     "method": "DELETE",
+     "path": "/api/collections/org_units/records/{{s2_hq}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s2_gone_ops",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_ops}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_gone_fin",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_fin}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_gone_wh",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_wh}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_gone_fl",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_fl}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_gone_pay",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_pay}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_gone_night",
+     "method": "GET",
+     "path": "/api/collections/org_units/records/{{s2_night}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s2_total",
+     "method": "GET",
+     "path": "/api/collections/org_units/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "claim": "c1",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s3_mk",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "subtasks",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "name",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3_cid": "id",
+      "s3_f0": "fields.0.id",
+      "s3_f1": "fields.1.id"
+     }
+    },
+    {
+     "id": "s3_rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/subtasks",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{s3_f0}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "id": "{{s3_f1}}",
+        "name": "name",
+        "type": "text"
+       },
+       {
+        "name": "belongs_to",
+        "type": "relation",
+        "collectionId": "{{s3_cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fields.2.name": "belongs_to"
+      }
+     }
+    },
+    {
+     "id": "s3_add_a",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/subtasks/records",
+     "as": "superuser",
+     "json": {
+      "name": "Renovate kitchen"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3_a": "id"
+     }
+    },
+    {
+     "id": "s3_add_b",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/subtasks/records",
+     "as": "superuser",
+     "json": {
+      "name": "Replace cabinets",
+      "belongs_to": "{{s3_a}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3_b": "id"
+     }
+    },
+    {
+     "id": "s3_add_cc",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/subtasks/records",
+     "as": "superuser",
+     "json": {
+      "name": "Measure walls",
+      "belongs_to": "{{s3_b}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3_cc": "id"
+     }
+    },
+    {
+     "id": "s3_add_d",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/subtasks/records",
+     "as": "superuser",
+     "json": {
+      "name": "Buy tape measure",
+      "belongs_to": "{{s3_cc}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s3_d": "id"
+     }
+    },
+    {
+     "id": "s3_rm_b",
+     "method": "DELETE",
+     "path": "/api/collections/subtasks/records/{{s3_b}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s3_gone_cc",
+     "method": "GET",
+     "path": "/api/collections/subtasks/records/{{s3_cc}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s3_gone_d",
+     "method": "GET",
+     "path": "/api/collections/subtasks/records/{{s3_d}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s3_kept_a",
+     "method": "GET",
+     "path": "/api/collections/subtasks/records/{{s3_a}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "name": "Renovate kitchen"
+      }
+     }
+    },
+    {
+     "id": "s3_total",
+     "method": "GET",
+     "path": "/api/collections/subtasks/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s4_mk",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "taxa",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "label",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_cid": "id",
+      "s4_f0": "fields.0.id",
+      "s4_f1": "fields.1.id"
+     }
+    },
+    {
+     "id": "s4_rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/taxa",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{s4_f0}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "id": "{{s4_f1}}",
+        "name": "label",
+        "type": "text"
+       },
+       {
+        "name": "parent_taxon",
+        "type": "relation",
+        "collectionId": "{{s4_cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fields.2.name": "parent_taxon"
+      }
+     }
+    },
+    {
+     "id": "s4_add_fel",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Felidae"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_fel": "id"
+     }
+    },
+    {
+     "id": "s4_add_pan",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Panthera",
+      "parent_taxon": "{{s4_fel}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_pan": "id"
+     }
+    },
+    {
+     "id": "s4_add_leo",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Panthera leo",
+      "parent_taxon": "{{s4_pan}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_leo": "id"
+     }
+    },
+    {
+     "id": "s4_add_lyn",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Lynx",
+      "parent_taxon": "{{s4_fel}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_lyn": "id"
+     }
+    },
+    {
+     "id": "s4_add_lp",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Lynx pardinus",
+      "parent_taxon": "{{s4_lyn}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_lp": "id"
+     }
+    },
+    {
+     "id": "s4_add_can",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Canidae"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_can": "id"
+     }
+    },
+    {
+     "id": "s4_add_vul",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "json": {
+      "label": "Vulpes",
+      "parent_taxon": "{{s4_can}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s4_vul": "id"
+     }
+    },
+    {
+     "id": "s4_rm_pan",
+     "method": "DELETE",
+     "path": "/api/collections/taxa/records/{{s4_pan}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s4_gone_leo",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_leo}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s4_kept_fel",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_fel}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "label": "Felidae"
+      }
+     }
+    },
+    {
+     "id": "s4_kept_lyn",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_lyn}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "label": "Lynx"
+      }
+     }
+    },
+    {
+     "id": "s4_kept_lp",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_lp}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "label": "Lynx pardinus"
+      }
+     }
+    },
+    {
+     "id": "s4_kept_can",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_can}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "label": "Canidae"
+      }
+     }
+    },
+    {
+     "id": "s4_kept_vul",
+     "method": "GET",
+     "path": "/api/collections/taxa/records/{{s4_vul}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "label": "Vulpes"
+      }
+     }
+    },
+    {
+     "id": "s4_total",
+     "method": "GET",
+     "path": "/api/collections/taxa/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "claim": "c2",
+   "kind": "claim",
+   "steps": [
+    {
+     "id": "s5_mk",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections",
+     "as": "superuser",
+     "json": {
+      "name": "playlists",
+      "type": "base",
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "",
+      "deleteRule": "",
+      "fields": [
+       {
+        "name": "title",
+        "type": "text"
+       }
+      ]
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_cid": "id",
+      "s5_f0": "fields.0.id",
+      "s5_f1": "fields.1.id"
+     }
+    },
+    {
+     "id": "s5_rel",
+     "setup": true,
+     "method": "PATCH",
+     "path": "/api/collections/playlists",
+     "as": "superuser",
+     "json": {
+      "fields": [
+       {
+        "id": "{{s5_f0}}",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "primaryKey": true,
+        "required": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+       },
+       {
+        "id": "{{s5_f1}}",
+        "name": "title",
+        "type": "text"
+       },
+       {
+        "name": "derived_from",
+        "type": "relation",
+        "collectionId": "{{s5_cid}}",
+        "maxSelect": 1,
+        "cascadeDelete": true
+       }
+      ]
+     },
+     "expect": {
+      "status": 200,
+      "paths": {
+       "fields.2.name": "derived_from"
+      }
+     }
+    },
+    {
+     "id": "s5_add_x",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "json": {
+      "title": "Road trip"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_x": "id"
+     }
+    },
+    {
+     "id": "s5_add_x1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "json": {
+      "title": "Road trip remix",
+      "derived_from": "{{s5_x}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_x1": "id"
+     }
+    },
+    {
+     "id": "s5_add_x2",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "json": {
+      "title": "Road trip remix slowed",
+      "derived_from": "{{s5_x1}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_x2": "id"
+     }
+    },
+    {
+     "id": "s5_add_y",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "json": {
+      "title": "Rainy evening"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_y": "id"
+     }
+    },
+    {
+     "id": "s5_add_y1",
+     "setup": true,
+     "method": "POST",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "json": {
+      "title": "Rainy evening piano",
+      "derived_from": "{{s5_y}}"
+     },
+     "expect": {
+      "status": 200
+     },
+     "save": {
+      "s5_y1": "id"
+     }
+    },
+    {
+     "id": "s5_rm_x",
+     "method": "DELETE",
+     "path": "/api/collections/playlists/records/{{s5_x}}",
+     "as": "superuser",
+     "expect": {
+      "status": 204
+     }
+    },
+    {
+     "id": "s5_gone_x2",
+     "method": "GET",
+     "path": "/api/collections/playlists/records/{{s5_x2}}",
+     "as": "superuser",
+     "expect": {
+      "status": 404
+     }
+    },
+    {
+     "id": "s5_kept_y",
+     "method": "GET",
+     "path": "/api/collections/playlists/records/{{s5_y}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Rainy evening"
+      }
+     }
+    },
+    {
+     "id": "s5_kept_y1",
+     "method": "GET",
+     "path": "/api/collections/playlists/records/{{s5_y1}}",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "title": "Rainy evening piano"
+      }
+     }
+    },
+    {
+     "id": "s5_total",
+     "method": "GET",
+     "path": "/api/collections/playlists/records",
+     "as": "superuser",
+     "expect": {
+      "status": 200,
+      "paths": {
+       "totalItems": 2
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

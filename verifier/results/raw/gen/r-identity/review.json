@@ -1,0 +1,5 @@
+{"verdict":"request_changes","comments":[
+{"file":"apis/record_auth_with_password.go","text":"This reintroduces issue #7256 and is not behaviour-neutral. When the submitted identity is email-formatted but `email` is not among PasswordAuth.IdentityFields (e.g. identityFields = [\"username\"] and a username like `john@example.com`), the email branch is skipped, foundErr stays nil, so `!isEmail || foundErr != nil` is false and no identity field is queried at all. Authentication then fails for valid credentials. The previous single loop (email stably sorted first, email query skipped for non-email values) handled this correctly."},
+{"file":"apis/record_auth_with_password.go","text":"Secondary: when email is present and the email lookup fails, the fallback loop queries the email field a second time. Minor, but the old loop avoided redundant queries."},
+{"file":"apis/record_auth_with_password_test.go","text":"The regression test for an email-formatted username is removed; it should stay (and would fail against this change)."}
+]}

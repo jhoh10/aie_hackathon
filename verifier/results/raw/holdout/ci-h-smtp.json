@@ -1,0 +1,1 @@
+{"id":"h-smtp","pkgs":["./core"],"pass":true,"tail":"go: downloading modernc.org/sqlite v1.48.0\ngo: downloading golang.org/x/image v0.38.0\nok  \tgithub.com/pocketbase/pocketbase/core\t17.590s\n","wallMs":63297}

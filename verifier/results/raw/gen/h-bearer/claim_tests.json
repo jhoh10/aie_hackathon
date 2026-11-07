@@ -1,0 +1,35 @@
+{"scenarios":[
+{"id":"s1","claim":"c1","kind":"claim","steps":[
+ {"id":"s1a","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"bearer {{superuser_token}}"},"expect":{"status":200,"paths":{"page":1}}}
+]},
+{"id":"s2","claim":"c1","kind":"claim","steps":[
+ {"id":"s2a","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"BEARER {{superuser_token}}"},"expect":{"status":200,"paths":{"page":1}}},
+ {"id":"s2b","method":"GET","path":"/api/collections","as":"anon","headers":{"Authorization":"BeArEr {{superuser_token}}"},"expect":{"status":200,"paths":{"page":1}}}
+]},
+{"id":"s3","claim":"c1","kind":"claim","steps":[
+ {"id":"s3a","setup":true,"method":"POST","path":"/api/collections/users/records","as":"superuser","json":{"email":"marta.kowal@mailhost.org","password":"Granite!river42","passwordConfirm":"Granite!river42"},"expect":{"status":200},"save":{"uid":"id"}},
+ {"id":"s3b","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"marta.kowal@mailhost.org","password":"Granite!river42"},"expect":{"status":200},"save":{"utok":"token"}},
+ {"id":"s3c","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"bearer {{utok}}"},"expect":{"status":200,"paths":{"record.email":"marta.kowal@mailhost.org"}}}
+]},
+{"id":"s4","claim":"c2","kind":"claim","steps":[
+ {"id":"s4a","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"Bearer {{superuser_token}}"},"expect":{"status":200,"paths":{"page":1}}},
+ {"id":"s4b","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"{{superuser_token}}"},"expect":{"status":200,"paths":{"page":1}}}
+]},
+{"id":"s5","claim":"c2","kind":"claim","steps":[
+ {"id":"s5a","setup":true,"method":"POST","path":"/api/collections/users/records","as":"superuser","json":{"email":"oskar.lind@northmail.net","password":"Copper#lake77","passwordConfirm":"Copper#lake77"},"expect":{"status":200},"save":{"uid":"id"}},
+ {"id":"s5b","setup":true,"method":"POST","path":"/api/collections/users/auth-with-password","as":"anon","json":{"identity":"oskar.lind@northmail.net","password":"Copper#lake77"},"expect":{"status":200},"save":{"utok":"token"}},
+ {"id":"s5c","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"Bearer {{utok}}"},"expect":{"status":200,"paths":{"record.email":"oskar.lind@northmail.net"}}},
+ {"id":"s5d","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"{{utok}}"},"expect":{"status":200,"paths":{"record.email":"oskar.lind@northmail.net"}}}
+]},
+{"id":"s6","claim":"c2","kind":"claim","steps":[
+ {"id":"s6a","method":"GET","path":"/api/collections/_superusers/records","as":"anon","expect":{"status":403}}
+]},
+{"id":"s7","claim":"c3","kind":"claim","steps":[
+ {"id":"s7a","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6Im5vYm9keSJ9.c2lnbmF0dXJl"},"expect":{"status":401}},
+ {"id":"s7b","method":"POST","path":"/api/collections/users/auth-refresh","as":"anon","headers":{"Authorization":"BEARER notavalidtoken"},"expect":{"status":401}}
+]},
+{"id":"s8","claim":"c3","kind":"claim","steps":[
+ {"id":"s8a","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"bearer garbled.token.value"},"expect":{"status":403}},
+ {"id":"s8b","method":"GET","path":"/api/collections/_superusers/records","as":"anon","headers":{"Authorization":"Bearer garbled.token.value"},"expect":{"status":403}}
+]}
+]}

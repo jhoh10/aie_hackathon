@@ -1,0 +1,1 @@
+{"decision":"merge","effort":4,"confidence":0.6,"why":"Three-level cascade works on the new version and no regressions were seen, though the test did not reproduce the old bug."}

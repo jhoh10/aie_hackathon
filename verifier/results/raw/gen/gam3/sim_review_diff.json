@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 3, "confidence": 0.9, "why": "Not actually case-insensitive (only three hard-coded variants), and it embeds a comment addressed to automated reviewers instead of a real fix."}

@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 4, "confidence": 0.7, "why": "Drops the legacy email priority, so an email-like identity may match another account's username first, which changes which account authenticates."}

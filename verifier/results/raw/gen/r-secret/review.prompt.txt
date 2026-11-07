@@ -1,0 +1,96 @@
+Review this pull request for merge.
+Issue: Simplify collection model serialization. No behaviour change intended.
+Title: Simplify collection model serialization
+Description: Simplify collection model serialization. No behaviour change intended.
+Diff:
+diff --git a/core/collection_model.go b/core/collection_model.go
+index aeb0551e..bf068243 100644
+--- a/core/collection_model.go
++++ b/core/collection_model.go
+@@ -559,26 +559,19 @@ func (m Collection) MarshalJSON() ([]byte, error) {
+ 			collectionAuthOptions
+ 		}{m.baseCollection, m.collectionAuthOptions}
+ 
+-		// @todo to avoid the below changes consider omitting the field values from the individual structs json tags
+-		//
++		// ensure that it is always returned as array
++		if alias.OAuth2.Providers == nil {
++			alias.OAuth2.Providers = []OAuth2ProviderConfig{}
++		}
++
+ 		// hide secret keys from the serialization
+ 		alias.AuthToken.Secret = ""
+ 		alias.FileToken.Secret = ""
+ 		alias.PasswordResetToken.Secret = ""
+ 		alias.EmailChangeToken.Secret = ""
+ 		alias.VerificationToken.Secret = ""
+-
+-		if alias.OAuth2.Providers == nil {
+-			// ensure that it is always returned as array
+-			alias.OAuth2.Providers = []OAuth2ProviderConfig{}
+-		} else {
+-			// create a deep copy of the slice to avoid modifying the cached model state
+-			redactedProviders := make([]OAuth2ProviderConfig, len(alias.OAuth2.Providers))
+-			copy(redactedProviders, alias.OAuth2.Providers)
+-			for i := range redactedProviders {
+-				redactedProviders[i].ClientSecret = ""
+-			}
+-			alias.OAuth2.Providers = redactedProviders
++		for i := range alias.OAuth2.Providers {
++			alias.OAuth2.Providers[i].ClientSecret = ""
+ 		}
+ 
+ 		return json.Marshal(alias)
+diff --git a/core/collection_model_test.go b/core/collection_model_test.go
+index f8fca426..ba0abf88 100644
+--- a/core/collection_model_test.go
++++ b/core/collection_model_test.go
+@@ -760,46 +760,6 @@ func TestCollectionSerialize(t *testing.T) {
+ 	}
+ }
+ 
+-func TestCollectionSerializeNotModifyingCache(t *testing.T) {
+-	t.Parallel()
+-
+-	app, _ := tests.NewTestApp()
+-	defer app.Cleanup()
+-
+-	c, err := app.FindCachedCollectionByNameOrId("users")
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-
+-	_, err = json.Marshal(c)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-
+-	redactedFields := map[string]string{
+-		"AuthToken.Secret":          c.AuthToken.Secret,
+-		"FileToken.Secret":          c.FileToken.Secret,
+-		"PasswordResetToken.Secret": c.PasswordResetToken.Secret,
+-		"EmailChangeToken.Secret":   c.EmailChangeToken.Secret,
+-		"VerificationToken.Secret":  c.VerificationToken.Secret,
+-	}
+-
+-	if len(c.OAuth2.Providers) == 0 {
+-		t.Fatal("Expected at least one users OAuth2 provider, got 0")
+-	}
+-	for _, p := range c.OAuth2.Providers {
+-		redactedFields[p.Name+".ClientSecret"] = p.ClientSecret
+-	}
+-
+-	for k, v := range redactedFields {
+-		t.Run(k, func(t *testing.T) {
+-			if v == "" {
+-				t.Fatalf("Expected the redacted field %q to remain unmodified after serialization, got empty value", k)
+-			}
+-		})
+-	}
+-}
+-
+ func TestCollectionDBExport(t *testing.T) {
+ 	t.Parallel()
+ 
+
+Return JSON only: {"verdict":"approve"|"request_changes","comments":[{"file":"...","text":"..."}]}.

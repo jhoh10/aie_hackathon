@@ -1,0 +1,1 @@
+{"decision":"merge","effort":4,"confidence":0.7,"why":"The only probe change lets email-shaped usernames log in when username is the sole identity field, which is the same fix applied more broadly, and the core flow works on the new version."}

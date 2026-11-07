@@ -1,0 +1,21 @@
+{"scenarios":[
+{"id":"view-wildcard-rejected","claim":"c1","kind":"claim","steps":[
+{"id":"create-posts","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vposts1","type":"base","fields":[{"name":"title","type":"text"}]},"expect":{"status":200}},
+{"id":"create-view-star","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vview1","type":"view","viewQuery":"SELECT * FROM vposts1"},"expect":{"status":400,"json":{"data":{"viewQuery":{}}}}},
+{"id":"create-view-wrapped-star","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vview1b","type":"view","viewQuery":"SELECT * FROM (SELECT id, title FROM vposts1)"},"expect":{"status":400,"json":{"data":{"viewQuery":{}}}}},
+{"id":"view-not-created","method":"GET","path":"/api/collections/vview1","as":"superuser","expect":{"status":404}}
+]},
+{"id":"view-explicit-columns-saved-and-queryable","claim":"c1","kind":"claim","steps":[
+{"id":"create-posts","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vposts2","type":"base","fields":[{"name":"title","type":"text"}]},"expect":{"status":200}},
+{"id":"create-post","setup":true,"method":"POST","path":"/api/collections/vposts2/records","as":"superuser","json":{"title":"hello view"},"expect":{"status":200},"save":{"pid":"id"}},
+{"id":"create-view","method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vview2","type":"view","listRule":"","viewRule":"","viewQuery":"SELECT p.id, p.title FROM vposts2 p"},"expect":{"status":200,"json":{"name":"vview2","type":"view"}}},
+{"id":"list-view","method":"GET","path":"/api/collections/vview2/records","as":"anon","expect":{"status":200,"json":{"totalItems":1},"paths":{"items.0.id":"{{pid}}","items.0.title":"hello view"}}}
+]},
+{"id":"view-dependent-resave-on-source-change","claim":"c1","kind":"claim","steps":[
+{"id":"create-posts","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vposts3","type":"base","fields":[{"name":"title","type":"text"}]},"expect":{"status":200},"save":{"idfid":"fields.0.id","tfid":"fields.1.id"}},
+{"id":"create-view","setup":true,"method":"POST","path":"/api/collections","as":"superuser","json":{"name":"vview3","type":"view","listRule":"","viewQuery":"SELECT id, title FROM vposts3"},"expect":{"status":200}},
+{"id":"change-source-field-type","method":"PATCH","path":"/api/collections/vposts3","as":"superuser","json":{"fields":[{"id":"{{idfid}}","name":"id","type":"text","system":true,"primaryKey":true,"required":true,"min":15,"max":15,"pattern":"^[a-z0-9]+$","autogeneratePattern":"[a-z0-9]{15}"},{"id":"{{tfid}}","name":"title","type":"editor"}]},"expect":{"status":200}},
+{"id":"view-still-works","method":"GET","path":"/api/collections/vview3/records","as":"anon","expect":{"status":200}},
+{"id":"view-field-updated","method":"GET","path":"/api/collections/vview3","as":"superuser","expect":{"status":200,"paths":{"fields.1.name":"title","fields.1.type":"editor"}}}
+]}
+]}

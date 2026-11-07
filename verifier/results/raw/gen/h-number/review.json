@@ -1,0 +1,5 @@
+{"verdict":"approve","comments":[
+{"file":"core/field_number.go","text":"The root cause is right: ozzo's validation.Min skips empty values, so a `max` of 0 bypassed the min<=max check. The custom validation.By rule receives the *float64 field value and compares directly, so 0 (and negative) max values are now validated. Nil handling is fine since the rule is only added when both Min and Max are set."},
+{"file":"core/field_number.go","text":"Side effect worth noting in the changelog: record-level error messages change from \"Must be larger than %f\"/\"Must be less than %f\" to templated \"Must be greater or equal than {{.min}}\"/\"less or equal than {{.max}}\" (more accurate, since the bound is inclusive), and the onlyInt settings message loses its trailing period. Error codes are unchanged, so clients keying on codes are unaffected. Shared error vars are safe because SetParams returns a copy."},
+{"file":"core/field_number_test.go","text":"Good coverage of the max=0 and min=0 edge cases plus equal/less-than cases."}
+]}

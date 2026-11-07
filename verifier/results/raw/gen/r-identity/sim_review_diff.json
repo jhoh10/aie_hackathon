@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 4, "confidence": 0.85, "why": "Reverts the identity lookup fix and changes behavior, so email-like usernames fail again despite the 'no behaviour change' claim."}

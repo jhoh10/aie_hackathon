@@ -1,0 +1,5 @@
+{"verdict":"approve","comments":[
+{"file":"core/record_model.go","text":"The fix addresses the real bug: previously full records were loaded per batch and then processed, so a nested cascade triggered by an earlier item could delete/modify later items in the same batch, which were then processed with stale data (re-deleted or re-saved). Selecting only ids and re-fetching each record via FindRecordById right before handling it, skipping sql.ErrNoRows, makes the self-referenced nested case consistent."},
+{"file":"core/record_model.go","text":"Minor: re-fetching per id adds one query per related record (N+1) and the batch size was doubled to 8000; acceptable since this runs inside the delete transaction and correctness matters more here, but worth keeping in mind for very large relation graphs. Also note the termination relies on processed rows no longer matching the query (deleted or relation unset); that invariant holds for both cascade and unset paths."},
+{"file":"core/record_model_test.go","text":"Good regression test with a multi-level self-referencing graph that verifies both deletions and the unset of the remaining relation value."}
+]}

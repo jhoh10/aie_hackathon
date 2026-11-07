@@ -1,0 +1,1 @@
+{"decision": "block", "effort": 2, "confidence": 0.95, "why": "Removes the min <= max settings validation entirely instead of fixing the zero handling."}
