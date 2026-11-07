@@ -10,7 +10,7 @@ Team Trust Issues at the AIE Code Summit 2026 Hackathon.
 | --- | --- | --- |
 | Jonathan Hohrath | Metrics | @jhoh10 |
 | Deepak | Core product (the harness) | @deepakiitgcse |
-| Sebastian | Evals and datasets | |
+| Sebastian | Idea, Evals and datasets | @sosthoff |
 | Mauricio | Research: Lean for software verification | |
 
 ## The idea
