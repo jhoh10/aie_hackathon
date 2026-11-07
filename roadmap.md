@@ -11,4 +11,4 @@
 - [x] Test live refresh, failure recovery and locked handoff preservation.
 - [x] Pull the current source repository and build an interactive app based on verification-first-reviewer-harness.
 - [x] Verify reviewer comments, decision warnings, Markdown export/download, packet import and mobile/dark display.
-- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.
+- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.- [ ] Push app to jhoh10/aie_hackathon using the kolumba-ai GitHub account
