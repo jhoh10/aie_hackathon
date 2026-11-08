@@ -1,0 +1,16 @@
+# Trust Issues rebuild
+- [x] Refresh both harness sources and port exact plans and four packets.
+- [x] Build a shared Developer / Reviewer shell, routes, themes and shortcuts.
+- [x] Add per-example review persistence, exports and the blocking-feedback loop.
+- [x] Verify acceptance flows and desktop/mobile display.
+- [x] Port the four exact repository plans into typed data and validate JSON imports.
+- [x] Rebuild the review screen, independent plan state, locking and JSON handoff.
+- [x] Add theme, routine policy, keyboard help and mobile layout.
+- [x] Test all four approval flows, imports, locking and responsive display.
+- [x] Refresh GitHub source claims every minute while open, without overlapping updates or altering locked plans.
+- [x] Test live refresh, failure recovery and locked handoff preservation.
+- [x] Pull the current source repository and build an interactive app based on verification-first-reviewer-harness.
+- [x] Verify reviewer comments, decision warnings, Markdown export/download, packet import and mobile/dark display.
+- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.
+- [ ] User connects Lovable to GitHub (Git sync) under the kolumba-ai account and sends the new repo link.
+- [ ] Option B: clone the synced Lovable repo, copy it into jhoh10/aie_hackathon under app/ with history, update README, TASKS.md and docs/log.md, pull then push to main.

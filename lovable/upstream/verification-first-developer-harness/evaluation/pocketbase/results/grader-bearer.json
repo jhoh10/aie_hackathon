@@ -1,0 +1,8 @@
+{
+  "id": "bearer",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestRequireAuth (0.80s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t0.813s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t2.927s"
+}

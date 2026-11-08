@@ -67,12 +67,15 @@ After the freeze, only if there's time. Otherwise these are "what's next" materi
 - [ ] [SB, JH] Agree on the boundary between evals and metrics (datasets and graders vs the numbers we show)
 - [ ] Decide how evals, metrics and Lean show up in the product or the demo
 
+- [ ] [MA] Before submitting: copy the latest Lovable code into `lovable/` again (Lovable syncs only with kolumba-ai/verify-first-claim-review)
+
 ## Blocked
 
 - [ ] [DT] Meta Model API chat calls (see Open item 6; get keys for everyone once billing works): waiting on billing for the Meta team (dev.meta.ai/billing). The key lists models fine; `POST /v1/chat/completions` returns 402 `billing_not_configured`. Ask Meta on site for hackathon credits. Until then the verifier uses saved answers (`MODEL=files` or no key).
 
 ## Done
 
+- [x] [MA] Lovable app (Developer + Reviewer tabs) copied into `lovable/` from kolumba-ai/verify-first-claim-review, linked from the README (2026-11-07)
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
 - [x] [JH] Benchmark grown to 39 cases: 19 new in an `extended` split, CI step run on all (verifier/cases/README.md) (2026-11-07)
 - [x] [JH] Developer-side eval built: 10 PocketBase tasks, simulated engineer, hidden graders all checked (verification-first-developer-harness/evaluation/pocketbase/) (2026-11-07)

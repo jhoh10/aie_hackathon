@@ -1,0 +1,2 @@
+import { createFileRoute } from "@tanstack/react-router";
+export const Route = createFileRoute('/session')({ head: () => ({ meta: [{ title: 'Workflow · Trust Issues' }, { name: "description", content: 'The verification-first workflow for coding agents.' }, { property: "og:title", content: 'Workflow · Trust Issues' }, { property: "og:description", content: 'The verification-first workflow for coding agents.' }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: () => null });

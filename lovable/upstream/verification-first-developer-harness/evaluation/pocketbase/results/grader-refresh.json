@@ -1,0 +1,8 @@
+{
+  "id": "refresh",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestRecordAuthRefresh (2.44s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t2.494s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t2.394s"
+}

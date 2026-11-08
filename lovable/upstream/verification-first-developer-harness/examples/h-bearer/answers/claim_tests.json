@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    { "id": "c1-lower-refresh", "claim": "c1", "kind": "claim", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh?fields=record.collectionName", "headers": { "Authorization": "bearer {{superuser_token}}" },
+        "expect": { "status": 200, "paths": { "record.collectionName": "_superusers" } } } ] },
+    { "id": "c1-upper-list", "claim": "c1", "kind": "claim", "steps": [
+      { "id": "list", "method": "GET", "path": "/api/collections/_superusers/records?fields=collectionName", "headers": { "Authorization": "BEARER {{superuser_token}}" },
+        "expect": { "status": 200, "paths": { "totalItems": 1, "items.0.collectionName": "_superusers" } } } ] },
+    { "id": "c1-mixed-refresh", "claim": "c1", "kind": "claim", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh?fields=record.collectionName", "headers": { "Authorization": "bEaReR {{superuser_token}}" },
+        "expect": { "status": 200, "paths": { "record.collectionName": "_superusers" } } } ] },
+    { "id": "c2-exact-list", "claim": "c2", "kind": "claim", "steps": [
+      { "id": "list", "method": "GET", "path": "/api/collections/_superusers/records?fields=collectionName", "headers": { "Authorization": "Bearer {{superuser_token}}" },
+        "expect": { "status": 200, "paths": { "totalItems": 1, "items.0.collectionName": "_superusers" } } } ] },
+    { "id": "c2-bare-refresh", "claim": "c2", "kind": "claim", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh?fields=record.collectionName", "headers": { "Authorization": "{{superuser_token}}" },
+        "expect": { "status": 200, "paths": { "record.collectionName": "_superusers" } } } ] },
+    { "id": "c3-lower-garbage-refresh", "claim": "c3", "kind": "claim", "steps": [
+      { "id": "refresh", "method": "POST", "path": "/api/collections/_superusers/auth-refresh", "headers": { "Authorization": "bearer qk3VnZ0rT8mW2xLp" },
+        "expect": { "status": 401 } } ] },
+    { "id": "c3-upper-garbage-list", "claim": "c3", "kind": "claim", "steps": [
+      { "id": "list", "method": "GET", "path": "/api/collections/_superusers/records", "headers": { "Authorization": "BEARER eyJhbGciOiJIUzI1NiJ9.e30.c2lnbmF0dXJl" },
+        "expect": { "status": 403 } } ] }
+  ]
+}

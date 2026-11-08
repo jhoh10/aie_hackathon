@@ -1,0 +1,8 @@
+{
+  "id": "excerpt",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestNewExcerptModifier (0.00s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/tools/picker\t0.004s\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/tools/picker\t0.014s"
+}

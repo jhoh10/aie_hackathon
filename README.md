@@ -168,6 +168,8 @@ The reviewer side works the same way with [verification-first-reviewer-harness/r
 ```
 .
 ├── verification-first-developer-harness/  # the harness: prompt, five-phase conversation, templates, SWE-bench evaluation
+├── verification-first-reviewer-harness/   # the reviewer side: review packet prompt, flow, renderer, examples
+├── lovable/                               # interactive app (Developer + Reviewer tabs), copied from kolumba-ai/verify-first-claim-review
 ├── verifier/                              # the independent verifier (Node + Docker)
 │   ├── src/                               # pipeline, sandbox, verdict rules, benchmark, PR page server
 │   ├── cases/                             # the 20 PocketBase benchmark PRs
@@ -186,5 +188,6 @@ The reviewer side works the same way with [verification-first-reviewer-harness/r
 - Sponsor docs: [resources/sponsors.md](resources/sponsors.md)
 - Slides: [presentation/slides.pdf](presentation/slides.pdf) (6 slides, opens on GitHub; sources and the editable original in [presentation/](presentation/README.md))
 - Results: [verifier/results/summary.md](verifier/results/summary.md) (all 20 benchmark cases; the results slide is the last page of the slides)
+- Interactive app (Developer + Reviewer tabs): https://verify-first-claim-review.lovable.app. Code in [lovable/](lovable/), copied with its history from [kolumba-ai/verify-first-claim-review](https://github.com/kolumba-ai/verify-first-claim-review), which stays the copy Lovable syncs with. To run it locally: `cd lovable && npm install && npm run dev`.
 - Submission form:
 - Demo video:

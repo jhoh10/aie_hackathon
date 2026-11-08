@@ -1,0 +1,8 @@
+{
+  "id": "oauth",
+  "ok": true,
+  "base": "fail",
+  "upstream": "pass",
+  "baseTail": "--- FAIL: TestCollectionUpdate (1.15s)\nFAIL\nFAIL\tgithub.com/pocketbase/pocketbase/apis\t1.163s\nok  \tgithub.com/pocketbase/pocketbase/core\t0.013s [no tests to run]\nFAIL",
+  "upstreamTail": "ok  \tgithub.com/pocketbase/pocketbase/apis\t1.188s\nok  \tgithub.com/pocketbase/pocketbase/core\t0.005s [no tests to run]"
+}
