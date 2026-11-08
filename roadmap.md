@@ -11,4 +11,6 @@
 - [x] Test live refresh, failure recovery and locked handoff preservation.
 - [x] Pull the current source repository and build an interactive app based on verification-first-reviewer-harness.
 - [x] Verify reviewer comments, decision warnings, Markdown export/download, packet import and mobile/dark display.
-- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.- [ ] Push app to jhoh10/aie_hackathon using the kolumba-ai GitHub account
+- [x] Pull the just-updated GitHub source and adapt the reviewer app to its current packet and renderer.
+- [ ] User connects Lovable to GitHub (Git sync) under the kolumba-ai account and sends the new repo link.
+- [ ] Option B: clone the synced Lovable repo, copy it into jhoh10/aie_hackathon under app/ with history, update README, TASKS.md and docs/log.md, pull then push to main.
