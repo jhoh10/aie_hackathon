@@ -20,7 +20,7 @@ Disqualifiers: the demo must clearly show what was built today, and no existing 
 - [x] Repo is accessible to judges (public, or judges added). Public; but the kolumba-ai Lovable repo the README links is not, and the claude.ai slide links need a logged-out check
 - [x] README has the pitch, team and how to run it
 - [ ] App is deployed or runs from a clean clone. Verifier unit tests pass (26/26, Node 26); Lovable app is live; `lovable/` not built from this copy
-- [x] Demo video recorded (check the length limit): presentation/trust-issues-demo.mp4, 59.8 s
+- [x] Demo video recorded (check the length limit): presentation/trust-issues-demo.mp4, 59.3 s
 - [x] Slides done: presentation/slides.pdf (6 slides; no "what's next" slide yet)
 - [ ] Every team member listed on the submission form
 - [ ] Submitted, with time to spare

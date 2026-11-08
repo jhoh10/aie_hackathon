@@ -9,8 +9,8 @@ a person approves <i>what</i> a change should do, and an independent verifier pr
 
 <p align="center">
 AIE Code Summit 2026 Hackathon · <b>Trust but Verify</b> track<br>
-<a href="https://claude.ai/artifact/7xuTH5ZMozXnB3w5Wa3WRW">Slides</a> ·
-<a href="https://claude.ai/artifact/7cH4e89QAiXjvaW2zWs3Ci">Results diagrams</a> ·
+<a href="presentation/slides.pdf">Slides</a> ·
+<a href="presentation/metrics.md">All metrics</a> ·
 <a href="verifier/results/summary.md">Benchmark results</a> ·
 <a href="verifier/cases/README.md">The 20 test PRs</a> ·
 <a href="verification-first-developer-harness/README.md">The harness</a>
