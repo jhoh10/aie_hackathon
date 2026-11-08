@@ -9,7 +9,7 @@ The demo has two acts, and each act ends on a page in the browser pane:
 1. **Developer harness.** The default Claude Code harness and the verification-first developer harness both work live on the same SWE-bench task. The output is a side-by-side page.
 2. **Reviewer harness.** The verification-first reviewer harness turns a PR into a review packet live. The output is the reviewer's page.
 
-Total time is about 6–8 minutes, and the model cost is about $1.50.
+In the rehearsal on 2026-11-07, Act 1 took 1.5 minutes (both sides in parallel, $0.70 + $0.66) and Act 2 took 25 seconds ($0.21). With narration, plan on 3–4 minutes and about $1.60.
 
 ---
 
@@ -38,7 +38,7 @@ Check these and fix anything missing. Report only one line, "Preflight OK", or s
 1. `claude` and `uv` are on the PATH, and `claude -p "say ok" --model claude-haiku-5-5` answers. If Claude Code isn't signed in, stop and ask the presenter to sign in.
 2. `sim/work/pylint-base` exists. If it doesn't, clone it: `git clone --filter=blob:none https://github.com/pylint-dev/pylint.git sim/work/pylint-base`.
 3. `$W/$TASK/.venv/bin/python` exists. If it doesn't, create it with the `uv venv` and `uv pip install` commands for this task in [sim/README.md](../sim/README.md), using `$W` as the workdir.
-4. Clear any earlier live run. Remove `sim/out/$TASK/live/`, `$W/$TASK/live/` and `$W/review-pr`, then run `git -C sim/work/pylint-base worktree prune`.
+4. Clear any earlier live run. Write the removal so it can't expand to `/` if a variable is empty: `rm -rf sim/out/pylint-dev__pylint-8898/live "${W:?}/pylint-dev__pylint-8898/live" "${W:?}/review-pr"`. Then run `git -C sim/work/pylint-base worktree prune` and `git -C sim/work/pylint-base branch -D demo-base demo-pr` (ignore "not found").
 
 ### Step 1: Act 1, default vs verification-first developer harness
 
@@ -53,7 +53,7 @@ python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides
 python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides c --run live
 ```
 
-While they run, narrate from `sim/out/$TASK/live/side_a/transcript.jsonl` and `side_c/transcript.jsonl`, and read new lines as they appear. Things worth calling out:
+While they run, narrate from `sim/out/$TASK/live/side_a/transcript.jsonl` and `side_c/transcript.jsonl`. These files grow one whole turn at a time (an agent turn, then the engineer's reply), not one tool call at a time, so check them about every 30 seconds and describe each new turn. Between turns, `git -C "$W/$TASK/live/side_c" status --short` shows the files the agent is touching right now. Things worth calling out:
 - Side A starts editing code straight away.
 - Side C looks around silently. Then it writes `.verify/plan.md` with its claims and the regression scope, and runs the baseline before it builds.
 - The engineer approves the plan, which is the one human approval.
@@ -114,7 +114,8 @@ python3 "$REPO/verification-first-reviewer-harness/ui/render.py" .verify/review-
 
 Open `http://127.0.0.1:4620/review.html` in the browser pane. Point out:
 - the header line, with the claims proven and the untested count;
-- each **No test** row, which is a behaviour the PR changes without any test exercising it. On this task, comma-inside-`()` (`(a,b)`) is the usual one, and it is exactly what the hidden test checks.
+- each **No test** row, which is a behaviour the PR changes without any test exercising it. Name the actual rows on the page, because they differ between runs. In the recorded run, comma-inside-`()` (`(a,b)`) was untested; in the rehearsal, `(a,b)` was tested, and escaped brackets, a stray `)` and parens inside `[...]` were not.
+- any test marked `(changed; was …)`. An agent editing an existing test is what a reviewer most needs to see. On this task the hidden test is that same error test (`test_csv_regex_error`), so a changed test there is worth calling out.
 - that the Architecture section is missing because nothing changed at a high level;
 - that a comment on a row turns into a new claim, and the decision exports as `review.md`.
 
@@ -127,7 +128,7 @@ End with three lines:
 2. **Reviewer harness:** review the behaviour and the tests, not the diff, and untested changes stand out.
 3. **Where everything is:** `verification-first-developer-harness/`, `verification-first-reviewer-harness/`, `sim/`.
 
-Leave the server running and the pages open for questions. When the presenter says the demo is over, stop the server and remove the review worktree: `git -C sim/work/pylint-base worktree remove --force "$W/review-pr"`.
+Leave the server running and the pages open for questions. When the presenter says the demo is over, stop the server and remove the review worktree and its branches: `git -C sim/work/pylint-base worktree remove --force "$W/review-pr"`, then `git -C sim/work/pylint-base branch -D demo-base demo-pr`.
 
 ---
 

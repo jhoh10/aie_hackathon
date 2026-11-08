@@ -7,7 +7,7 @@ What's in this folder:
 - [slides.pdf](slides.pdf): the 6 slides (cover, process before and after, what a person reads and decides, real evidence from case inj2, independence rules, results). Rebuild with `python3 build_pdf.py` after editing a slide.
 - [trust-issues-demo.mp4](trust-issues-demo.mp4): the one-minute demo video, with captions in [trust-issues-demo.srt](trust-issues-demo.srt).
 - [metrics.md](metrics.md): every metric in one page.
-- [live-demo.md](live-demo.md): a runbook for Claude Code. Say "Run presentation/live-demo.md" and it runs default vs the developer harness live on pylint-8898, then the reviewer harness on the result, and opens both pages. About 6–8 minutes and $1.50; outputs go to the git-ignored `sim/out/<task>/live/`.
+- [live-demo.md](live-demo.md): a runbook for Claude Code. Say "Run presentation/live-demo.md" and it runs default vs the developer harness live on pylint-8898, then the reviewer harness on the result, and opens both pages. About 3–4 minutes and $1.60 (rehearsed 2026-11-07); outputs go to the git-ignored `sim/out/<task>/live/`.
 - `deck.json` and `slides/`: the slide sources.
 - `results-page/index.html`: source of the results diagrams page. It draws from [../verifier/results/per-case.json](../verifier/results/per-case.json) and needs the dashboard runtime it was written for, so on GitHub use [../verifier/results/summary.md](../verifier/results/summary.md) for the same numbers.
 - `video/`: the scripts that captured the app, rendered the frames and stitched the narration.

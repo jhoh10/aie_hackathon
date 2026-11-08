@@ -34,7 +34,7 @@ Updated 4:37 PM. **Open work is in "Open: pick one up", most urgent first.** Put
 ### In progress
 
 - [ ] [DT] Reviewer harness: scoped in docs/decisions.md and first version built (verification-first-reviewer-harness/, real pylint-8898 example plus three more). Next: show the packet on the verifier PR page next to the verdict, and measure it against a raw-diff review. Checkpoint was 3:30 PM.
-- [ ] [DT] Live demo runbook (presentation/live-demo.md): written, with the branch and render steps dry-run. Next: one full live run on the demo machine. It takes 6–8 minutes against the 3-minute slot, and Act 1 uses pylint-8898 instead of the `idchars` scenario picked in the demo script.
+- [ ] [DT] Live demo runbook (presentation/live-demo.md): written and rehearsed end to end (about 3–4 minutes, $1.60). Open: Act 1 uses pylint-8898 instead of the `idchars` scenario picked in the demo script.
 - [ ] [MA] Lean for software verification: decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
 ### Open: pick one up
