@@ -36,7 +36,6 @@ Updated 3:40 PM. **Open work is in "Open: pick one up", most urgent first.** Put
 - [ ] [DT] Reviewer harness: scoped in docs/decisions.md and first version built (verification-first-reviewer-harness/, real pylint-8898 example plus three more). Next: show the packet on the verifier PR page next to the verdict, and measure it against a raw-diff review. Checkpoint was 3:30 PM.
 - [ ] [SB] Commit the raw benchmark results (`verifier/.work/results/dev`, `holdout` and the `.usage.json` files from `.work/gen`) under `verifier/results/raw/`, so `metrics.ts` can run on any machine. Without them, tokens (metric 4) and wall time (6) aren't reported.
 - [ ] [SB] Run the simulated engineer: `node src/benchmark.ts dev sim` and `holdout sim` (needs `verifier.json` from that split and a model). It has never run, so metric 5 (reviewer load: tokens read and effort, today vs ours) has no numbers yet. That's our best answer to "plain AI review already stops 12 of 12".
-- [ ] [JH] Developer-side eval (verification-first-developer-harness/evaluation/pocketbase/README.md). `number` done: both arms pass the hidden tests, harness $1.23 vs default $0.47, and the simulated engineer corrected one claim in the plan. The other 9 tasks are running on Jon's machine (about 4:15 PM). Then `node --no-warnings run.ts all --report` and mark "surfaced the open question" by hand.
 - [ ] [JH] Metrics (AIE-5): pick the 2–3 numbers for the demo and the slide (overdue since 3:30). Settled now: the verifier stopped 10 of 12 bad PRs, CI stopped 0 (verifier/results/summary.md). Waiting on SB: reviewer load (metric 5). Be upfront that the verifier passed only 1 of 8 honest PRs (3 wrongly blocked, 4 sent to a person) and that AI review did better on 1–3. Definitions in verifier/docs/metrics.md (now including developer-side metrics 8 and 9).
 - [ ] [MA] Lean for software verification: decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
@@ -75,6 +74,7 @@ After the freeze, only if there's time. Otherwise these are "what's next" materi
 
 ## Done
 
+- [x] [JH] Developer-side eval run on all 10 tasks, both arms; report with hand marks in verification-first-developer-harness/evaluation/pocketbase/results/report.md. Ambiguous: harness 7/7, default 5/7, $10.17 vs $3.89. Controls: 2/3 each (cascade fails on both). Surfaced the open question: harness 7/7, default 0/7 (2026-11-07)
 - [x] [MA] Lovable app (Developer + Reviewer tabs) copied into `lovable/` from kolumba-ai/verify-first-claim-review, linked from the README (2026-11-07)
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
 - [x] [JH] Benchmark grown to 39 cases: 19 new in an `extended` split, CI step run on all (verifier/cases/README.md) (2026-11-07)

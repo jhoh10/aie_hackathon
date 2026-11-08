@@ -72,6 +72,8 @@ Metrics 1–7 judge a finished PR. These two judge the developer harness, which 
 
    The headline we hope for: on ambiguous issues the harness asks the question that decides the fix and passes where the default agent guesses wrong, at a known extra cost on the clear ones. One run per arm shows a pattern, not a rate.
 
+   **Result (one run per arm):** ambiguous tasks, harness 7 of 7 vs default 5 of 7, $10.17 vs $3.89 in total. Controls, 2 of 3 each (cascade fails on both). Surfaced the open question: harness 7 of 7, default 0 of 7. Details in results/report.md.
+
 ## Limits
 
 - The dev split has 8 cases, so one case moves a rate by 12 points or more. Report counts next to percentages.
