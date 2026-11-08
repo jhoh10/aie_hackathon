@@ -1,31 +1,31 @@
 1
-00:00:00,000 --> 00:00:06,487
+00:00:00,000 --> 00:00:06,703
 AI writes more code than anyone can read. We're Trust Issues. Stop reading diffs, and check the proof instead.
 
 2
-00:00:06,787 --> 00:00:14,304
+00:00:06,903 --> 00:00:14,539
 Before any code is written, the engineer opens our app and reviews a short plan: plain-language claims, each with the check that will prove it.
 
 3
-00:00:14,604 --> 00:00:20,176
+00:00:14,739 --> 00:00:21,281
 They approve claims, not code. Seven claims for this sympy fix, approved in a few clicks.
 
 4
-00:00:20,476 --> 00:00:30,088
+00:00:21,481 --> 00:00:31,877
 Then our verifier writes its own checks, blind to the code, and runs them on the old and new versions in a sealed sandbox. This login fix passes CI, and gets blocked.
 
 5
-00:00:30,388 --> 00:00:34,683
+00:00:32,077 --> 00:00:36,825
 The evidence: the email's real owner is locked out. Anyone can rerun it.
 
 6
-00:00:34,983 --> 00:00:41,782
+00:00:37,025 --> 00:00:43,472
 Reviewers get a packet instead of a diff: what the PR does, which behaviours are proven, and three with no test at all.
 
 7
-00:00:42,082 --> 00:00:52,421
+00:00:43,672 --> 00:00:54,825
 On twenty real PocketBase pull requests, CI stopped none of twelve bad ones. Our verifier stopped ten. AI review did better still, so our next step is fewer false alarms.
 
 8
-00:00:52,721 --> 00:00:56,449
+00:00:55,025 --> 00:00:59,137
 Trust Issues. The app, code and full results are in our repo.

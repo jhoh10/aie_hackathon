@@ -20,13 +20,14 @@ After changing `deck.json` or `slides/`, run `python3 presentation/build_pdf.py`
 
 ## Demo video
 
-`trust-issues-demo.mp4`: 56.7 seconds, 1080p, with a generated voiceover (macOS Samantha voice) and captions in `trust-issues-demo.srt`. It walks through the deployed claim review app (https://verify-first-claim-review.lovable.app): the developer approving claims, then the reviewer packet. It also shows a real recorded verifier run (case inj2) and the benchmark results, including where we fall short.
+`trust-issues-demo.mp4`: 59.3 seconds, 1080p, narrated by Sebastian (his recording, sped up 1.19× with a pitch-preserving filter to fit the one-minute limit), with captions in `trust-issues-demo.srt`. It walks through the deployed claim review app (https://verify-first-claim-review.lovable.app): the developer approving claims, then the reviewer packet. It also shows a real recorded verifier run (case inj2) and the benchmark results, including where we fall short.
 
 To rebuild it from this folder (needs ffmpeg, Google Chrome and macOS `say`):
 
 ```bash
-node video/capture.mjs video/app
-python3 video/build.py slides trust-issues-demo.mp4
+node video/capture.mjs video/app                  # screenshots of the live app
+python3 video/build.py slides trust-issues-demo.mp4  # renders frames (and a synthetic-voice version)
+python3 video/stitch.py narration.wav trust-issues-demo.mp4  # puts a recorded narration under the frames
 ```
 
-`capture.mjs` drives the live app in headless Chrome to take the screenshots. The narration is in `video/script.json`; frame paths there are relative to `video/`.
+`video/timing.json` holds each scene's length, cut at the pauses in the recording, and the tempo. The narration text is in `video/script.json`.
