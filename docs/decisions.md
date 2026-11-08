@@ -13,6 +13,13 @@ One entry per real choice. Newest first. These are handy when writing the pitch 
 
 -->
 
+## 2026-11-07: Live demo: the sim engineer knows the intent (`--brief`)
+
+- **Chose:** an optional `--brief` for `sim/run.py`: the simulated engineer also knows what it wants (for pylint-8898, written from the upstream fix in behaviour terms: only `{}` protects a comma). It follows the PocketBase eval's rule: it answers only what an agent asks or what a plan gets wrong, never recites the brief, and the same engineer serves both sides. presentation/live-demo.md uses it.
+- **Over:** an engineer who knows only the issue (the sim's default, still the default), or picking a different task.
+- **Because:** without a brief, nobody in the loop can answer the question that decides the hidden test, so the harness's question gets a guess for an answer: Side C passed 1 of 5, Side A 0 of 5. A real engineer knows their intent; the PocketBase eval already models that. With the brief, Side C passed 2 of 2 (corrected at plan time, before code), and Side A also passed 2 of 2 (once on its own, once after a post-build correction and rework). The demo shows "caught at the plan" vs "caught after building", not a pass-vs-fail gap.
+- **Revisit if:** we want a pass-vs-fail contrast: that needs a task where the default agent's report doesn't reveal its design, or the `idchars` PocketBase task.
+
 ## 2026-11-07: Demo: wrong guess vs one-line fix, then the review packet
 
 - **Chose:** A, then D, with C as the fallback. A: on `idchars`, default Claude guesses its own list of forbidden id characters and fails the maintainer's hidden tests; our harness shows a plan, the engineer adds one line, and it passes. D: the reviewer packet on pylint-8898, where all 11 approved checks passed but the packet flagged the untested `( )` handling that failed the real hidden test. C: `h-bearer`, harness plan to verifier PASS, fully live.

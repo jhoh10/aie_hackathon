@@ -215,6 +215,10 @@ def main():
     hidden = md("```\n" + "\n".join(l[1:] for l in task["test_patch"].splitlines()
                                     if l.startswith("+") and not l.startswith("+++")) + "\n```")
 
+    brief = (f'<details><summary>The engineer\'s intent (only the simulated engineer saw it, on both sides; '
+             f'it answers only what an agent asks or what a plan gets wrong)</summary><div class="md">{md(task["engineer_brief"])}</div></details>'
+             if task.get("engineer_brief") else "")
+
     def two(fn):
         return f'<div class="grid" style="--n:{len(data)}">' + "".join(f'<div class="col">{fn(s, d)}</div>' for s, d in data.items()) + "</div>"
 
@@ -223,7 +227,7 @@ def main():
 <h1>Harness side by side</h1>
 <p class="sub">SWE-bench Verified · <code>{esc(inst)}</code> · same issue, model, tools and simulated engineer on both sides</p>
 <div class="issue"><b>The issue</b><div class="md">{md(task["problem_statement"])}</div>
-<details><summary>Hidden test used for scoring (neither side saw it)</summary>{hidden}</details></div>
+{brief}<details><summary>Hidden test used for scoring (neither side saw it)</summary>{hidden}</details></div>
 <h2>Scoreboard</h2>
 <div class="grid" style="--n:{len(data)}">{"".join(card(s, st[s]) for s in data)}</div>
 <h2>Test plan and report</h2>

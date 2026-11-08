@@ -1,0 +1,18 @@
+[
+ {
+  "agent": "`bad-name-rgxs` no longer breaks on commas inside a regex quantifier like `{1,3}`. `(foo{1,3})` now parses as one pattern instead of crashing. The `tests/config` suite passes (76 tests). I didn't run the rest of the test suite, and I didn't re-run your exact `pylint foo.py` config.\n\nI added `_check_regexp_csv` in `pylint/utils/utils.py` and exported it from `pylint/utils/__init__.py`. It splits the option on commas, except for commas inside `{\u2026}`. `_regexp_csv_transfomer` in `pylint/config/argument.py` now uses it. Since it's the shared transformer for `regexp_csv` options, any option of that type gets the same behavior.\n\n- **Limit:** only braces are protected. A comma inside a character class (`[a,b]`) or a group (`(a,b)`) still splits the pattern. A comma outside braces can't be written inside a regex, and there is no escape syntax. Say if you want brackets and parentheses covered too. The catch is that an unbalanced `[` or `(` would then swallow the rest of the list.\n- **Test change:** the existing `test_csv_regex_error` used `(foo{1,3})` as its \"invalid regex\" example, which is the bug itself. I changed it to `(foo{1,3}`, which really is invalid, and added `test_regex_with_comma_quantifier`. It checks that `(foo{1,3}),bar` gives two patterns.",
+  "engineer": "Approved. Brackets and parentheses should stay as they are, so `(a,b)` and `[a,b]` still split. Only the braces are protected.",
+  "agent_cost": 0.15447929999999999,
+  "agent_secs": 43.000075817108154,
+  "agent_turns": 14,
+  "engineer_cost": 0.046674600000000004
+ },
+ {
+  "agent": "Understood. That's how the code already behaves: only `{` and `}` are tracked, so `(a,b)` and `[a,b]` still split on the comma. I'm making no further changes.",
+  "engineer": "DONE",
+  "agent_cost": 0.1636058,
+  "agent_secs": 4.835403919219971,
+  "agent_turns": 1,
+  "engineer_cost": 0.0403715
+ }
+]

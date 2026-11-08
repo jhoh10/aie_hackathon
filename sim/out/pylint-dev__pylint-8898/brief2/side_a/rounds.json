@@ -1,0 +1,26 @@
+[
+ {
+  "agent": "Regexes with commas inside brackets, braces or parentheses now work in the regex-list options like `bad-names-rgxs`. The `tests/config` and `tests/test_self.py` suites pass (214 passed, 1 xfailed).\n\nIn `pylint/config/argument.py`, `_regexp_csv_transfomer` now uses a new splitter, `_split_regexp_csv`, instead of a plain comma split. It only splits on commas that sit outside `()`, `[]` and `{}`, and a backslash-escaped comma (`\\,`) is also kept. So `(foo{1,3})` stays one pattern, and `a,b` still splits into two.\n\nOne existing test, `test_csv_regex_error`, used the issue's exact regex `(foo{1,3})` and expected it to fail with the mangled `(foo{1`. I changed it to use `(foo{1,3}` (unclosed), so it still checks the invalid-regex error. I also added `test_csv_regex_comma_in_quantifier`, which checks that `(foo{1,3})` is accepted.\n\n`regexp_paths_csv` options (such as `ignore-paths`) still split on every comma. I left them alone because they build patterns from file paths rather than raw regexes.",
+  "engineer": "The splitting is wider than what I asked for. Only commas inside `{...}` quantifier braces should be kept. Commas inside `( )` or `[ ]` must still split patterns as they do today, so `(a,b)` should still give two pieces, `(a` and `b)`. Please drop the special handling for `()`, `[]` and the backslash-escaped comma.\n\nThen `(foo{1,3}` should split as it did before the change, and I'd expect the original test to be restored with the issue's regex. Keep the whitespace stripping and the error naming the bad piece.",
+  "agent_cost": 0.1304218,
+  "agent_secs": 52.41925382614136,
+  "agent_turns": 10,
+  "engineer_cost": 0.0476686
+ },
+ {
+  "agent": "I narrowed the splitter as you asked, but I did not restore the original test, because two of your expectations can't both hold.\n\n**What changed.** In `pylint/config/argument.py`, `_split_regexp_csv` now only keeps commas inside `{...}`. The special handling for `()`, `[]` and `\\,` is gone. Whitespace stripping and the error that names the bad piece are unchanged. Output from the new splitter:\n\n| Input | Result |\n|---|---|\n| `(a,b)` | `['(a', 'b)']` |\n| `[x,y]` | `['[x', 'y]']` |\n| `c\\,d` | `['c\\\\', 'd']` |\n| `a{1,2} , b` | `['a{1,2}', 'b']` |\n\n**The conflict.** With braces kept together, the issue's regex `(foo{1,3})` is a single valid pattern. The original test passes that regex and expects the old error about `(foo{1`, so it would now fail. Likewise `(foo{1,3}` stays one piece, `(foo{1,3}`, instead of splitting into `(foo{1` and `3}` as before. Both follow from keeping commas inside braces, which is the fix for the issue.\n\n**Tests.** I left the two tests from my earlier change as they were. `test_csv_regex_error` uses the unclosed `(foo{1,3}` and expects the error to name `(foo{1,3}`. `test_csv_regex_comma_in_quantifier` checks that `(foo{1,3})` is accepted. `tests/config` passes (76 passed). I didn't re-run `tests/test_self.py` after this change.\n\n**Decision for you.** Do you want the original test back with its old error? That would mean `(foo{1,3})` splits again, which brings the issue back. Or should I keep the current tests?",
+  "engineer": "Keep the current tests. The original test only expected that error because of the bug, so it shouldn't come back. `(foo{1,3})` should be accepted as one pattern, and `(foo{1,3}` should be reported as invalid under its full text.\n\nPlease re-run the `tests/test_self.py` suite too, then report back.",
+  "agent_cost": 0.18550940000000002,
+  "agent_secs": 20.755688190460205,
+  "agent_turns": 4,
+  "engineer_cost": 0.0436655
+ },
+ {
+  "agent": "I kept the current tests, and `tests/config` and `tests/test_self.py` both pass: 214 passed, 1 xfailed. The xfail was there in my first run too.\n\n- **Fix:** `pylint/config/argument.py` splits regex lists on commas except those inside `{...}`. `(a,b)` and `[x,y]` still split at the comma, as they did before.\n- **`(foo{1,3})`:** accepted as one pattern. `test_csv_regex_comma_in_quantifier` covers this.\n- **`(foo{1,3}`:** rejected as invalid, and the error names the full text `(foo{1,3}`. `test_csv_regex_error` covers this.",
+  "engineer": "DONE",
+  "agent_cost": 0.21314660000000002,
+  "agent_secs": 27.427032947540283,
+  "agent_turns": 2,
+  "engineer_cost": 0.0440355
+ }
+]

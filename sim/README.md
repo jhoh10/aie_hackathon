@@ -47,6 +47,8 @@ for r in run1 run2 run3; do python3 sim/run.py sim/tasks/pylint-dev__pylint-8898
 python3 sim/summary.py pylint-dev__pylint-8898
 ```
 
+Give the engineer an intent, as in the PocketBase eval, with `--brief sim/briefs/<task>.md`. It then answers what an agent asks, or what a plan gets wrong, from that intent, and the page shows the brief. Without it, the engineer knows only the issue.
+
 Pages land in `out/<task>/compare.html` (one run) and `out/<task>/summary.html` (averages, linking each run's page).
 
 ## Files
@@ -56,6 +58,7 @@ Pages land in `out/<task>/compare.html` (one run) and `out/<task>/summary.html` 
 | [run.py](run.py) | Runs the sides, the simulated engineer and the scoring |
 | [viewer.py](viewer.py) | Builds the side-by-side page for one run |
 | [summary.py](summary.py) | Averages repeated runs into one page |
+| [briefs/](briefs/) | The engineer's intent per task, for `--brief` |
 | [tasks/](tasks/) | The SWE-bench Verified task records we used |
 | `out/` | Transcripts, patches, plans, reports, scores and pages from our runs |
 | `work/` | Repo clones (git-ignored) |
@@ -64,3 +67,4 @@ Pages land in `out/<task>/compare.html` (one run) and `out/<task>/summary.html` 
 
 - **sympy-24661:** both sides resolved it. The model had probably seen the task during training.
 - **pylint-8898, 3 runs per side:** the lean harness (C) cost $0.42 against $0.88 for B and $0.74 for A. It took half the time, and the engineer read half as many words. The hidden test rewards one specific design, so 8 of 9 runs failed it on every side; pass rate doesn't separate the harnesses there. See `docs/log.md` and `docs/decisions.md`.
+- **pylint-8898 with the engineer brief (`brief1`, `brief2`):** all 4 runs passed the hidden test. Side C's plan protected `()` too both times, and the engineer corrected it at approval, before any code. Side A picked braces-only on its own once. The other time it built the wider version and was corrected only after its final report, so it reworked: 3 rounds, $0.66 and 101 s, against C's $0.50 and 85 s.

@@ -30,7 +30,8 @@ Rules:
 | `W` | `$HOME/trust-issues-demo`: outside the repo, with no spaces in the path |
 | `TASK` | `pylint-dev__pylint-8898` (the comma-in-regex bug; `sim/tasks/pylint-dev__pylint-8898.json`) |
 | `BASE` | `1f8c4d9eb185c16a2c1d881c054f015e1c2eb334` (the task's base commit) |
-| `FALLBACK` | `sim/out/pylint-dev__pylint-8898/run1`, a recorded run with the same setup |
+| `BRIEF` | `sim/briefs/pylint-dev__pylint-8898.md`: what the engineer wants, written from the upstream fix in behaviour terms. Only the simulated engineer sees it. |
+| `FALLBACK` | `sim/out/pylint-dev__pylint-8898/brief2`, a recorded run with the same setup in which both sides pass and Side A has to rework |
 
 ### Step 0: Preflight (silent, under a minute)
 
@@ -45,18 +46,20 @@ Check these and fix anything missing. Report only one line, "Preflight OK", or s
 Tell the audience in 2–3 lines:
 - **The task:** pylint's `bad-names-rgxs` option splits regular expressions on commas, which breaks patterns like `(foo{1,3})`.
 - **Side A** is Claude Code with its default behaviour. **Side C** is our verification-first developer harness ([harness-prompt.md](../verification-first-developer-harness/harness-prompt.md)). Both get the same issue, the same model and tools, and the same simulated engineer. Neither sees the hidden tests.
+- **The engineer knows what they want:** only commas inside `{}` are protected, and `(a,b)` still splits. Like a real engineer, it answers only what an agent asks, or what a plan gets wrong. It never volunteers the rest. The issue alone doesn't say this, and the hidden test checks it.
 
 Start both sides in parallel, each as its own background command, with the second started about 5 seconds after the first so the two `git worktree add` calls don't collide:
 
 ```bash
-python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides a --run live
-python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides c --run live
+python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides a --run live --brief sim/briefs/pylint-dev__pylint-8898.md
+python3 sim/run.py sim/tasks/pylint-dev__pylint-8898.json --workdir "$W" --sides c --run live --brief sim/briefs/pylint-dev__pylint-8898.md
 ```
 
 While they run, narrate from `sim/out/$TASK/live/side_a/transcript.jsonl` and `side_c/transcript.jsonl`. These files grow one whole turn at a time (an agent turn, then the engineer's reply), not one tool call at a time, so check them about every 30 seconds and describe each new turn. Between turns, `git -C "$W/$TASK/live/side_c" status --short` shows the files the agent is touching right now. Things worth calling out:
 - Side A starts editing code straight away.
 - Side C looks around silently. Then it writes `.verify/plan.md` with its claims and the regression scope, and runs the baseline before it builds.
-- The engineer approves the plan, which is the one human approval.
+- **The key moment:** Side C's plan usually protects `()` and `[]` as well. The engineer reads the plan and corrects that one line before any code exists. Quote the correction.
+- Side A usually shows no plan. If its final report shows the wider design, the engineer corrects it only then, and A reworks code it already wrote. If A happened to pick braces-only on its own, say so: the difference is luck versus being asked.
 - Side C ends with a 4-line final message.
 
 When a side's `.verify/plan.md` appears in its checkout (`$W/$TASK/live/side_c/.verify/plan.md`), show the claims table in chat.
@@ -75,7 +78,7 @@ Sum up in at most 4 lines from the two `score.json` files and the scoreboard:
 - how many words the engineer had to read on each side;
 - that Side C wrote its tests before it wrote code.
 
-Say plainly what happened, even if Side C lost on this run. Our recorded result over 3 runs per side: C averaged $0.42 and 1.3 min, against A's $0.74. The hidden test rewards one specific design, so most runs on both sides fail it.
+Say plainly what happened, even if Side C lost on this run. Recorded with this brief (2 runs per side): Side C passed 2 of 2, both times after a plan-time correction. Side A passed 2 of 2: once by choosing braces-only on its own, and once only after a post-build correction and rework (3 rounds, $0.66 and 101 s, against C's $0.50 and 85 s). Without a brief, the engineer can't answer the deciding question, and most runs on both sides fail the hidden test (C passed 1 of 5).
 
 **Fallback:** if a side errors out or runs past 8 minutes, stop it. Then open the recorded run's page, `$FALLBACK/compare.html` (copy it into `$W/pages`), say it's the recorded run, and continue with Act 2.
 

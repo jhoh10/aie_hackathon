@@ -1,0 +1,129 @@
+diff --git a/pylint/config/argument.py b/pylint/config/argument.py
+index 30a5fd175..2d2a46a3f 100644
+--- a/pylint/config/argument.py
++++ b/pylint/config/argument.py
+@@ -114,7 +114,7 @@ def _regex_transformer(value: str) -> Pattern[str]:
+ def _regexp_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions."""
+     patterns: list[Pattern[str]] = []
+-    for pattern in _csv_transformer(value):
++    for pattern in pylint_utils._check_regexp_csv(value):
+         patterns.append(_regex_transformer(pattern))
+     return patterns
+ 
+diff --git a/pylint/utils/__init__.py b/pylint/utils/__init__.py
+index 61833a598..eecb3cbe3 100644
+--- a/pylint/utils/__init__.py
++++ b/pylint/utils/__init__.py
+@@ -14,6 +14,7 @@ from pylint.utils.utils import (
+     HAS_ISORT_5,
+     IsortDriver,
+     _check_csv,
++    _check_regexp_csv,
+     _splitstrip,
+     _unquote,
+     decoding_stream,
+@@ -32,6 +33,7 @@ __all__ = [
+     "HAS_ISORT_5",
+     "IsortDriver",
+     "_check_csv",
++    "_check_regexp_csv",
+     "_splitstrip",
+     "_unquote",
+     "decoding_stream",
+diff --git a/pylint/utils/utils.py b/pylint/utils/utils.py
+index fa7f7b92f..7f673fa49 100644
+--- a/pylint/utils/utils.py
++++ b/pylint/utils/utils.py
+@@ -22,7 +22,7 @@ import sys
+ import textwrap
+ import tokenize
+ import warnings
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
+ from io import BufferedReader, BytesIO
+ from typing import (
+     TYPE_CHECKING,
+@@ -247,6 +247,32 @@ def _unquote(string: str) -> str:
+     return string
+ 
+ 
++def _check_regexp_csv(value: list[str] | tuple[str] | str) -> Iterable[str]:
++    r"""Split a comma separated string of regexes, keeping commas that are
++    inside a ``{...}`` quantifier (e.g. ``(foo{1,3})`` is one pattern).
++
++    Commas inside ``()`` or ``[]`` still split. An unclosed ``{`` is literal.
++    """
++    if isinstance(value, (list, tuple)):
++        yield from value
++        return
++    current: list[str] = []
++    in_braces = False
++    for i, char in enumerate(value):
++        if char == "{" and not in_braces and "}" in value[i:]:
++            in_braces = True
++        elif char == "}" and in_braces:
++            in_braces = False
++        elif char == "," and not in_braces:
++            if "".join(current).strip():
++                yield "".join(current).strip()
++            current = []
++            continue
++        current.append(char)
++    if "".join(current).strip():
++        yield "".join(current).strip()
++
++
+ def _check_csv(value: list[str] | tuple[str] | str) -> Sequence[str]:
+     if isinstance(value, (list, tuple)):
+         return value
+diff --git a/tests/config/test_config.py b/tests/config/test_config.py
+index 83c8b072e..c60941e10 100644
+--- a/tests/config/test_config.py
++++ b/tests/config/test_config.py
+@@ -137,16 +137,43 @@ def test_csv_regex_error(capsys: CaptureFixture) -> None:
+     """
+     with pytest.raises(SystemExit):
+         Run(
+-            [str(EMPTY_MODULE), r"--bad-names-rgx=(foo{1,3})"],
++            [str(EMPTY_MODULE), r"--bad-names-rgx=ok,(foo"],
+             exit=False,
+         )
+     output = capsys.readouterr()
+     assert (
+-        r"Error in provided regular expression: (foo{1 beginning at index 0: missing ), unterminated subpattern"
++        r"Error in provided regular expression: (foo beginning at index 0: missing ), unterminated subpattern"
+         in output.err
+     )
+ 
+ 
++@pytest.mark.parametrize(
++    "value,expected",
++    [
++        ("(foo{1,3})", ["(foo{1,3})"]),
++        ("a{1,2},b[x,y]", ["a{1,2}", "b[x", "y]"]),
++        ("foo{1,3},bar,(a,b)", ["foo{1,3}", "bar", "(a", "b)"]),
++        ("(a,b)", ["(a", "b)"]),
++        (" a , b,,c ", ["a", "b", "c"]),
++    ],
++)
++def test_regexp_csv_splitting(value: str, expected: list[str]) -> None:
++    """Commas split regexes except inside {} quantifiers."""
++    from pylint.config.argument import _regexp_csv_transfomer
++
++    # Invalid pieces like "(a" can't compile, so test the splitting helper.
++    from pylint.utils import _check_regexp_csv
++
++    assert list(_check_regexp_csv(value)) == expected
++    if value == "(foo{1,3})":
++        assert [p.pattern for p in _regexp_csv_transfomer(value)] == expected
++
++
++def test_bad_names_rgxs_with_quantifier_comma() -> None:
++    """The reported case runs without error."""
++    Run([str(EMPTY_MODULE), r"--bad-names-rgx=(foo{1,3})"], exit=False)
++
++
+ def test_short_verbose(capsys: CaptureFixture) -> None:
+     """Check that we correctly handle the -v flag."""
+     Run([str(EMPTY_MODULE), "-v"], exit=False)

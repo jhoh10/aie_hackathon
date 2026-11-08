@@ -59,6 +59,33 @@ How to behave:
 
 Reply with only your next message to the agent (or DONE)."""
 
+# With --brief, the engineer also knows what they want (their intent), as in
+# verification-first-developer-harness/evaluation/pocketbase/. Same engineer on every side, and it only
+# answers what it's asked or what a plan gets wrong, so only an agent that asks or shows a plan gets the intent.
+ENGINEER_BRIEF_PROMPT = """You are role-playing the software engineer who filed the GitHub issue below and asked a coding agent to resolve it. You know what you want (your intent, below) but you have not read the code, and you don't want to.
+
+How to behave:
+- If the agent asks you questions, answer them from your intent, briefly, in terms of behaviour (inputs and outputs), not code.
+- If it shows a plan or a list of checks, approve it ("Approved.") when it matches your intent. If something in it contradicts your intent, say what to change in one or two lines, and approve the rest.
+- Only say what its message asks about or gets wrong. Don't volunteer the rest of your intent. A real engineer answers what they're asked; they don't recite a spec.
+- Never mention files, functions, tests or code, and never mention that you were given an intent.
+- You cannot run commands or see the agent's machine. Never claim you ran anything or saw any output.
+- If the agent's latest message is a final report saying the work is finished and it asks nothing, reply with exactly: DONE
+
+<issue>
+{issue}
+</issue>
+
+<your_intent>
+{brief}
+</your_intent>
+
+<conversation_so_far>
+{conversation}
+</conversation_so_far>
+
+Reply with only your next message to the agent (or DONE)."""
+
 USER_PROMPT = """Please resolve this GitHub issue in the repository in the current directory.
 
 <issue>
@@ -109,11 +136,14 @@ def claude(args, cwd, log, tag, env=None):
     return result
 
 
-def engineer(issue, convo, model, workdir, log):
+def engineer(issue, convo, model, workdir, log, brief=None):
     edir = Path(workdir) / "engineer"
     edir.mkdir(parents=True, exist_ok=True)
     convo_text = "\n\n".join(f"[{who}]\n{text}" for who, text in convo)
-    prompt = ENGINEER_PROMPT.format(issue=issue, conversation=convo_text)
+    if brief:
+        prompt = ENGINEER_BRIEF_PROMPT.format(issue=issue, brief=brief, conversation=convo_text)
+    else:
+        prompt = ENGINEER_PROMPT.format(issue=issue, conversation=convo_text)
     r = claude([prompt, "--model", model, "--disallowedTools",
                 "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch", "Task", "NotebookEdit"],
                cwd=edir, log=log, tag="engineer")
@@ -155,7 +185,8 @@ def run_side(side, task, args):
         r = claude([msg, *a, *common], cwd=wt, log=log, tag=f"agent:{i}", env=agent_env)
         session = r["session_id"]
         convo.append(("agent", r["result"]))
-        reply, er = engineer(issue, convo, args.engineer_model, Path(args.workdir) / task["instance_id"] / args.run / f"eng_{side}", log)
+        reply, er = engineer(issue, convo, args.engineer_model, Path(args.workdir) / task["instance_id"] / args.run / f"eng_{side}", log,
+                              brief=Path(args.brief).read_text() if args.brief else None)
         rounds.append({"agent": r["result"], "engineer": reply,
                        "agent_cost": r.get("total_cost_usd", 0), "agent_secs": r["_wall"],
                        "agent_turns": r.get("num_turns"), "engineer_cost": er.get("total_cost_usd", 0)})
@@ -249,6 +280,7 @@ def main():
     ap.add_argument("--engineer-model", default="claude-sonnet-5-5")
     ap.add_argument("--max-rounds", type=int, default=6)
     ap.add_argument("--score-only", action="store_true")
+    ap.add_argument("--brief", help="File with the engineer's intent (see sim/briefs/); default: the engineer knows only the issue")
     ap.add_argument("--run", default="", help="Run name for repeated runs, e.g. run1 (outputs go in out/<task>/run1/)")
     args = ap.parse_args()
 
@@ -261,7 +293,8 @@ def main():
         score_side(side, task, args)
     (OUT / task["instance_id"] / args.run).mkdir(parents=True, exist_ok=True)
     (OUT / task["instance_id"] / args.run / "task.json").write_text(json.dumps(
-        {k: task[k] for k in ("instance_id", "repo", "problem_statement", "FAIL_TO_PASS", "test_patch", "patch")}, indent=1))
+        {**{k: task[k] for k in ("instance_id", "repo", "problem_statement", "FAIL_TO_PASS", "test_patch", "patch")},
+         **({"engineer_brief": Path(args.brief).read_text()} if args.brief else {})}, indent=1))
     print("Now run: python3 sim/viewer.py", task["instance_id"])
 
 
