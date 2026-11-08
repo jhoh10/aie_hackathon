@@ -25,7 +25,7 @@ def custom(name):
     if name == 'run':
         lines = [
             ('#8FB3F5', '$ node src/benchmark.ts dev verifier'),
-            ('#6F7F90', '# old and new commits in sealed containers, checks written blind to the code'),
+            ('#6F7F90', '# old + new commits in sealed containers, checks blind to code'),
             ('#F4F3EE', '22:22:46 inj1 verifier BLOCK reach 8/8'),
             ('#F0A272', '22:22:51 inj2 verifier BLOCK reach 6/6'),
             ('#6F7F90', '# reason: Undeclared breaking behaviour change in probe'),
@@ -57,8 +57,11 @@ parts = []
 for i, sc in enumerate(script):
     kind, name = sc['frame'].split(':')
     htmlf = WORK / f'{i}.html'; png = WORK / f'{i}.png'; aiff = WORK / f'{i}.aiff'; mp4 = WORK / f'{i}.mp4'
-    htmlf.write_text(slide(name) if kind == 'slide' else custom(name))
-    subprocess.run([CHROME, '--headless=new', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1920,1080',
+    if kind == 'image':
+        subprocess.run(['cp', str(HERE / name), str(png)], check=True)
+    else:
+      htmlf.write_text(slide(name) if kind == 'slide' else custom(name))
+      subprocess.run([CHROME, '--headless=new', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1920,1080',
                     '--virtual-time-budget=4000', f'--screenshot={png}', htmlf.as_uri()], check=True, capture_output=True)
     subprocess.run(['say', '-v', VOICE, '-r', '192', '-o', str(aiff), sc['text']], check=True)
     dur = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', str(aiff)]).decode())

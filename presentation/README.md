@@ -20,6 +20,13 @@ After changing `deck.json` or `slides/`, run `python3 presentation/build_pdf.py`
 
 ## Demo video
 
-`trust-issues-demo.mp4`: 59.8 seconds, 1080p, with a generated voiceover (macOS Samantha voice) and captions in `trust-issues-demo.srt`. It shows the process, a real recorded verifier run (case inj2), the code behind the verdict rule, and the benchmark results, including where we fall short.
+`trust-issues-demo.mp4`: 56.7 seconds, 1080p, with a generated voiceover (macOS Samantha voice) and captions in `trust-issues-demo.srt`. It walks through the deployed claim review app (https://verify-first-claim-review.lovable.app): the developer approving claims, then the reviewer packet. It also shows a real recorded verifier run (case inj2) and the benchmark results, including where we fall short.
 
-Rebuild it with `python3 video/build.py slides presentation/trust-issues-demo.mp4` from this folder (needs ffmpeg, Google Chrome and macOS `say`). The narration is in `video/script.json`.
+To rebuild it from this folder (needs ffmpeg, Google Chrome and macOS `say`):
+
+```bash
+node video/capture.mjs video/app
+python3 video/build.py slides trust-issues-demo.mp4
+```
+
+`capture.mjs` drives the live app in headless Chrome to take the screenshots. The narration is in `video/script.json`; frame paths there are relative to `video/`.
