@@ -28,3 +28,6 @@ venv/
 
 # Simulation checkouts and envs
 sim/work/
+
+# Live demo outputs (presentation/live-demo.md)
+sim/out/*/live/
