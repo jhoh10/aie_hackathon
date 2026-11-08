@@ -1,30 +1,34 @@
 [
  {
   "frame": "slide:cover",
-  "text": "AI writes more code than anyone can read. We're Trust Issues. Our idea: stop reading diffs, and check the proof instead."
+  "text": "AI writes more code than anyone can read. We're Trust Issues. Stop reading diffs, and check the proof instead."
  },
  {
-  "frame": "slide:process",
-  "text": "An engineer approves a few plain-language claims. Our verifier writes its own checks without seeing the code, and runs them on the old and new versions in a sealed sandbox."
+  "frame": "image:app/app-dev-top.png",
+  "text": "Before any code is written, the engineer opens our app and reviews a short plan: plain-language claims, each with the check that will prove it."
+ },
+ {
+  "frame": "image:app/app-dev-approved.png",
+  "text": "They approve claims, not code. Seven claims for this sympy fix, approved in a few clicks."
  },
  {
   "frame": "custom:run",
-  "text": "Here's a real run we built today. A plausible login fix passes the project's own tests. The verifier blocks it."
+  "text": "Then our verifier writes its own checks, blind to the code, and runs them on the old and new versions in a sealed sandbox. This login fix passes CI, and gets blocked."
  },
  {
   "frame": "slide:evidence",
-  "text": "Because it replays the same logins on both versions, and shows the email's real owner is now locked out. Anyone can rerun this evidence."
+  "text": "The evidence: the email's real owner is locked out. Anyone can rerun it."
  },
  {
-  "frame": "custom:code",
-  "text": "Under the hood: a no-network Docker sandbox, blind check writing, and a rule that a check only counts if it fails before the change and passes after."
+  "frame": "image:app/app-review-untested.png",
+  "text": "Reviewers get a packet instead of a diff: what the PR does, which behaviours are proven, and three with no test at all."
  },
  {
   "frame": "slide:results",
-  "text": "On twenty real PocketBase pull requests, CI stopped none of twelve bad ones. Our verifier stopped ten, including all three built to game it. AI review did better still, and we flag too many honest fixes."
+  "text": "On twenty real PocketBase pull requests, CI stopped none of twelve bad ones. Our verifier stopped ten. AI review did better still, so our next step is fewer false alarms."
  },
  {
-  "frame": "slide:attention",
-  "text": "Next: tighter evidence summaries, so the engineer reads less. Trust Issues. Code and full results are in our repo."
+  "frame": "slide:cover",
+  "text": "Trust Issues. The app, code and full results are in our repo."
  }
 ]
