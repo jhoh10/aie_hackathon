@@ -4,7 +4,7 @@
 Usage: python3 presentation/build_pdf.py [--chrome PATH] [--workdir DIR]
 
 Needs Google Chrome (headless) and network access for the Google Fonts the deck uses.
-The claude.ai Slides artifact stays the editable original; this is a read-only export.
+The slide HTML in slides/ is the source; this is a read-only export.
 """
 import argparse
 import json

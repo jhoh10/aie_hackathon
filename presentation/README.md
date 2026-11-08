@@ -2,15 +2,14 @@
 
 **To view:** [slides.pdf](slides.pdf) opens on GitHub (6 slides). All metrics in one page: [metrics.md](metrics.md). The verifier results tables are in [../verifier/results/summary.md](../verifier/results/summary.md).
 
-Editable originals on claude.ai. They are private to their owner's account until shared from each page's Share menu, so only the owner can open these links for now:
+What's in this folder:
 
-- Slide deck: https://claude.ai/artifact/7xuTH5ZMozXnB3w5Wa3WRW (downloads as PowerPoint or PDF)
-- Results diagrams: https://claude.ai/artifact/7cH4e89QAiXjvaW2zWs3Ci
-
-The files here are their sources, so the team keeps them if the links change:
-
-- `deck.json` and `slides/`: the 6 slides in the Slides artifact format (cover, process before and after, what a person reads, real evidence from case inj2, independence rules, results).
-- `results-page/index.html`: the diagrams page. It reads `verifier/results/per-case.json` through the dashboard runtime, so it only renders inside that artifact.
+- [slides.pdf](slides.pdf): the 6 slides (cover, process before and after, what a person reads and decides, real evidence from case inj2, independence rules, results). Rebuild with `python3 build_pdf.py` after editing a slide.
+- [trust-issues-demo.mp4](trust-issues-demo.mp4): the one-minute demo video, with captions in [trust-issues-demo.srt](trust-issues-demo.srt).
+- [metrics.md](metrics.md): every metric in one page.
+- `deck.json` and `slides/`: the slide sources.
+- `results-page/index.html`: source of the results diagrams page. It draws from [../verifier/results/per-case.json](../verifier/results/per-case.json) and needs the dashboard runtime it was written for, so on GitHub use [../verifier/results/summary.md](../verifier/results/summary.md) for the same numbers.
+- `video/`: the scripts that captured the app, rendered the frames and stitched the narration.
 
 Every number on the slides comes from `verifier/results/`.
 
