@@ -1,6 +1,6 @@
 # Presentation graphics
 
-**To view:** [slides.pdf](slides.pdf) opens on GitHub (6 slides). The results tables are in [../verifier/results/summary.md](../verifier/results/summary.md).
+**To view:** [slides.pdf](slides.pdf) opens on GitHub (6 slides). All metrics in one page: [metrics.md](metrics.md). The verifier results tables are in [../verifier/results/summary.md](../verifier/results/summary.md).
 
 Editable originals on claude.ai. They are private to their owner's account until shared from each page's Share menu, so only the owner can open these links for now:
 
