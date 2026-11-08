@@ -8,7 +8,7 @@ What's in this folder:
 - [trust-issues-demo.mp4](trust-issues-demo.mp4): the one-minute demo video, with captions in [trust-issues-demo.srt](trust-issues-demo.srt).
 - [metrics.md](metrics.md): every metric in one page.
 - [compare-brief.html](compare-brief.html): the recorded side-by-side page from Act 1 of the live demo (pylint-8898, run `brief2`). Default Claude Code vs the verification-first harness, with the engineer knowing the intent. Both sides pass the hidden test: the harness was corrected at plan time, and the default agent reworked after building. Its source is `sim/out/pylint-dev__pylint-8898/brief2/compare.html`.
-- [metrics-talk.html](metrics-talk.html): three light slides for a one-minute metrics pitch. Open in a browser; arrow keys or click to advance, `f` for fullscreen.
+- [metrics-talk.html](metrics-talk.html): five light slides (background, then the numbers) for a one-minute metrics pitch. Open in a browser; arrow keys or click to advance, `f` for fullscreen.
 - [live-demo.md](live-demo.md): a runbook for Claude Code. Say "Run presentation/live-demo.md" and it runs default vs the developer harness live on pylint-8898, then the reviewer harness on the result, and opens both pages. About 3–4 minutes and $1.60 (rehearsed 2026-11-07); outputs go to the git-ignored `sim/out/<task>/live/`.
 - `deck.json` and `slides/`: the slide sources.
 - `results-page/index.html`: source of the results diagrams page. It draws from [../verifier/results/per-case.json](../verifier/results/per-case.json) and needs the dashboard runtime it was written for, so on GitHub use [../verifier/results/summary.md](../verifier/results/summary.md) for the same numbers.

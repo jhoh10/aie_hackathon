@@ -51,6 +51,21 @@
   .row.us .fill { background: var(--us); }
   .row.zero .val { color: var(--bad); }
 
+  /* three-up stats and background cards */
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: auto; }
+  .trio .stat { padding: 40px 44px; }
+  .trio .num { font-size: 104px; }
+  .trio .label { color: var(--ink); font-weight: 600; }
+  .trio .vs { font-size: 26px; line-height: 1.4; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+    padding: 40px 44px; display: flex; flex-direction: column; gap: 16px; }
+  .card .step { font-size: 24px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); }
+  .card h3 { font-size: 40px; font-weight: 600; line-height: 1.15; }
+  .card p { font-size: 28px; line-height: 1.45; color: var(--muted); }
+  .card.us { border-color: var(--us); }
+  .card.us .step { color: var(--us); }
+
   .note { font-size: 26px; color: var(--muted); }
   .foot { position: absolute; left: 140px; right: 140px; bottom: 56px;
     display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); }
@@ -62,8 +77,32 @@
 <body>
 <div class="stage" id="stage">
 
-  <!-- 1: developer harness -->
+  <!-- 0: background -->
   <section class="slide on">
+    <div class="kicker">Trust issues</div>
+    <h1>AI writes the PR and CI goes green. <em>Is it right?</em></h1>
+    <p class="sub">Agents guess when an issue leaves a decision open, and a passing test suite says nothing about the change itself. We built a check on each side of the PR.</p>
+    <div class="trio">
+      <div class="card us">
+        <div class="step">Before the PR</div>
+        <h3>Developer harness</h3>
+        <p>Plans first and puts open questions to the engineer before writing any code.</p>
+      </div>
+      <div class="card us">
+        <div class="step">At the PR</div>
+        <h3>Verifier</h3>
+        <p>Turns approved claims into checks, runs them on the old and new code, and returns a verdict with evidence.</p>
+      </div>
+      <div class="card">
+        <div class="step">Tested on</div>
+        <h3>Real PocketBase code</h3>
+        <p>10 upstream issues for the harness. 20 PRs for the verifier: 8 honest fixes, 4 reverted fixes, 8 bad PRs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1: developer harness -->
+  <section class="slide">
     <div class="kicker">Before the PR</div>
     <h1>The harness asks first, so it <em>builds the right thing</em>.</h1>
     <p class="sub">7 real PocketBase issues that leave a design decision open, graded by the upstream fix’s hidden tests.</p>
@@ -93,10 +132,34 @@
       <div class="row"><span class="name">AI review of the diff</span><div class="track"><div class="fill" data-v="12"></div></div><span class="val">12</span></div>
       <div class="row us"><span class="name">Our verifier</span><div class="track"><div class="fill" data-v="10"></div></div><span class="val">10</span></div>
     </div>
-    <p class="note">The verifier stopped all 3 PRs built to game the checks, with evidence anyone can rerun.</p>
+    <p class="note">CI ran the project’s own tests and passed every bad PR. AI review caught them all too, but leaves only an opinion behind.</p>
   </section>
 
-  <!-- 3: honest about the gap -->
+  <!-- 3: evidence and cost -->
+  <section class="slide">
+    <div class="kicker">What a verdict is made of</div>
+    <h1>Every stop comes with <em>evidence you can rerun</em>.</h1>
+    <p class="sub">The verifier runs each check on both the old and the new code, so a verdict points at behaviour that changed.</p>
+    <div class="trio">
+      <div class="stat hl">
+        <div class="label">PRs built to game the checks</div>
+        <div class="num">3<small>/3</small></div>
+        <div class="vs">stopped by the verifier</div>
+      </div>
+      <div class="stat hl">
+        <div class="label">Changed code fully reached</div>
+        <div class="num">13<small>/19</small></div>
+        <div class="vs">scored cases; 61–88% on the rest</div>
+      </div>
+      <div class="stat">
+        <div class="label">Cost per PR</div>
+        <div class="num">~2<small> min</small></div>
+        <div class="vs">median 109 s and ~14k tokens; 20 s when cached</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4: honest about the gap -->
   <section class="slide">
     <div class="kicker">Where we fall short</div>
     <h1>Too many honest fixes get stopped.</h1>
