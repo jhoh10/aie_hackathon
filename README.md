@@ -73,7 +73,8 @@ We built a benchmark of **20 real-world PRs on [PocketBase](https://github.com/p
   | `beta@probe.io` + Beta's password | 200 | **400, Beta locked out** |
   | `betauser` + Beta's password | 200 | 200 |
 
-- On the harness side, the lean prompt cut cost from $0.88 to $0.42 and time from 2.5 to 1.3 minutes per task on SWE-bench `pylint-8898`, with one engineer reply per task ([evaluation](verification-first-developer-harness/evaluation/)).
+- **The developer harness builds the right thing when the issue leaves a decision open.** On 7 real PocketBase issues like that, it passed the maintainers' hidden tests **7 of 7**, against **5 of 7** for default Claude Code. Default Claude guessed on `idchars` (its own list of forbidden id characters) and `oauth`. The harness raised the open question in its plan on all 7, before writing code, so the engineer could settle it with one reply. It costs about 2.6× more ($10.17 vs $3.89 for all 7). On 3 clear control issues it bought nothing (2 of 3 each). [Report](verification-first-developer-harness/evaluation/pocketbase/results/report.md).
+- The lean harness prompt cut cost from $0.88 to $0.42 and time from 2.5 to 1.3 minutes per task on SWE-bench `pylint-8898`, with one engineer reply per task ([evaluation](verification-first-developer-harness/evaluation/)).
 
 **Where it falls short**
 
@@ -190,5 +191,4 @@ The reviewer side works the same way with [verification-first-reviewer-harness/r
 - Slides: [presentation/slides.pdf](presentation/slides.pdf) (6 slides, opens on GitHub; sources and the editable original in [presentation/](presentation/README.md))
 - Results: [verifier/results/summary.md](verifier/results/summary.md) (all 20 benchmark cases; the results slide is the last page of the slides)
 - Interactive app (Developer + Reviewer tabs): https://verify-first-claim-review.lovable.app. Code in [lovable/](lovable/), copied with its history from [kolumba-ai/verify-first-claim-review](https://github.com/kolumba-ai/verify-first-claim-review), which stays the copy Lovable syncs with. To run it locally: `cd lovable && npm install && npm run dev`.
-- Submission form:
-- Demo video:
+- Demo video: [presentation/trust-issues-demo.mp4](presentation/trust-issues-demo.mp4) (one minute, captions in [trust-issues-demo.srt](presentation/trust-issues-demo.srt))

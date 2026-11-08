@@ -9,11 +9,11 @@ Planned backwards from the **5:00 PM PT submission deadline** (from the CV page,
 - [x] **11:45 AM: idea locked, roles split.** Idea 1 picked, owners below, deadline confirmed.
 - [ ] **12:30 PM: stack and skeleton (overdue, nearly done).** "Running it" in the README filled in and the verifier wired to Muse Spark. Left: Meta billing (key accepted, but chat calls return 402 `billing_not_configured`).
 - [ ] **1:30 PM: hello world end to end (done with hand-written checks).** Harness side done: DT ran plan → approval → build → report on two SWE-bench tasks (verification-first-developer-harness/evaluation/). Hand-off done: `src/handoff.ts` runs an approved plan through the verifier, PASS on `h-bearer` (verification-first-developer-harness/README.md, "End to end"). Still missing: the real model instead of hand-written answers (blocked on Meta billing), and the demo scenario named in the README's "Demo moment".
-- [ ] **2:00 PM: benchmark running (started, handed to SB at 2:20).** A first dev run got partway on Jon's machine; see SB's Now line for what's left.
+- [x] **2:00 PM: benchmark running (done ~2:45 PM, SB).** All 20 cases scored against CI, implementer tests, AI review and the verifier (verifier/results/summary.md).
 - [ ] **3:00 PM: demo moment works.** The live scenario runs reliably, using the Meta API if we have keys. If it isn't working by now, cut scope; don't move the freeze.
-- [ ] **3:30 PM: numbers in.** The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier). Also the reviewer harness checkpoint: if it isn't working by now, show it as a short walkthrough on top of the verifier results, not as an evaluated component.
+- [x] **3:30 PM: numbers in (done ~4:30 PM, JH).** All metrics in presentation/metrics.md. The 2–3 benchmark numbers that go in the demo are picked. They support the demo; a dashboard can't be the main feature (disqualifier). Also the reviewer harness checkpoint: if it isn't working by now, show it as a short walkthrough on top of the verifier results, not as an evaluated component.
 - [ ] **4:00 PM: feature freeze.** Only bug fixes after this. Demo script written, slides started.
-- [ ] **4:30 PM: demo assets.** One-minute demo video recorded, slides done, README has the pitch, team and how to run it.
+- [x] **4:30 PM: demo assets (video, slides and README done).** One-minute demo video recorded, slides done, README has the pitch, team and how to run it.
 - [ ] **4:45 PM: submitted.** Public repo, video, every member on the submission page. 15 minutes of buffer.
 - [ ] **4:45–5:00 PM: rehearse.** Run the 3-minute live demo twice.
 
@@ -29,23 +29,20 @@ Focus for the rest of the day (2:25 PM): so far we've built for the developer ma
 
 ## Now
 
-Updated 3:40 PM. **Open work is in "Open: pick one up", most urgent first.** Put your initials on a line before you start it, and push straight away so no one doubles up.
+Updated 4:37 PM. **Open work is in "Open: pick one up", most urgent first.** Put your initials on a line before you start it, and push straight away so no one doubles up.
 
 ### In progress
 
 - [ ] [DT] Reviewer harness: scoped in docs/decisions.md and first version built (verification-first-reviewer-harness/, real pylint-8898 example plus three more). Next: show the packet on the verifier PR page next to the verdict, and measure it against a raw-diff review. Checkpoint was 3:30 PM.
-- [ ] [SB] Commit the raw benchmark results (`verifier/.work/results/dev`, `holdout` and the `.usage.json` files from `.work/gen`) under `verifier/results/raw/`, so `metrics.ts` can run on any machine. Without them, tokens (metric 4) and wall time (6) aren't reported.
-- [ ] [SB] Run the simulated engineer: `node src/benchmark.ts dev sim` and `holdout sim` (needs `verifier.json` from that split and a model). It has never run, so metric 5 (reviewer load: tokens read and effort, today vs ours) has no numbers yet. That's our best answer to "plain AI review already stops 12 of 12".
-- [ ] [JH] Metrics (AIE-5): pick the 2–3 numbers for the demo and the slide (overdue since 3:30). Settled now: the verifier stopped 10 of 12 bad PRs, CI stopped 0 (verifier/results/summary.md). Waiting on SB: reviewer load (metric 5). Be upfront that the verifier passed only 1 of 8 honest PRs (3 wrongly blocked, 4 sent to a person) and that AI review did better on 1–3. Definitions in verifier/docs/metrics.md (now including developer-side metrics 8 and 9).
 - [ ] [MA] Lean for software verification: decide **now** (was due 1:30 PM) whether it goes in the demo or becomes a "what's next" slide.
 
 ### Open: pick one up
 
 1. [x] [JH] **Demo scenario picked (3:58 PM): A, then D, with C as the fallback.** A: the developer harness on `idchars`. Default Claude guesses its own list of forbidden id characters and fails the hidden tests; our harness shows a plan, the engineer adds one line, it passes (results in verification-first-developer-harness/evaluation/pocketbase/results/). D: the reviewer packet on pylint-8898 (`verification-first-reviewer-harness/examples/pylint-8898/review.html`). C: `h-bearer` plan-to-PASS if anything breaks. Options and reasoning: docs/decisions.md and the "Demo scenario options" doc (ask JH to share it).
 2. [x] [JH] **Demo script written** in docs/submission.md: timed lines, stage setup (4 tabs), fallback, and Q&A answers, including the honest ones (AI review, simulated reviewer, cost). Rehearse it twice.
-3. [ ] **Slides.** SB's 6-slide deck and diagrams are in presentation/. Add the numbers slide from JH and a "what's next" slide (Lean from MA, extended split, developer-side eval).
-4. [ ] **One-minute demo video** as a backup in case the live demo fails: a screen capture of the `idchars` default vs harness runs works for this. Due 4:30 PM.
-5. [ ] **README pitch, team and links**, then **submit the form** (every member listed, repo public and readable by judges). Due 4:45 PM. Check the README and pitch say "developer harness" and "reviewer harness" consistently.
+3. [ ] **Slides.** SB's 6-slide deck and diagrams are in presentation/ (slides.pdf). Still missing: the numbers slide from JH and a "what's next" slide (Lean from MA, extended split, developer-side eval).
+4. [x] [SB] **One-minute demo video** (done: presentation/trust-issues-demo.mp4) as a backup in case the live demo fails: a screen capture of the `idchars` default vs harness runs works for this. Due 4:30 PM.
+5. [ ] **README pitch, team and links** (done), then **submit the form** (still open) (every member listed, repo public and readable by judges). Due 4:45 PM. Check the README and pitch say "developer harness" and "reviewer harness" consistently.
 6. [ ] **Did anyone claim the $100 Meta credits?** The claim closed at 3:00 PM (form on the CV details page, see resources/sponsors.md). If billing got set up, the 402 `billing_not_configured` may be fixed: try one verifier call with `META_API_KEY`. Real Muse Spark calls are what the Meta prize is judged on.
 7. [ ] **Run the extended split** (19 new cases, verifier/cases/README.md): from `verifier/`, `node --no-warnings src/benchmark.ts extended`. CI step done (19/19 pass, reverts included); the model steps need `META_API_KEY` or saved answers. Gives a false-alarm rate on 18 good cases instead of 8. Nice to have; a "what's next" line if it doesn't finish.
 8. [ ] [SB] Verifier: test the PR page and GitHub status end to end (not tried yet). Only if the demo uses the PR page.
@@ -74,6 +71,11 @@ After the freeze, only if there's time. Otherwise these are "what's next" materi
 
 ## Done
 
+- [x] [JH] Metrics (AIE-5): all numbers in one page, presentation/metrics.md, linked from the README (2026-11-07)
+- [x] [SB] Simulated engineer run on dev and holdout; held-out: 5 of 12 right from the verdict vs 12 of 12 from the diff (verifier/results/raw/) (2026-11-07)
+- [x] [SB] Raw benchmark results committed under verifier/results/raw/, so metrics.ts runs without a clone (2026-11-07)
+- [x] [SB] One-minute demo video: presentation/trust-issues-demo.mp4 (2026-11-07)
+- [x] [JH] Pre-submission repo review: README gets the developer-side result and the video link, tracking docs brought up to date (2026-11-07)
 - [x] [JH] Developer-side eval run on all 10 tasks, both arms; report with hand marks in verification-first-developer-harness/evaluation/pocketbase/results/report.md. Ambiguous: harness 7/7, default 5/7, $10.17 vs $3.89. Controls: 2/3 each (cascade fails on both). Surfaced the open question: harness 7/7, default 0/7 (2026-11-07)
 - [x] [MA] Lovable app (Developer + Reviewer tabs) copied into `lovable/` from kolumba-ai/verify-first-claim-review, linked from the README (2026-11-07)
 - [x] [SB] Evals and dataset: 20 PocketBase PRs (8 real fixes, 4 reverts, 8 authored bad PRs), see verifier/cases/README.md (2026-11-07)
